@@ -85,7 +85,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: '22nvcrl04-2IRIAKE',
+    google: '22nvcrl04-2IRlAkERr-6ib_TAw50M3poVrxxBjW1RQ',
     // yandex: 'your-yandex-verification-code',
   },
 }
