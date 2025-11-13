@@ -4,7 +4,12 @@ export function OrganizationSchema() {
     '@type': 'Organization',
     name: 'Raven Tech Group',
     url: 'https://www.raventechgroup.com',
-    logo: 'https://www.raventechgroup.com/images/logos/raven_logo.png',
+    logo: {
+      '@type': 'ImageObject',
+      url: 'https://www.raventechgroup.com/images/favicon/web-app-manifest-512x512.png',
+      width: 512,
+      height: 512,
+    },
     description: 'Raven Tech Group provides cutting-edge technology solutions, software development, and IT consulting services across Africa and Europe.',
     address: {
       '@type': 'PostalAddress',
