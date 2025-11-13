@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null
 
 // Simple in-memory rate limiting (in production, use Redis or similar)
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>()
@@ -127,6 +127,13 @@ export async function POST(request: NextRequest) {
     // Send email using Resend
     // Note: To use a custom "from" address, verify your domain with Resend first
     // For now, using Resend's default sender. Update the "from" field after domain verification.
+    if (!resend) {
+      return NextResponse.json(
+        { error: 'Email service not configured. Please set RESEND_API_KEY environment variable.' },
+        { status: 500 }
+      )
+    }
+
     const { data, error } = await resend.emails.send({
       from: 'Raven Tech Group Website <onboarding@resend.dev>',
       to: ['hello@raventechgroup.com'],
