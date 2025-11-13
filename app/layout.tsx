@@ -59,9 +59,9 @@ export const metadata: Metadata = {
     siteName: 'Raven Tech Group',
     images: [
       {
-        url: '/images/og-image.jpg',
-        width: 1200,
-        height: 630,
+        url: '/images/favicon/web-app-manifest-512x512.png',
+        width: 512,
+        height: 512,
         alt: 'Raven Tech Group - Technology Solutions',
       },
     ],
@@ -71,7 +71,7 @@ export const metadata: Metadata = {
     title: 'Raven Tech Group - Innovative Technology Solutions',
     description: 'Raven Tech Group provides cutting-edge technology solutions, software development, and IT consulting services. Transform your business with innovative technology.',
     creator: '@raventechgroup',
-    images: ['/images/og-image.jpg'],
+    images: ['/images/favicon/web-app-manifest-512x512.png'],
   },
   robots: {
     index: true,
