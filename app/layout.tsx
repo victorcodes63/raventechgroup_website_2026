@@ -85,8 +85,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // Add your verification codes here when available
-    // google: 'your-google-verification-code',
+    google: '22nvcrl04-2IRIAKE',
     // yandex: 'your-yandex-verification-code',
   },
 }
