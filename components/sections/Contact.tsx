@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, FormEvent } from 'react'
+import { useState, FormEvent, useRef } from 'react'
 import { motion } from 'framer-motion'
 import { Send, Mail, Phone, MapPin, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { fadeInUp, staggerContainer, scrollReveal } from '@/lib/animations'
@@ -36,6 +36,7 @@ export function Contact({ variant = 'default' }: ContactProps) {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const formRef = useRef<HTMLFormElement>(null)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault()
@@ -43,7 +44,13 @@ export function Contact({ variant = 'default' }: ContactProps) {
     setSubmitStatus('idle')
     setErrorMessage('')
 
-    const formData = new FormData(e.currentTarget)
+    const form = e.currentTarget || formRef.current
+    if (!form) {
+      setIsSubmitting(false)
+      return
+    }
+
+    const formData = new FormData(form)
     const data = {
       name: formData.get('name'),
       email: formData.get('email'),
@@ -73,7 +80,13 @@ export function Contact({ variant = 'default' }: ContactProps) {
       }
 
       setSubmitStatus('success')
-      e.currentTarget.reset()
+      
+      // Reset form safely
+      if (formRef.current) {
+        formRef.current.reset()
+      } else if (e.currentTarget) {
+        e.currentTarget.reset()
+      }
       
       // Track form submission in Google Analytics
       trackEvent('form_submit', 'contact', isHomepage ? 'homepage' : 'contact_page')
@@ -213,7 +226,7 @@ export function Contact({ variant = 'default' }: ContactProps) {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
               )}
               <div className="relative z-10">
-              <form onSubmit={handleSubmit} className={`grid gap-5 sm:gap-6 ${isHomepage ? 'sm:grid-cols-2' : 'sm:grid-cols-2'}`}>
+              <form ref={formRef} onSubmit={handleSubmit} className={`grid gap-5 sm:gap-6 ${isHomepage ? 'sm:grid-cols-2' : 'sm:grid-cols-2'}`}>
                 <motion.div
                   whileFocus={{ scale: 1.02 }}
                   transition={{ duration: 0.2 }}
