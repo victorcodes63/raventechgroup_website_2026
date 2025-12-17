@@ -25,7 +25,7 @@ const nextConfig = {
   poweredByHeader: false,
   // Experimental features for better performance
   experimental: {
-    optimizeCss: true,
+    // optimizeCss: true, // Critters dependency issue in Next.js 16
   },
   // Security headers
   async headers() {
