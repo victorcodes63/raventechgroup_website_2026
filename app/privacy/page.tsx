@@ -47,7 +47,7 @@ const sections = [
 
 export default function PrivacyPage() {
   return (
-    <main className="bg-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <section className="border-b border-white/10 bg-gradient-to-b from-black via-black to-zinc-950">
         <div className="container mx-auto px-4 pb-16 pt-32 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl">
@@ -100,7 +100,7 @@ export default function PrivacyPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   )
 }
 

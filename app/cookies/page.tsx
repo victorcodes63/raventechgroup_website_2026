@@ -6,7 +6,7 @@ import { fadeInUp, staggerContainer } from '@/lib/animations'
 
 export default function CookiesPage() {
   return (
-    <main className="bg-black text-white">
+    <div className="min-h-screen bg-black text-white">
       <section className="border-b border-white/10 bg-gradient-to-b from-black via-black to-zinc-950">
         <div className="container mx-auto px-4 pb-24 pt-32 sm:px-6 lg:px-8">
           <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="mx-auto max-w-3xl space-y-6 text-center">
@@ -68,7 +68,7 @@ export default function CookiesPage() {
           </div>
         </div>
       </section>
-    </main>
+    </div>
   )
 }
 
