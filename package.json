@@ -9,18 +9,30 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "download:service-images": "node scripts/download-service-images.js"
   },
   "dependencies": {
+    "@neondatabase/serverless": "^1.1.0",
+    "@phosphor-icons/react": "^2.1.10",
+    "@tailwindcss/typography": "^0.5.19",
+    "aceternity-ui": "^0.2.2",
+    "clsx": "^2.1.1",
     "framer-motion": "^11.0.5",
+    "isomorphic-dompurify": "^3.9.0",
     "lucide-react": "^0.323.0",
     "next": "^16.0.1",
     "next-seo": "^6.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "resend": "^4.0.0"
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1",
+    "resend": "^4.0.0",
+    "tailwind-merge": "^3.5.0",
+    "zod": "^4.3.6"
   },
   "devDependencies": {
+    "@types/dompurify": "^3.0.5",
     "@types/node": "^20.11.5",
     "@types/react": "^18.2.48",
     "@types/react-dom": "^18.2.18",
@@ -29,6 +41,7 @@
     "eslint-config-next": "^14.1.0",
     "postcss": "^8.4.33",
     "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.3.3"
   }
 }
