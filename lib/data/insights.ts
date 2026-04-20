@@ -105,7 +105,7 @@ export const insights: Insight[] = [
     heroImage: '/images/insights/sacco-mistakes-hero.jpg',
     heroImageAlt: 'Members at a SACCO meeting with documents and mobile phones',
     publishedAt: '2026-04-20',
-    readingTime: '10 min read',
+    readingTime: '11 min read',
     author: VICTOR,
     tableOfContents: [
       { id: 'why-saccos-are-especially-hard-to-digitise-well', label: 'Why SACCOs are especially hard to digitise well', level: 2 },
@@ -171,7 +171,7 @@ export const insights: Insight[] = [
     heroImage: '/images/insights/cost-breakdown-hero.jpg',
     heroImageAlt: 'Desk with laptop and financial planning notes',
     publishedAt: '2026-04-20',
-    readingTime: '11 min read',
+    readingTime: '12 min read',
     author: VICTOR,
     tableOfContents: [
       { id: 'why-this-article-exists', label: 'Why this article exists', level: 2 },
