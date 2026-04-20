@@ -9,47 +9,150 @@
 
   html {
     scroll-behavior: smooth;
+    overflow-x: clip;
+    max-width: 100%;
+    scroll-padding-top: 5rem;
+    font-size: 100%;
   }
 
   body {
-    @apply bg-white text-dark-900 font-light;
+    @apply bg-[#0A0A0A] text-white font-light;
     font-feature-settings: 'rlig' 1, 'calt' 1;
+    overflow-x: clip;
+    max-width: 100%;
   }
 
   /* Typography improvements */
   h1, h2, h3, h4, h5, h6 {
     @apply font-medium tracking-tight;
   }
+}
 
-  h1 {
-    @apply text-4xl md:text-5xl lg:text-6xl;
+@layer components {
+  /** Native `<select>` chevron on dark form surfaces — avoids inline background styles */
+  .contact-form-select-chevron-dark {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-opacity='0.35' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 0.75rem center;
+    background-size: 1rem;
   }
 
-  h2 {
-    @apply text-3xl md:text-4xl lg:text-5xl;
+  .site-shell {
+    width: 100%;
+    padding-inline: clamp(16px, 3.5vw, 56px);
   }
 
-  h3 {
-    @apply text-2xl md:text-3xl lg:text-4xl;
+  .content-wrap {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1440px;
   }
 
-  h4 {
-    @apply text-xl md:text-2xl lg:text-3xl;
+  .content-wrap-wide {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 1600px;
   }
 
-  p {
-    @apply text-base md:text-lg leading-relaxed font-light;
+  .content-wrap-narrow {
+    margin-inline: auto;
+    width: 100%;
+    max-width: 860px;
   }
 
-  /* Smooth scrolling for anchor links */
-  html {
-    scroll-padding-top: 80px;
+  /* Hero client logo marquee — fills the full content column, clips at its right edge */
+  .hero-client-marquee {
+    overflow-x: clip;
+    overflow-y: hidden;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .hero-client-marquee-track {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    gap: 48px;
+    padding-left: 1rem;
+    animation: hero-marquee-scroll 24s linear infinite;
+    width: max-content;
+  }
+
+  @keyframes hero-marquee-scroll {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .hero-client-marquee-track {
+      animation: none;
+    }
+  }
+
+  /** Insights / long-form — dark prose on #0A0A0A */
+  .prose-raven {
+    --tw-prose-body: rgba(255, 255, 255, 0.75);
+    --tw-prose-headings: #ffffff;
+    --tw-prose-links: #ffa91f;
+    --tw-prose-bold: #ffffff;
+    --tw-prose-quotes: rgba(255, 255, 255, 0.75);
+    --tw-prose-quote-borders: #ffa91f;
+    --tw-prose-bullets: rgba(255, 255, 255, 0.45);
+  }
+
+  .prose-raven pre {
+    @apply rounded-card border border-white/[0.12] bg-[#111111] p-4 text-sm leading-relaxed;
+  }
+
+  .prose-raven code {
+    @apply rounded-card bg-white/[0.06] px-1.5 py-0.5 text-[0.9em] text-white/85;
+  }
+
+  .prose-raven pre code {
+    @apply bg-transparent p-0 text-white/90;
+  }
+
+  .prose-raven blockquote {
+    @apply border-l-2 border-[#FFA91F] pl-6 text-xl italic text-white/75;
   }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+
+  /**
+   * Service page “How we work” timeline — brand amber pulse travels left → right.
+   * Color matches Tailwind `brand.500` (#FFA91F). Applied only when JS allows motion.
+   */
+  .service-delivery-timeline-pulse {
+    background-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 169, 31, 0) 36%,
+      rgba(255, 169, 31, 0.92) 50%,
+      rgba(255, 169, 31, 0) 64%,
+      transparent 100%
+    );
+    background-size: 42% 100%;
+    background-repeat: no-repeat;
+    animation: service-delivery-timeline-pulse-shift 2.85s ease-in-out infinite;
+  }
+
+  @keyframes service-delivery-timeline-pulse-shift {
+    0% {
+      background-position: -42% 50%;
+    }
+    100% {
+      background-position: 142% 50%;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-delivery-timeline-pulse {
+      animation: none;
+    }
   }
 
   /* Touch manipulation for better mobile performance */
@@ -65,26 +168,54 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-track {
-    @apply bg-dark-100;
+    background: #111111;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-dark-300 rounded-full;
+    background: #333333;
+    border-radius: 9999px;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    @apply bg-dark-400;
+    background: #444444;
   }
 
   /* Mobile-specific utilities */
   @media (max-width: 640px) {
-    /* Ensure minimum touch target size */
-    button,
+    /* Ensure minimum touch target size — exclude thin custom controls (e.g. hero panel progress) */
+    button:not(.hero-progress-track),
     a[role="button"],
     input[type="button"],
     input[type="submit"] {
       min-height: 44px;
       min-width: 44px;
+    }
+  }
+
+  /* About page hero — amber grid (homepage design language, no inline background styles) */
+  .about-hero-grid {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Crect x='0.4' y='0.4' width='59.2' height='59.2' fill='none' stroke='rgba(255%2C169%2C30%2C0.18)' stroke-width='0.8' /%3E%3Cpath d='M30 0 V60 M0 30 H60' fill='none' stroke='rgba(255%2C169%2C30%2C0.08)' stroke-width='0.65' /%3E%3C/svg%3E");
+    background-size: 60px 60px;
+    background-repeat: repeat;
+  }
+
+  @keyframes about-hero-grid-drift {
+    0%,
+    100% {
+      background-position: 0 0;
+    }
+    50% {
+      background-position: 42px 32px;
+    }
+  }
+
+  .about-hero-grid-drift {
+    animation: about-hero-grid-drift 24s ease-in-out infinite;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .about-hero-grid-drift {
+      animation: none;
     }
   }
 }
