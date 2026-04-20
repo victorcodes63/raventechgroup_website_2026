@@ -23,8 +23,10 @@ export function InsightsIndexClient({ insights }: InsightsIndexClientProps) {
   const filtered = useMemo(() => insights.filter((i) => matchesCategory(i, filter)), [insights, filter])
 
   const gridInsights = useMemo(() => {
-    const showFeatured = filter === 'all' && featured && filtered.some((i) => i.slug === featured.slug)
-    return filtered.filter((i) => !showFeatured || i.slug !== featured?.slug)
+    const showFeaturedRow = filter === 'all' && featured != null && filtered.some((i) => i.slug === featured.slug)
+    if (!showFeaturedRow) return filtered
+    /** Hero shows the primary featured article; grid lists everything else (no duplicate featured rows). */
+    return filtered.filter((i) => !i.featured)
   }, [filtered, filter, featured])
 
   const showFeatured = filter === 'all' && featured != null && filtered.some((i) => i.slug === featured.slug)

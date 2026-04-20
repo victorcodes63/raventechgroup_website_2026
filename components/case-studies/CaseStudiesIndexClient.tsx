@@ -24,8 +24,9 @@ export function CaseStudiesIndexClient({ studies }: CaseStudiesIndexClientProps)
   }, [studies, filter])
 
   const gridStudies = useMemo(() => {
-    const showFeatured = filter === 'all' && featured && filtered.some((s) => s.slug === featured.slug)
-    return filtered.filter((s) => !showFeatured || s.slug !== featured.slug)
+    const showFeaturedRow = filter === 'all' && featured != null && filtered.some((s) => s.slug === featured.slug)
+    if (!showFeaturedRow) return filtered
+    return filtered.filter((s) => !s.featured)
   }, [filtered, filter, featured])
 
   const showFeaturedBlock = filter === 'all' && featured != null && filtered.some((s) => s.slug === featured.slug)
