@@ -1,6 +1,6 @@
 /**
  * Primary header navigation — single source of truth for desktop + mobile.
- * Order is intentional: services first, proof and resources, how we work, company last before CTAs.
+ * Order: Services → Case studies → Resources → Company; CTAs in Header.tsx.
  */
 
 export type SiteNavDropdownItem = {
@@ -48,8 +48,6 @@ export const SITE_HEADER_NAV: SiteNavEntry[] = [
       },
     ],
   },
-  { type: 'link', label: 'How we work', href: '/process' },
-  { type: 'link', label: 'Problems', href: '/#problems' },
   {
     type: 'dropdown',
     id: 'company',
