@@ -47,7 +47,7 @@ export function TrustBadges() {
         </motion.div>
 
         <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-          {badges.map((badge, index) => {
+          {badges.map((badge) => {
             const Icon = badge.icon
             return (
               <motion.div

@@ -83,9 +83,6 @@ export async function POST(request: NextRequest) {
       /<a href/i,
     ]
     
-    const allText = `${name} ${email} ${message || ''} ${projectContext || ''}`.toLowerCase()
-    const hasSpamPattern = spamPatterns.some(pattern => pattern.test(allText))
-    
     // Allow URLs in message/project context (legitimate use case), but flag if in name/email
     const nameEmailText = `${name} ${email}`.toLowerCase()
     const spamInNameEmail = spamPatterns.some(pattern => pattern.test(nameEmailText))

@@ -4,14 +4,9 @@ import { motion } from 'framer-motion'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import Image from 'next/image'
 import {
-  ShieldCheck,
   UsersRound,
   Workflow,
-  Building2,
-  Compass,
   Rocket,
-  Share2,
-  Radar,
 } from 'lucide-react'
 
 const differentiators = [
