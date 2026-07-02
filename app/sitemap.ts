@@ -1,6 +1,7 @@
 import { MetadataRoute } from 'next'
 import { caseStudies } from '@/lib/data/caseStudies'
-import { insights } from '@/lib/data/insights'
+import { getPublishedInsights } from '@/lib/data/insights'
+import { products } from '@/lib/data/products'
 import { services } from '@/lib/data/services'
 
 export default function sitemap(): MetadataRoute.Sitemap {
@@ -25,7 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       url: `${baseUrl}/about`,
       lastModified: now,
       changeFrequency: 'monthly',
-      priority: 0.8,
+      priority: 0.85,
     },
     {
       url: `${baseUrl}/services`,
@@ -34,16 +35,16 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.9,
     },
     {
-      url: `${baseUrl}/playbooks`,
-      lastModified: now,
-      changeFrequency: 'weekly',
-      priority: 0.8,
-    },
-    {
       url: `${baseUrl}/process`,
       lastModified: now,
       changeFrequency: 'monthly',
       priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/products`,
+      lastModified: now,
+      changeFrequency: 'weekly',
+      priority: 0.9,
     },
     {
       url: `${baseUrl}/contact`,
@@ -97,6 +98,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.85,
   }))
 
+  const productPages: MetadataRoute.Sitemap = products.map((product) => ({
+    url: `${baseUrl}${product.bridgeHref}`,
+    lastModified: now,
+    changeFrequency: 'weekly' as const,
+    priority: 0.9,
+  }))
+
   const caseStudyPages: MetadataRoute.Sitemap = caseStudies.map((study) => ({
     url: `${baseUrl}/case-studies/${study.slug}`,
     lastModified: now,
@@ -104,13 +112,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  const insightPages: MetadataRoute.Sitemap = insights.map((insight) => ({
+  const insightPages: MetadataRoute.Sitemap = getPublishedInsights().map((insight) => ({
     url: `${baseUrl}/insights/${insight.slug}`,
     lastModified: now,
     changeFrequency: 'monthly' as const,
     priority: 0.7,
   }))
 
-  return [...mainPages, ...servicePages, ...caseStudyPages, ...insightPages]
+  return [
+    ...mainPages,
+    ...servicePages,
+    ...productPages,
+    ...caseStudyPages,
+    ...insightPages,
+  ]
 }
 

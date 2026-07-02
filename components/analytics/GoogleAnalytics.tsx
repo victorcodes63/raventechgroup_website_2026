@@ -1,13 +1,40 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Script from 'next/script'
 
 interface GoogleAnalyticsProps {
   gaId: string
+  adsId?: string
 }
 
-export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
-  if (!gaId) {
+const CONSENT_KEY = 'cookie-consent'
+const CONSENT_EVENT = 'cookie-consent-updated'
+
+export function GoogleAnalytics({ gaId, adsId = '' }: GoogleAnalyticsProps) {
+  const [hasConsent, setHasConsent] = useState(false)
+
+  const measurementId = gaId || adsId
+
+  useEffect(() => {
+    if (!measurementId) return
+
+    const syncConsent = () => {
+      if (typeof window === 'undefined') return
+      const consent = window.localStorage.getItem(CONSENT_KEY)
+      setHasConsent(consent === 'accepted')
+    }
+
+    syncConsent()
+    window.addEventListener(CONSENT_EVENT, syncConsent as EventListener)
+    window.addEventListener('storage', syncConsent)
+    return () => {
+      window.removeEventListener(CONSENT_EVENT, syncConsent as EventListener)
+      window.removeEventListener('storage', syncConsent)
+    }
+  }, [measurementId])
+
+  if (!measurementId || !hasConsent) {
     return null
   }
 
@@ -15,17 +42,18 @@ export function GoogleAnalytics({ gaId }: GoogleAnalyticsProps) {
     <>
       <Script
         strategy="afterInteractive"
-        src={`https://www.googletagmanager.com/gtag/js?id=${gaId}`}
+        src={`https://www.googletagmanager.com/gtag/js?id=${measurementId}`}
       />
       <Script
-        id="google-analytics"
+        id="google-tracking"
         strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
             function gtag(){dataLayer.push(arguments);}
             gtag('js', new Date());
-            gtag('config', '${gaId}');
+            ${gaId ? `gtag('config', '${gaId}');` : ''}
+            ${adsId ? `gtag('config', '${adsId}');` : ''}
           `,
         }}
       />
@@ -61,15 +89,31 @@ export function trackEvent(
   }
 }
 
+export function trackAdsConversion(
+  conversionLabel: string,
+  value?: number,
+  currency: string = 'USD'
+) {
+  if (typeof window === 'undefined' || !window.gtag) return
+  const adsId = process.env.NEXT_PUBLIC_GOOGLE_ADS_ID
+  if (!adsId || !conversionLabel) return
+
+  window.gtag('event', 'conversion', {
+    send_to: `${adsId}/${conversionLabel}`,
+    ...(typeof value === 'number' ? { value } : {}),
+    ...(typeof value === 'number' ? { currency } : {}),
+  })
+}
+
 // Extend Window interface for TypeScript
 declare global {
   interface Window {
     gtag: (
-      command: 'config' | 'event' | 'js' | 'set',
-      targetId: string | Date,
-      config?: Record<string, any>
+      command: 'config' | 'event' | 'js' | 'set' | 'consent',
+      targetId: string | Date | 'default' | 'update',
+      config?: Record<string, unknown>
     ) => void
-    dataLayer: any[]
+    dataLayer: unknown[]
   }
 }
 

@@ -49,9 +49,9 @@ export default function PrivacyPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <section className="border-b border-white/10 bg-gradient-to-b from-black via-black to-zinc-950">
-        <div className="container mx-auto px-4 pb-16 pt-32 sm:px-6 lg:px-8">
+        <div className="site-shell pb-16 pt-32">
           <div className="mx-auto max-w-3xl">
-            <span className="inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+            <span className="inline-flex rounded-sm border border-white/15 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
               Privacy Policy
             </span>
             <h1 className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl">How Raven Tech Group handles your data</h1>
@@ -64,10 +64,10 @@ export default function PrivacyPage() {
       </section>
 
       <section className="border-b border-white/10 bg-black">
-        <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
+        <div className="site-shell py-16">
           <div className="mx-auto max-w-4xl space-y-12">
             {sections.map((section) => (
-              <article key={section.title} className="rounded-3xl border border-white/10 bg-white/[0.03] p-8">
+              <article key={section.title} className="rounded-sm border border-white/10 bg-white/[0.03] p-8">
                 <h2 className="text-2xl font-semibold text-white">{section.title}</h2>
                 <ul className="mt-4 space-y-3 text-sm text-white/65 sm:text-base">
                   {section.items.map((item) => (
@@ -83,8 +83,8 @@ export default function PrivacyPage() {
       </section>
 
       <section className="border-t border-white/10 bg-zinc-950">
-        <div className="container mx-auto px-4 py-16 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl rounded-3xl border border-white/10 bg-white/[0.04] p-8 text-center">
+        <div className="site-shell py-16">
+          <div className="mx-auto max-w-3xl rounded-sm border border-white/10 bg-white/[0.04] p-8 text-center">
             <h2 className="text-2xl font-semibold text-white">Questions or requests?</h2>
             <p className="mt-4 text-sm text-white/65 sm:text-base">
               Reach our data protection lead at{' '}

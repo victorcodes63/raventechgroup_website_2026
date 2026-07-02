@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { caseStudiesOrdered, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
+import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
@@ -55,12 +56,19 @@ function CaseStudyMedia({
         }}
       />
       <div
-        className={`absolute inset-0 ${
+        className={`absolute inset-0 z-[1] ${
           isFeatured
             ? 'bg-gradient-to-t from-black/76 via-black/32 to-transparent lg:bg-gradient-to-r lg:from-black/55 lg:via-black/20 lg:to-transparent'
             : 'bg-gradient-to-t from-black/82 via-black/45 to-transparent'
         }`}
       />
+      {study.clientLogo ? (
+        <CaseStudyClientLogoBadge
+          clientLogo={study.clientLogo}
+          clientName={study.client}
+          placement="card"
+        />
+      ) : null}
       {isFeatured ? (
         <>
           <div className="absolute inset-x-0 bottom-0 h-px bg-[#0E0E0E] lg:hidden" aria-hidden />

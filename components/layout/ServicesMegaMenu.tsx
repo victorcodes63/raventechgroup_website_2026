@@ -1,10 +1,19 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 
 import { services } from '@/lib/data/services'
+import {
+  SERVICE_MEGA_CATEGORIES,
+  SERVICE_MEGA_CATEGORY_SERVICES,
+  type MegaMenuServiceItem,
+  type ServiceMegaCategoryId,
+} from '@/lib/data/serviceMegaGroups'
+import { SERVICE_MEGA_MENU_ICONS } from '@/lib/data/serviceMegaMenuIcons'
+import { CTAButton } from '@/components/ui/CTAButton'
+import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 
 type ServicesMegaMenuProps = {
   isOpen: boolean
@@ -13,8 +22,36 @@ type ServicesMegaMenuProps = {
   onSoftClose?: () => void
 }
 
+/** Matches /services index:4 tiles use 2 columns (2×2), never 3+1 with empty slots. */
+function megaMenuGridLayout(itemCount: number): { gridClass: string; columnCount: number } {
+  if (itemCount <= 1) {
+    return { gridClass: 'grid-cols-1', columnCount: 1 }
+  }
+  if (itemCount === 2) {
+    return { gridClass: 'grid-cols-1 sm:grid-cols-2', columnCount: 2 }
+  }
+  if (itemCount === 3) {
+    return { gridClass: 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3', columnCount: 3 }
+  }
+  return { gridClass: 'grid-cols-1 sm:grid-cols-2', columnCount: 2 }
+}
+
 export function ServicesMegaMenu({ isOpen, onOpen, onClose, onSoftClose }: ServicesMegaMenuProps) {
+  const reducedMotion = useReducedMotion()
   const menuRef = useRef<HTMLDivElement | null>(null)
+  const [activeCategory, setActiveCategory] = useState<ServiceMegaCategoryId>('engineering')
+
+  const categoryConfig = useMemo(() => SERVICE_MEGA_CATEGORIES, [])
+
+  const categoryServices = useMemo(() => SERVICE_MEGA_CATEGORY_SERVICES, [])
+
+  const activeItems = categoryServices[activeCategory]
+  const activeMeta = categoryConfig.find((c) => c.id === activeCategory)
+
+  const { gridClass: serviceGridClass, columnCount: numCols } = megaMenuGridLayout(activeItems.length)
+  const totalSlots =
+    activeItems.length <= numCols ? numCols : Math.ceil(activeItems.length / numCols) * numCols
+  const fillerCount = totalSlots - activeItems.length
 
   useEffect(() => {
     if (!isOpen) return
@@ -31,6 +68,8 @@ export function ServicesMegaMenu({ isOpen, onOpen, onClose, onSoftClose }: Servi
 
   useEffect(() => {
     if (!isOpen) return
+
+    setActiveCategory('engineering')
 
     const handleClickOutside = (event: MouseEvent) => {
       const target = event.target as Node
@@ -58,116 +97,166 @@ export function ServicesMegaMenu({ isOpen, onOpen, onClose, onSoftClose }: Servi
           ref={menuRef}
           role="dialog"
           aria-label="Services navigation"
-          initial={{ opacity: 0, y: -16 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -16 }}
-          transition={{ duration: 0.24, ease: 'easeOut' }}
+          initial={
+            reducedMotion ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: -8, scale: 0.98 }
+          }
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={
+            reducedMotion
+              ? { opacity: 1, y: 0, scale: 1, transition: { duration: 0 } }
+              : { opacity: 0, y: -8, scale: 0.98, transition: { duration: 0.15 } }
+          }
+          transition={
+            reducedMotion ? { duration: 0 } : { duration: 0.25, ease: [0.22, 1, 0.36, 1] }
+          }
           onMouseEnter={onOpen}
-          onFocusCapture={onOpen}
           onMouseLeave={handleMouseLeave}
-          className="pointer-events-auto absolute left-0 right-0 top-full z-40 hidden pt-2 md:block"
+          className="pointer-events-auto absolute left-0 right-0 top-full z-40 hidden w-full min-w-0 pt-2 md:block"
         >
-          <div className="px-4 sm:px-6 lg:px-8">
-            <motion.div
-              layout
-              className="relative overflow-hidden rounded-3xl border border-white/10 bg-black shadow-[0_32px_140px_-48px_rgba(12,12,18,0.9)]"
-              style={{ minHeight: '25vh' }}
-            >
-              <div className="relative grid gap-10 px-6 py-8 sm:px-8 sm:py-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.25fr)] lg:gap-12">
-                <div className="flex flex-col justify-between gap-8">
-                  <div className="space-y-4">
-                    <span className="inline-flex items-center gap-2 self-start rounded-full border border-brand-500/40 bg-brand-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-brand-300">
-                      Explore Services
-                    </span>
-                    <h3 className="text-2xl font-semibold leading-tight text-white sm:text-3xl">
-                      Solutions engineered for resilient, modern enterprises.
-                    </h3>
-                    <p className="text-sm leading-relaxed text-white/70 sm:text-base">
-                      From strategy to deployment, our teams craft end-to-end experiences that unlock new
-                      growth, performance, and security for your organisation.
+          <div className="w-full min-w-0">
+            <div className="relative w-full min-w-0 overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] shadow-[0_32px_80px_rgba(0,0,0,0.7)] backdrop-blur-xl">
+              <div className="relative grid gap-0 lg:grid-cols-[minmax(220px,260px)_minmax(0,1fr)]">
+                <div className="border-b border-white/[0.06] bg-[#0D0D0D] p-4 lg:border-b-0 lg:border-r lg:border-white/[0.06] lg:p-5">
+                  <div className="mb-3">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/30">
+                      Service groups
                     </p>
                   </div>
-                  <div className="flex flex-wrap items-center gap-3">
-                    <Link
-                      href="/services"
-                      onClick={onClose}
-                      className="inline-flex items-center justify-center rounded-full border border-brand-400/60 bg-brand-400 px-5 py-2 text-sm font-semibold text-black shadow-[0_16px_40px_-18px_rgba(255,169,30,0.55)] transition duration-200 hover:-translate-y-0.5 hover:bg-brand-300"
-                    >
-                      View Services
-                    </Link>
-                    <Link
-                      href="/contact"
-                      onClick={onClose}
-                      className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm font-medium text-white transition duration-200 hover:border-white/30 hover:bg-white/10"
-                    >
-                      Book a consultation
-                    </Link>
+                  <div className="space-y-0">
+                    {categoryConfig.map((category) => {
+                      const isActive = activeCategory === category.id
+                      return (
+                        <button
+                          key={category.id}
+                          id={`mega-group-${category.id}`}
+                          type="button"
+                          aria-pressed={isActive}
+                          aria-controls="mega-services-panel"
+                          onMouseEnter={() => setActiveCategory(category.id)}
+                          onFocus={() => setActiveCategory(category.id)}
+                          onClick={() => setActiveCategory(category.id)}
+                          className={`w-full border-l-2 px-4 py-3 text-left transition-colors duration-150 ${
+                            isActive
+                              ? 'border-[#FFA91F] bg-white/[0.05] text-white'
+                              : 'border-transparent text-white/65 hover:bg-white/[0.03] hover:text-white'
+                          }`}
+                        >
+                          <p className="text-sm font-semibold">{category.label}</p>
+                          <p
+                            className={`mt-1 line-clamp-2 text-xs leading-relaxed ${
+                              isActive ? 'text-white/45' : 'text-white/40'
+                            }`}
+                          >
+                            {category.description}
+                          </p>
+                        </button>
+                      )
+                    })}
                   </div>
                 </div>
 
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                  {services.map((service, index) => {
-                    const Icon = service.Icon
-                    return (
-                      <Link
-                        key={service.slug}
-                        href={service.href}
-                        onClick={onClose}
-                        className="group relative flex h-full flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/[0.03] p-5 transition-all duration-200 hover:border-brand-400/60 hover:bg-brand-400/5 hover:shadow-[0_14px_60px_-30px_rgba(255,169,30,0.45)]"
-                      >
-                        <motion.span
-                          layout
-                          className="mb-4 inline-flex h-11 w-11 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-300 transition duration-200 group-hover:bg-brand-400/20 group-hover:text-brand-200"
-                        >
-                          <Icon className="h-6 w-6" aria-hidden />
-                        </motion.span>
-                        <div className="space-y-2">
-                          <p className="text-base font-semibold text-white group-hover:text-brand-200">
-                            {service.title}
-                          </p>
-                          <p className="text-sm leading-relaxed text-white/60">{service.description}</p>
-                        </div>
-                        <motion.span
-                          layout
-                          className="mt-4 inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/50 transition duration-200 group-hover:text-brand-200"
-                        >
-                          Learn more
-                          <svg
-                            className="h-3 w-3 transition-transform duration-200 group-hover:translate-x-1"
-                            viewBox="0 0 12 12"
-                            fill="none"
-                            aria-hidden
-                          >
-                            <path
-                              d="M2 6h8M6 2l4 4-4 4"
-                              stroke="currentColor"
-                              strokeWidth="1.5"
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                            />
-                          </svg>
-                        </motion.span>
-
-                        <div className="pointer-events-none absolute inset-0 opacity-0 transition-opacity duration-200 group-hover:opacity-100">
-                          <div className="absolute inset-0 bg-gradient-to-br from-brand-500/10 via-transparent to-transparent" />
-                        </div>
-
-                        <span className="pointer-events-none absolute -right-10 -top-10 h-24 w-24 rounded-full bg-brand-400/10 blur-2xl transition duration-200 group-hover:-right-6 group-hover:-top-6" />
-                      </Link>
-                    )
-                  })}
-                  {services.length % 2 !== 0 && (
-                    <div className="hidden rounded-2xl border border-dashed border-white/10 sm:flex sm:items-center sm:justify-center">
-                      <span className="text-xs uppercase tracking-[0.3em] text-white/30">More coming soon</span>
+                <div className="flex min-h-0 flex-col bg-[#111111] p-4 sm:p-5 lg:p-6">
+                  <div className="mb-4 flex flex-wrap items-end justify-between gap-3 border-b border-white/[0.06] pb-3">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FFA91F]">
+                        {activeMeta?.label.toUpperCase()}
+                      </p>
+                      <p className="mt-0.5 text-sm text-white/60">{activeMeta?.highlight}</p>
                     </div>
-                  )}
+                    <p
+                      className="shrink-0 text-right text-xs tabular-nums text-white/35"
+                      aria-live="polite"
+                    >
+                      {activeItems.length} {activeMeta?.label}{' '}
+                      {activeItems.length === 1 ? 'service' : 'services'}
+                    </p>
+                  </div>
+
+                  <div
+                    id="mega-services-panel"
+                    role="tabpanel"
+                    aria-labelledby={`mega-group-${activeCategory}`}
+                  >
+                    <AnimatePresence mode="wait">
+                      <motion.div
+                        key={activeCategory}
+                        initial={reducedMotion ? false : { opacity: 0, y: 6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={reducedMotion ? { opacity: 1 } : { opacity: 0, y: -4 }}
+                        transition={{ duration: reducedMotion ? 0 : 0.18, ease: 'easeOut' }}
+                        className="overflow-hidden rounded-card"
+                      >
+                        <div className={`grid items-stretch gap-3 ${serviceGridClass}`}>
+                          {activeItems.map((item: MegaMenuServiceItem, index: number) => {
+                            const service = services.find((s) => s.slug === item.slug)
+                            if (!service) return null
+                            const MenuIcon = SERVICE_MEGA_MENU_ICONS[item.slug]
+                            if (!MenuIcon) return null
+                            const isPrimary = index === 0
+
+                            return (
+                              <Link
+                                key={`${activeCategory}-${item.slug}-${item.title}`}
+                                href={service.href}
+                                onClick={onClose}
+                                className="group/card flex h-full min-h-0 flex-col rounded-card border border-white/[0.06] bg-[#0A0A0A] p-5 transition-all duration-200 hover:border-[#FFA91F]/25 hover:bg-[#141414]"
+                              >
+                                <div className="flex gap-3">
+                                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-card border border-[#FFA91F]/20 bg-[#FFA91F]/10 text-[#FFA91F]">
+                                    <MenuIcon size={18} weight="bold" aria-hidden />
+                                  </span>
+                                  <div className="min-w-0 flex-1">
+                                    {isPrimary && (
+                                      <span className="mb-1 block text-[9px] font-semibold uppercase tracking-[0.2em] text-[#FFA91F]">
+                                        Core service
+                                      </span>
+                                    )}
+                                    <p className="text-base font-semibold leading-snug text-white">{item.title}</p>
+                                    <p className="mt-1 text-xs leading-relaxed text-white/50">{item.sub}</p>
+                                  </div>
+                                </div>
+                                <ArrowSwapRow
+                                  groupName="card"
+                                  iconSize={13}
+                                  strokeWidth={2.4}
+                                  className="mt-4 text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]/80 group-hover/card:text-[#FFA91F]"
+                                >
+                                  Learn more
+                                </ArrowSwapRow>
+                              </Link>
+                            )
+                          })}
+                          {Array.from({ length: fillerCount }).map((_, i) => (
+                            <div
+                              key={`mega-empty-${activeCategory}-${i}`}
+                              aria-hidden
+                              className="min-h-[140px] rounded-card border border-dashed border-white/[0.04] bg-[#0A0A0A]/50 sm:min-h-[150px]"
+                            />
+                          ))}
+                        </div>
+                      </motion.div>
+                    </AnimatePresence>
+                  </div>
+
+                  <div className="mt-6 flex flex-wrap items-center gap-3 border-t border-white/[0.06] pt-6">
+                    <CTAButton href="/services" onClick={onClose} variant="primary" className="px-5 py-2 text-sm">
+                      View all services
+                    </CTAButton>
+                    <CTAButton
+                      href="/book"
+                      variant="outline-dark"
+                      onClick={onClose}
+                      className="px-5 py-2 text-sm"
+                    >
+                      Book a discovery call
+                    </CTAButton>
+                  </div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </div>
         </motion.div>
       )}
     </AnimatePresence>
   )
 }
-

@@ -1,84 +1,95 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { fadeInUp, staggerContainer } from '@/lib/animations'
+import {
+  ShoppingBag,
+  Users,
+  Car,
+  HeartPulse,
+  Landmark,
+  Package,
+  GraduationCap,
+  Building2,
+} from 'lucide-react'
 
-const focusAreas = [
+const industries = [
   {
-    title: 'Financial services & cooperatives',
-    description:
-      'Digital channels, core banking modernisation, and compliance automation for SACCOs, microfinance institutions, and growth-stage fintechs.',
-    signals: ['Core system modernisation', 'Payments & KYC orchestration', 'Regulatory reporting automation'],
+    icon: ShoppingBag,
+    name: 'Retail & E-commerce',
+    description: 'Storefronts, order management, and payment flows built for African markets — M-Pesa and beyond.',
   },
   {
-    title: 'Public sector & essential services',
-    description:
-      'Citizen portals, permit systems, and shared services that prioritise reliability, accessibility, and audit-ready operations.',
-    signals: ['Service digitisation', 'Data-sharing platforms', 'Operational transparency'],
+    icon: Users,
+    name: 'HR & Staffing',
+    description: 'Recruitment pipelines, payroll dashboards, and candidate tracking that replace spreadsheet chaos.',
   },
   {
-    title: 'Energy, logistics & infrastructure',
-    description:
-      'Operational dashboards, IoT integrations, and field-service tooling for organisations keeping cities and utilities running.',
-    signals: ['Real-time monitoring', 'Workforce coordination', 'Billing and settlement systems'],
+    icon: Car,
+    name: 'Automotive & Parts',
+    description: 'Parts catalogs, supplier layers, and inventory platforms built for scale — not WhatsApp threads.',
   },
   {
-    title: 'Growth-stage SaaS & marketplaces',
-    description:
-      'Product build-outs, integrations, and scalability programmes for teams expanding across new markets and verticals.',
-    signals: ['Feature velocity pressure', 'Multi-tenant architectures', 'Data integrations'],
+    icon: HeartPulse,
+    name: 'Healthcare',
+    description: 'Patient management, appointment systems, and compliance-ready data infrastructure.',
+  },
+  {
+    icon: Landmark,
+    name: 'Financial Services',
+    description: 'Fintech integrations, lending platforms, and secure transaction infrastructure for regulated teams.',
+  },
+  {
+    icon: Package,
+    name: 'Logistics & Supply Chain',
+    description: 'Tracking systems, route optimisation, and warehouse tooling that keeps operations moving.',
+  },
+  {
+    icon: GraduationCap,
+    name: 'Education & NGOs',
+    description: 'LMS platforms, grant management, and beneficiary tracking built for mission-driven organisations.',
+  },
+  {
+    icon: Building2,
+    name: 'Professional Services',
+    description: 'CRM, proposal tooling, and client portals that help service firms win and retain more clients.',
   },
 ]
 
 export function Industries() {
   return (
-    <section className="relative overflow-hidden border-t border-white/10 bg-white py-12 sm:py-16 md:py-20 text-black">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-[10%] top-[-12%] h-64 w-64 rounded-full bg-black/5 blur-[130px]" />
-        <div className="absolute -right-[16%] bottom-[-12%] h-[320px] w-[420px] rounded-full bg-brand-500/15 blur-[180px]" />
-      </div>
-      <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="mx-auto max-w-6xl space-y-8 sm:space-y-12"
-        >
-          <motion.div variants={fadeInUp} className="text-center space-y-3 sm:space-y-4">
-            <span className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">Where we're most helpful</span>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-black">Industries & problem statements</h2>
-            <p className="text-sm text-black/70 sm:text-base px-4 sm:px-0 leading-relaxed">
-              We embed with teams operating critical systems—regulated, high-impact, or rapidly scaling. If these challenges feel familiar, we can help.
+    <section className="bg-[#0A0A0A] py-16 sm:py-20 md:py-28">
+      <div className="site-shell">
+        <div className="mb-10 sm:mb-14 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.28em] text-brand-500">Sectors we serve</p>
+            <h2 className="max-w-lg text-2xl font-bold leading-[1.1] tracking-tight text-white sm:text-3xl">
+              We specifically work in your sector
+            </h2>
+            <p className="mt-3 max-w-xl text-sm leading-relaxed text-white/55 sm:text-base">
+              Deep context in the industries that matter most across East Africa and beyond — not generic software shops.
             </p>
-          </motion.div>
+          </div>
+        </div>
 
-          <motion.div
-            variants={fadeInUp}
-            className="grid gap-4 sm:gap-6 md:grid-cols-2"
-          >
-            {focusAreas.map(({ title, description, signals }) => (
-              <div key={title} className="flex h-full flex-col gap-4 sm:gap-5 rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 p-5 sm:p-6 md:p-7 shadow-[0_34px_120px_-70px_rgba(15,23,42,0.35)]">
-                <div>
-                  <h3 className="text-base sm:text-lg font-semibold text-black">{title}</h3>
-                  <p className="mt-2 text-sm text-black/70 leading-relaxed">{description}</p>
-                </div>
-                <ul className="space-y-1.5 sm:space-y-2 text-sm text-black/65">
-                  {signals.map((point) => (
-                    <li key={point} className="flex gap-2 leading-relaxed">
-                      <span className="mt-[6px] block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-500" />
-                      <span>{point}</span>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            ))}
-          </motion.div>
-        </motion.div>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+          {industries.map(({ icon: Icon, name, description }, i) => (
+            <motion.div
+              key={name}
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-50px' }}
+              transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1], delay: i * 0.055 }}
+              className="group rounded-card border border-white/[0.06] bg-[#111111] p-5 transition duration-300 hover:border-brand-500/25 hover:bg-[#161616]"
+            >
+              <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-card bg-white/[0.05] text-brand-400 transition group-hover:bg-brand-500/20 group-hover:text-brand-300">
+                <Icon size={18} />
+              </span>
+              <h3 className="text-[13px] font-bold leading-snug text-white sm:text-sm">{name}</h3>
+              <p className="mt-2 text-[12px] leading-relaxed text-white/45 sm:text-[13px]">{description}</p>
+            </motion.div>
+          ))}
+        </div>
       </div>
     </section>
   )
 }
-
-
-

@@ -38,7 +38,7 @@ function getClientIdentifier(request: NextRequest): string {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { name, email, phone, company, timeline, services, budget, message, projectContext, honeypot } = body
+    const { name, email, phone, country, company, timeline, services, message, projectContext, attachmentName, consentUpdates, honeypot } = body
 
     // Bot protection: Check honeypot field (should be empty)
     if (honeypot && honeypot.trim() !== '') {
@@ -117,11 +117,14 @@ export async function POST(request: NextRequest) {
         <h2>New Contact Form Submission</h2>
         <p><strong>Name:</strong> ${name}</p>
         <p><strong>Email:</strong> ${email}</p>
+        ${phone ? `<p><strong>Phone:</strong> ${phone}</p>` : ''}
+        ${country ? `<p><strong>Country:</strong> ${country}</p>` : ''}
         ${company ? `<p><strong>Company:</strong> ${company}</p>` : ''}
         ${timeline ? `<p><strong>Timeline:</strong> ${timeline}</p>` : ''}
         ${services ? `<p><strong>Area of Interest:</strong> ${services}</p>` : ''}
-        ${budget ? `<p><strong>Budget Range:</strong> ${budget}</p>` : ''}
         ${message ? `<p><strong>Message:</strong><br>${message.replace(/\n/g, '<br>')}</p>` : ''}
+        ${attachmentName ? `<p><strong>Attachment:</strong> ${attachmentName}</p>` : ''}
+        <p><strong>Marketing updates consent:</strong> ${consentUpdates ? 'Yes' : 'No'}</p>
       `
 
     // Send email using Resend
@@ -143,8 +146,11 @@ export async function POST(request: NextRequest) {
         <html>
           <head>
             <meta charset="utf-8">
+            <link rel="preconnect" href="https://fonts.googleapis.com" />
+            <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+            <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet" />
             <style>
-              body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; line-height: 1.6; color: #333; }
+              body { font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
               .header { background: #000; color: #FFA91E; padding: 20px; border-radius: 8px 8px 0 0; }
               .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }

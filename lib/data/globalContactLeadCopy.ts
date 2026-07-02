@@ -9,7 +9,7 @@ export type GlobalContactLeadCopy = {
 export const GLOBAL_CONTACT_LEAD_DEFAULT: GlobalContactLeadCopy = {
   headline: 'Send a brief. We reply within one business day.',
   supporting:
-    'Scope, deadlines, budget band, or a one-page problem statement—enough for a substantive first response.',
+    'Scope, deadlines, or a one-page problem statement—enough for a substantive first response.',
 }
 
 const STATIC_COPY: Record<string, Partial<GlobalContactLeadCopy>> = {
@@ -37,11 +37,6 @@ const STATIC_COPY: Record<string, Partial<GlobalContactLeadCopy>> = {
     headline: 'Interested in working with us? Send a note or your profile.',
     supporting:
       'Role you want, location, and a link to work we should look at. We read every message.',
-  },
-  '/playbooks': {
-    headline: 'Want the playbooks applied to your stack? Send a brief.',
-    supporting:
-      'What you are trying to improve and who owns the decision—enough to propose a sensible next step.',
   },
   '/process': {
     headline: 'Ready to run this process on your systems? Send a brief.',

@@ -1,6 +1,7 @@
 import type { Config } from 'tailwindcss'
 
 const config: Config = {
+  darkMode: ['class'],
   content: [
     './pages/**/*.{js,ts,jsx,tsx,mdx}',
     './components/**/*.{js,ts,jsx,tsx,mdx}',
@@ -10,29 +11,29 @@ const config: Config = {
     extend: {
       colors: {
         primary: {
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#ffa91e',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+          50: '#fff9ec',
+          100: '#fff0cf',
+          200: '#ffe09f',
+          300: '#ffd06f',
+          400: '#ffc152',
+          500: '#ffa91f',
+          600: '#e6961a',
+          700: '#b97918',
+          800: '#8f5f15',
+          900: '#6b4711',
         },
         brand: {
-          DEFAULT: '#ffa91e',
-          50: '#fff7ed',
-          100: '#ffedd5',
-          200: '#fed7aa',
-          300: '#fdba74',
-          400: '#fb923c',
-          500: '#ffa91e',
-          600: '#ea580c',
-          700: '#c2410c',
-          800: '#9a3412',
-          900: '#7c2d12',
+          DEFAULT: '#ffa91f',
+          50: '#fff9ec',
+          100: '#fff0cf',
+          200: '#ffe09f',
+          300: '#ffd06f',
+          400: '#FFB83F',
+          500: '#FFA91F',
+          600: '#e6961a',
+          700: '#CC8500',
+          800: '#8f5f15',
+          900: '#6b4711',
         },
         dark: {
           50: '#f9fafb',
@@ -48,15 +49,18 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ['var(--font-manrope)', 'system-ui', 'sans-serif'],
-        display: ['var(--font-manrope)', 'system-ui', 'sans-serif'],
+        /** Single brand face site-wide; serif/mono map to Manrope so utilities never pull Georgia/system mono */
+        sans: ['var(--font-manrope)', 'sans-serif'],
+        display: ['var(--font-manrope)', 'sans-serif'],
+        serif: ['var(--font-manrope)', 'sans-serif'],
+        mono: ['var(--font-manrope)', 'sans-serif'],
       },
       fontSize: {
-        'xs': ['0.75rem', { lineHeight: '1rem' }],
-        'sm': ['0.875rem', { lineHeight: '1.25rem' }],
-        'base': ['1rem', { lineHeight: '1.5rem' }],
-        'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-        'xl': ['1.25rem', { lineHeight: '1.75rem' }],
+        xs: ['0.75rem', { lineHeight: '1rem' }],
+        sm: ['0.875rem', { lineHeight: '1.25rem' }],
+        base: ['1rem', { lineHeight: '1.5rem' }],
+        lg: ['1.125rem', { lineHeight: '1.75rem' }],
+        xl: ['1.25rem', { lineHeight: '1.75rem' }],
         '2xl': ['1.5rem', { lineHeight: '2rem' }],
         '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
         '4xl': ['2.25rem', { lineHeight: '2.5rem' }],
@@ -66,10 +70,14 @@ const config: Config = {
         '8xl': ['6rem', { lineHeight: '1' }],
         '9xl': ['8rem', { lineHeight: '1' }],
       },
+      borderRadius: {
+        /** Matches Hero panels; sync with `--radius-card` in globals.css */
+        card: 'var(--radius-card)',
+      },
       spacing: {
-        '18': '4.5rem',
-        '88': '22rem',
-        '128': '32rem',
+        18: '4.5rem',
+        88: '22rem',
+        128: '32rem',
       },
       animation: {
         'fade-in': 'fadeIn 0.5s ease-in-out',
@@ -92,7 +100,7 @@ const config: Config = {
       },
     },
   },
-  plugins: [],
+  plugins: [require('tailwindcss-animate'), require('@tailwindcss/typography')],
 }
-export default config
 
+export default config

@@ -14,9 +14,13 @@ type RelatedContentProps = {
   eyebrow: string
   heading: string
   cards: RelatedCard[]
+  footerLink?: {
+    href: string
+    label: string
+  }
 }
 
-export function RelatedContent({ eyebrow, heading, cards }: RelatedContentProps) {
+export function RelatedContent({ eyebrow, heading, cards, footerLink }: RelatedContentProps) {
   return (
     <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-16 lg:py-24">
       <div className="mx-auto max-w-7xl px-5 md:px-8 lg:px-12">
@@ -56,6 +60,18 @@ export function RelatedContent({ eyebrow, heading, cards }: RelatedContentProps)
             </Link>
           ))}
         </div>
+        {footerLink ? (
+          <div className="mt-8 flex justify-end">
+            <Link
+              href={footerLink.href}
+              className="group/card inline-flex items-center text-sm font-semibold text-[#FFA91F]"
+            >
+              <ArrowSwapRow groupName="card" iconSize={14} strokeWidth={2}>
+                {footerLink.label}
+              </ArrowSwapRow>
+            </Link>
+          </div>
+        ) : null}
       </div>
     </section>
   )

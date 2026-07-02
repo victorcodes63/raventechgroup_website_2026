@@ -7,9 +7,9 @@ export type InsightCategoryFilter = 'all' | Insight['category']
 
 const FILTERS: { id: InsightCategoryFilter; label: string }[] = [
   { id: 'all', label: 'All' },
-  { id: 'engineering', label: 'Engineering' },
-  { id: 'strategy', label: 'Strategy' },
-  { id: 'kenya-market', label: 'Kenya market' },
+  { id: 'fintech-mpesa', label: 'M-Pesa & Fintech' },
+  { id: 'sacco-cooperative', label: 'SACCO & Cooperatives' },
+  { id: 'kenya-market', label: 'Kenya Tech Market' },
 ]
 
 type InsightFiltersProps = {

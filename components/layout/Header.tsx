@@ -16,7 +16,7 @@ import {
 } from '@/lib/data/siteNavigation'
 import { CTAButton } from '@/components/ui/CTAButton'
 
-type OpenHeaderMenu = 'services' | 'resources' | 'company' | null
+type OpenHeaderMenu = 'services' | 'products' | 'company' | null
 
 const TOP_SCROLL_THRESHOLD = 56
 const SCROLL_DELTA = 8
@@ -98,12 +98,16 @@ export function Header() {
         return
       }
 
+      const scrollDelta = y - lastScrollY.current
+      if (Math.abs(scrollDelta) >= SCROLL_DELTA) {
+        setOpenMenu(null)
+      }
+
       if (y < TOP_SCROLL_THRESHOLD) {
         setConcealedByScroll(false)
       } else {
-        const delta = y - lastScrollY.current
-        if (delta > SCROLL_DELTA) setConcealedByScroll(true)
-        else if (delta < -SCROLL_DELTA) setConcealedByScroll(false)
+        if (scrollDelta > SCROLL_DELTA) setConcealedByScroll(true)
+        else if (scrollDelta < -SCROLL_DELTA) setConcealedByScroll(false)
       }
       lastScrollY.current = y
     }
@@ -111,13 +115,6 @@ export function Header() {
     window.addEventListener('scroll', handleScroll, { passive: true })
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
-
-  useEffect(() => {
-    if (isDesktop && concealedByScroll && openMenu !== null) {
-      clearMenuCloseTimer()
-      setOpenMenu(null)
-    }
-  }, [isDesktop, concealedByScroll, openMenu])
 
   useEffect(() => {
     if (!concealedByScroll) setPeekTop(false)
@@ -200,7 +197,7 @@ export function Header() {
           duration: reducedMotion ? 0 : 0.32,
           ease: [0.4, 0, 0.2, 1],
         }}
-        className={`pointer-events-none fixed left-0 right-0 top-0 z-50 w-full will-change-transform transition-all duration-300 ease-in-out border-b ${
+        className={`pointer-events-none fixed left-0 right-0 top-0 z-50 w-full overflow-visible will-change-transform transition-all duration-300 ease-in-out border-b ${
           scrolled
             ? 'border-white/[0.08] bg-[#0A0A0A]/75 backdrop-blur-xl backdrop-saturate-150'
             : 'border-white/[0.06] bg-transparent'
@@ -218,8 +215,8 @@ export function Header() {
         <div className="site-shell pointer-events-auto">
           <div className="relative overflow-visible">
             <nav aria-label="Main navigation">
-              <div className="relative flex h-[60px] w-full items-center gap-3 md:h-[72px] md:gap-6">
-                <Link href="/" className="flex flex-shrink-0 self-stretch items-center space-x-2 touch-manipulation">
+              <div className="relative flex h-[60px] w-full items-stretch gap-3 overflow-visible md:h-[72px] md:gap-6">
+                <Link href="/" className="flex flex-shrink-0 items-center space-x-2 touch-manipulation">
                   <motion.div
                     whileHover={reducedMotion ? undefined : { scale: 1.02 }}
                     whileTap={reducedMotion ? undefined : { scale: 0.98 }}
@@ -238,14 +235,14 @@ export function Header() {
                   </motion.div>
                 </Link>
 
-                <div className="hidden min-w-0 flex-1 items-center justify-center overflow-x-auto [scrollbar-width:none] md:flex md:justify-center [&::-webkit-scrollbar]:hidden">
-                  <div className="flex items-center gap-x-3 px-1 lg:gap-x-4 xl:gap-x-6">
+                <div className="hidden min-w-0 flex-1 items-stretch justify-center overflow-visible md:flex md:justify-center">
+                  <div className="flex h-full items-center gap-x-3 px-1 lg:gap-x-4 xl:gap-x-6">
                     {SITE_HEADER_NAV.map((entry) => {
                       if (entry.type === 'services') {
                         return (
                           <div
                             key="services"
-                            className="relative shrink-0"
+                            className="relative flex h-full shrink-0 items-center"
                             onMouseEnter={() => openMenuNow('services')}
                             onMouseLeave={scheduleMenuClose}
                           >
@@ -299,7 +296,7 @@ export function Header() {
                         return (
                           <div
                             key={dd.id}
-                            className="relative shrink-0"
+                            className="relative flex h-full shrink-0 items-center"
                             onMouseEnter={() => openMenuNow(dd.id)}
                             onMouseLeave={scheduleMenuClose}
                           >
@@ -345,13 +342,7 @@ export function Header() {
                   </div>
                 </div>
 
-                <div className="hidden flex-shrink-0 items-center gap-2 md:flex lg:gap-3" onMouseEnter={closeAllMenus}>
-                  <Link
-                    href="/book"
-                    className="rounded-card border border-white/20 px-4 py-2 text-[13px] font-semibold text-white/85 transition-colors duration-200 hover:border-[#FFA91F] hover:text-[#FFA91F] lg:text-sm"
-                  >
-                    Book
-                  </Link>
+                <div className="hidden h-full flex-shrink-0 items-center md:flex" onMouseEnter={closeAllMenus}>
                   <CTAButton href="/contact" className="px-4 py-2 text-sm lg:px-5">
                     Contact
                   </CTAButton>
@@ -361,7 +352,7 @@ export function Header() {
 
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                  className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center p-2 text-white transition-colors hover:text-brand-400 md:hidden touch-manipulation"
+                  className="flex min-h-[44px] min-w-[44px] shrink-0 items-center justify-center self-center p-2 text-white transition-colors hover:text-brand-400 md:hidden touch-manipulation"
                   aria-label="Toggle menu"
                   aria-expanded={isMobileMenuOpen}
                 >
@@ -500,15 +491,8 @@ export function Header() {
                             duration: reducedMotion ? 0 : undefined,
                             delay: reducedMotion ? 0 : SITE_HEADER_NAV.length * 0.04,
                           }}
-                          className="flex flex-col gap-2 border-t border-white/[0.06] pt-4"
+                          className="border-t border-white/[0.06] pt-4"
                         >
-                          <Link
-                            href="/book"
-                            onClick={() => setIsMobileMenuOpen(false)}
-                            className="flex min-h-[44px] items-center justify-center rounded-card border border-white/20 px-4 py-3 text-sm font-semibold text-white transition-colors hover:border-[#FFA91F] hover:text-[#FFA91F]"
-                          >
-                            Book a call
-                          </Link>
                           <CTAButton
                             href="/contact"
                             onClick={() => setIsMobileMenuOpen(false)}

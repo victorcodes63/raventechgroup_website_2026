@@ -48,6 +48,7 @@ import {
   serviceTimelineLineVariants,
   serviceWhatYouGetBlockVariants,
 } from '@/lib/animations'
+import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { caseStudies, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
 import { getServiceMetricsBand } from '@/lib/data/serviceMetricsBand'
 import type { ServiceDetail } from './service-page-types'
@@ -107,19 +108,24 @@ function RealProjectsCaseStudyImage({
 }) {
   const { src, unoptimized } = getCaseStudyImageSrc(study)
   return (
-    <Image
-      src={src}
-      alt={alt}
-      fill
-      priority={priority}
-      sizes={sizes}
-      unoptimized={unoptimized}
-      className={`${objectPosition === 'center' ? 'object-center' : 'object-top origin-top'} ${className}`}
-      onError={(e) => {
-        const el = e.target as HTMLImageElement
-        el.src = study.heroImage
-      }}
-    />
+    <>
+      <Image
+        src={src}
+        alt={alt}
+        fill
+        priority={priority}
+        sizes={sizes}
+        unoptimized={unoptimized}
+        className={`${objectPosition === 'center' ? 'object-center' : 'object-top origin-top'} ${className}`}
+        onError={(e) => {
+          const el = e.target as HTMLImageElement
+          el.src = study.heroImage
+        }}
+      />
+      {study.clientLogo ? (
+        <CaseStudyClientLogoBadge clientLogo={study.clientLogo} clientName={study.client} placement="card" />
+      ) : null}
+    </>
   )
 }
 
@@ -619,7 +625,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
           <div className="site-shell">
             <div className="content-wrap">
               <div className="mb-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
-                <div>
+                <div className="lg:-mt-5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">
                     03 / Service benefits
                   </p>
@@ -942,7 +948,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
             <ServiceSectionHeader
               eyebrow="Insights"
               title="Related reading from Raven"
-              description="Field notes we publish for operators and technical leaders — blog routes go live as articles ship."
+              description="Case studies and field notes for operators and technical leaders."
               reducedMotion={reducedMotion}
             />
             <motion.div
@@ -958,12 +964,12 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                   variants={serviceInsightCardVariants}
                   className="group flex flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#0A0A0A] transition-all duration-300 hover:border-brand-500/40"
                 >
-                  <Link href={`/blog/${post.slug}`} className="flex flex-1 flex-col">
+                  <Link href={post.href ?? `/insights/${post.slug}`} className="flex flex-1 flex-col">
                     {post.image ? (
                       <div className="relative aspect-[16/10] w-full overflow-hidden">
                         <Image
                           src={post.image}
-                          alt={`${post.title} — Raven Tech Group blog`}
+                          alt={`${post.title} — Raven Tech Group`}
                           fill
                           className="object-cover transition duration-700 group-hover:scale-[1.02]"
                           sizes="(min-width: 1024px) 360px, 100vw"

@@ -5,6 +5,7 @@ import { motion } from 'framer-motion'
 import { Mail, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
 import { fadeInUp } from '@/lib/animations'
 import { trackEvent } from '@/components/analytics/GoogleAnalytics'
+import { CTAButtonElement } from '@/components/ui/CTAButton'
 
 export function Newsletter() {
   const [email, setEmail] = useState('')
@@ -73,23 +74,23 @@ export function Newsletter() {
       viewport={{ once: true, margin: '-100px' }}
       className="border-t border-white/10 bg-gradient-to-br from-brand-500/10 via-brand-500/5 to-transparent py-16 sm:py-20 md:py-24"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="site-shell">
         <div className="mx-auto max-w-3xl text-center">
           <motion.div
             initial={{ scale: 0 }}
             whileInView={{ scale: 1 }}
             viewport={{ once: true }}
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-            className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-brand-500/20"
+            className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-sm bg-brand-500/20"
           >
             <Mail className="h-8 w-8 text-brand-400" />
           </motion.div>
           
           <h2 className="mb-4 text-3xl font-semibold text-white sm:text-4xl">
-            Stay updated with our latest insights
+            The Raven Brief
           </h2>
           <p className="mb-8 text-base text-white/70 sm:text-lg">
-            Get technology tips, industry updates, and exclusive content delivered to your inbox.
+            Occasional notes on delivery, infrastructure, and security for teams building in East Africa—no fluff.
           </p>
 
           <form onSubmit={handleSubmit} className="mx-auto max-w-md">
@@ -105,32 +106,35 @@ export function Newsletter() {
                   onChange={(e) => setEmail(e.target.value)}
                   required
                   placeholder="Enter your email"
-                  className="w-full rounded-xl border border-white/20 bg-white/10 px-5 py-4 text-base text-white placeholder:text-white/50 focus:border-brand-500/80 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-brand-500/60"
+                  className="w-full rounded-sm border border-white/20 bg-white/10 px-5 py-4 text-base text-white placeholder:text-white/50 focus:border-brand-500/80 focus:bg-white/15 focus:outline-none focus:ring-2 focus:ring-brand-500/60"
                 />
               </div>
-              <motion.button
-                type="submit"
-                disabled={isSubmitting}
+              <motion.div
                 whileHover={!isSubmitting ? { scale: 1.05 } : {}}
                 whileTap={!isSubmitting ? { scale: 0.95 } : {}}
-                className="rounded-xl bg-brand-500 px-8 py-4 text-base font-semibold text-black transition-colors hover:bg-brand-400 disabled:opacity-70 disabled:cursor-not-allowed whitespace-nowrap"
               >
-                {isSubmitting ? (
-                  <>
-                    <Loader2 className="mr-2 inline h-5 w-5 animate-spin" />
-                    Subscribing...
-                  </>
-                ) : (
-                  'Subscribe'
-                )}
-              </motion.button>
+                <CTAButtonElement
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="whitespace-nowrap px-8 py-4 text-base"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                      Subscribing...
+                    </>
+                  ) : (
+                    'Subscribe'
+                  )}
+                </CTAButtonElement>
+              </motion.div>
             </div>
 
             {submitStatus === 'success' && (
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-brand-500/20 px-4 py-3 text-sm text-brand-200"
+                className="mt-4 flex items-center justify-center gap-2 rounded-sm bg-brand-500/20 px-4 py-3 text-sm text-brand-200"
               >
                 <CheckCircle size={18} />
                 <span>Successfully subscribed! Check your email.</span>
@@ -141,7 +145,7 @@ export function Newsletter() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-red-500/20 px-4 py-3 text-sm text-red-200"
+                className="mt-4 flex items-center justify-center gap-2 rounded-sm bg-red-500/20 px-4 py-3 text-sm text-red-200"
               >
                 <AlertCircle size={18} />
                 <span>{errorMessage}</span>

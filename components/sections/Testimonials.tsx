@@ -1,71 +1,79 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState, useCallback, useEffect } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 
-type Testimonial = {
-  name: string
-  role: string
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
+
+type HomeTestimonial = {
+  id: string
   quote: string
-  avatar: string
+  avatarSrc: string
+  avatarAlt: string
+  displayName: string
+  role: string
+  company: string
+  caseSlug: 'eagle-hr-consultants' | 'honey-box-accessories' | 'r4-automotive'
 }
 
-const testimonials: Testimonial[] = [
+const homeTestimonials: HomeTestimonial[] = [
   {
-    name: "Grace Achieng'",
-    role: 'Advisor, Nairobi Innovation Hub',
+    id: 'eagle-1',
     quote:
-      'The Raven crew are the operators we recommend when founders need steady engineering leadership without the red tape.',
-    avatar: '/images/testimonials/grace.jpg',
+      'We serve banks, regulators, and large employers on recruitment, outsourcing, and compliance—work that used to sprawl across sheets, email, and ad hoc trackers. One system now runs a mandate from first client contact through search, interviews, and billing, so our team spends time on placements and advisory instead of reconciling who said what in which thread.',
+    avatarSrc: '/images/testimonials/kirui-image.webp',
+    avatarAlt: 'Moses Kirui, Head of Operations, Eagle HR Consultants',
+    displayName: 'Moses Kirui',
+    role: 'Head of Operations · Eagle HR Consultants',
+    company: 'Eagle HR Consultants',
+    caseSlug: 'eagle-hr-consultants',
   },
   {
-    name: 'David Karanja',
-    role: 'CTO, RiftPay Sacco Platform',
+    id: 'eagle-2',
     quote:
-      'Raven helped us modernise core banking services without downtime. Documentation and audits stayed on track the entire release.',
-    avatar: '/images/testimonials/david.jpg',
+      'Partners and candidates meet us through our public site and job board—not a separate brochure and a hidden back office. Enquiries and applications no longer fragment across email and WhatsApp; they land in the ATS our delivery team uses daily, so we shortlist faster, give clients clearer status, and keep marketing and operations on one timeline.',
+    avatarSrc: '/images/testimonials/winnie-image.webp',
+    avatarAlt: 'Winnie Mbugua, Business Manager, Eagle HR Consultants',
+    displayName: 'Winnie Mbugua',
+    role: 'Business Manager · Eagle HR Consultants',
+    company: 'Eagle HR Consultants',
+    caseSlug: 'eagle-hr-consultants',
   },
   {
-    name: 'Amina Hassan',
-    role: 'Chief Operating Officer, Horn Health',
+    id: 'honey-1',
     quote:
-      'They embedded with our product squads and kept clinicians in the loop. Launching patient portals across East Africa finally felt manageable.',
-    avatar: '/images/testimonials/amina.jpg',
+      "From start to finish, the team was patient, creative, and direct. They paid attention to every detail and made sure the website reflected my brand's feel. I've received so many compliments already. I would recommend their services.",
+    avatarSrc: '/images/clients/honeybox-store.png',
+    avatarAlt: 'Huini Macharia, Founder, Honey Box Accessories',
+    displayName: 'Huini Macharia',
+    role: 'Founder · Honey Box Accessories',
+    company: 'Honey Box Accessories',
+    caseSlug: 'honey-box-accessories',
   },
   {
-    name: 'Thandiwe Moyo',
-    role: 'VP Engineering, Joburg Transit Authority',
+    id: 'r4-1',
     quote:
-      'Observability and resilience were built in from sprint zero. The handover runbooks still anchor our data teams today.',
-    avatar: '/images/testimonials/thandiwe.jpg',
+      'European parts, Kenyan buyers—every quote lived in Instagram DMs and long WhatsApp threads. Raven is putting live search, KES pricing, and M-Pesa checkout on a path our customers can actually follow.',
+    avatarSrc: '/images/testimonials/mechanic.png',
+    avatarAlt: 'David Mwangi, workshop lead, R4 Automotive',
+    displayName: 'David Mwangi',
+    role: 'Workshop lead & parts desk · R4 Automotive',
+    company: 'R4 Automotive',
+    caseSlug: 'r4-automotive',
   },
   {
-    name: 'Kwame Mensah',
-    role: 'CEO, Accra Microfinance Cooperative',
+    id: 'r4-2',
     quote:
-      'Security workshops were collaborative—not finger pointing. We left with a clear roadmap and immediate wins.',
-    avatar: '/images/testimonials/kwame.jpg',
-  },
-  {
-    name: 'Carol Njoroge',
-    role: 'Community Lead, Africa Dev Collective',
-    quote:
-      'Raven Tech Group contributes code, mentorship, and talks—always generous with knowledge and practical guidance.',
-    avatar: '/images/testimonials/carol.jpg',
-  },
-  {
-    name: 'Kevin Mwangi',
-    role: 'Product Lead, RetailMax',
-    quote:
-      'They kept us honest about scope, ran weekly demos, and left our internal devs confident to evolve the product.',
-    avatar: '/images/testimonials/kevin.jpg',
-  },
-  {
-    name: 'Fatima Diallo',
-    role: 'Head of Operations, Dakar Energy Cooperative',
-    quote:
-      'Their team balanced compliance and innovation. We now deploy infrastructure changes with confidence and full audit trails.',
-    avatar: '/images/testimonials/fatima.jpg',
+      'We are not a software company—we move BMW, VW, and Alfa parts from UK and EU suppliers into Kenya. The build gives us supplier routing, margin logic in shillings, and order visibility we never had when everything was manual back-and-forth.',
+    avatarSrc: '/images/testimonials/mechanic2.png',
+    avatarAlt: 'Brian Odhiambo, procurement lead, R4 Automotive',
+    displayName: 'Brian Odhiambo',
+    role: 'Procurement & garage operations · R4 Automotive',
+    company: 'R4 Automotive',
+    caseSlug: 'r4-automotive',
   },
 ]
 
@@ -73,96 +81,170 @@ interface TestimonialsProps {
   variant?: 'default' | 'contact'
 }
 
+const AUTOPLAY_MS = 6500
+
 export function Testimonials({ variant = 'default' }: TestimonialsProps) {
-  const gradients = [
-    'from-brand-500/80 to-brand-500/40',
-    'from-emerald-500/70 to-emerald-500/40',
-    'from-sky-500/70 to-sky-500/40',
-    'from-violet-500/70 to-violet-500/40',
-  ]
+  const reducedMotion = useReducedMotion()
+  const [current, setCurrent] = useState(0)
+  const [hoverPaused, setHoverPaused] = useState(false)
+  const [focusWithin, setFocusWithin] = useState(false)
+  const autoplayPaused = hoverPaused || focusWithin
+  const n = homeTestimonials.length
+  const t = homeTestimonials[current]
 
-  const rows = testimonials.reduce<Testimonial[][]>(
-    (acc, testimonial, index) => {
-      const rowIndex = index % 2
-      acc[rowIndex].push(testimonial)
-      return acc
-    },
-    [[], []],
-  )
+  const go = useCallback((dir: -1 | 1) => {
+    setCurrent((i) => (i + dir + n) % n)
+  }, [n])
 
-  const isContact = variant === 'contact'
+  useEffect(() => {
+    if (variant !== 'default' || reducedMotion || autoplayPaused) return
+    const id = window.setInterval(() => {
+      setCurrent((i) => (i + 1) % n)
+    }, AUTOPLAY_MS)
+    return () => window.clearInterval(id)
+  }, [variant, reducedMotion, autoplayPaused, n])
+
+  const bg = variant === 'contact' ? 'bg-[#111111]' : 'bg-[#0A0A0A]'
+  const avatarRingOffset = variant === 'contact' ? 'ring-offset-[#111111]' : 'ring-offset-[#0A0A0A]'
 
   return (
-    <section id="testimonials" className="relative overflow-hidden border-t border-white/10 bg-white py-12 sm:py-16 md:py-20">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(14,14,18,0.06),_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,169,30,0.08)_0%,transparent_45%,rgba(14,14,18,0.06)_85%)]" />
-      </div>
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="mx-auto max-w-5xl text-center">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-black">
-            {isContact ? "Still unsure? Here's what our partners say." : "What people say about Raven."}
-          </h2>
-          <p className="mt-3 sm:mt-4 text-sm text-black/65 sm:text-base px-4 sm:px-0">
-            {isContact 
-              ? "Real words from founders, advisors, and partners who've built with us — and never looked back."
-              : "Voices from founders, advisors, and partners who've built with us."}
-          </p>
-        </div>
+    <section
+      id="testimonials"
+      aria-labelledby="testimonials-heading"
+      className={`${bg} py-16 sm:py-20 md:py-28`}
+      onPointerEnter={() => setHoverPaused(true)}
+      onPointerLeave={() => setHoverPaused(false)}
+      onFocusCapture={() => setFocusWithin(true)}
+      onBlurCapture={(e) => {
+        if (!e.currentTarget.contains(e.relatedTarget as Node | null)) {
+          setFocusWithin(false)
+        }
+      }}
+    >
+      <div className="site-shell flex flex-col" style={{ minHeight: 'clamp(420px, 55vh, 580px)' }}>
 
-        <div className="mt-8 sm:mt-12 space-y-6 sm:space-y-8">
-          {rows.map((row, rowIndex) => (
-            <div key={rowIndex} className="relative overflow-hidden">
-              <motion.div
-                className="flex w-max gap-4 sm:gap-6 md:gap-8"
-                initial={{ x: rowIndex === 0 ? '0%' : '-50%' }}
-                animate={{ x: rowIndex === 0 ? '-50%' : '0%' }}
-                transition={{ repeat: Infinity, duration: 40, ease: 'linear' }}
+        <SectionEyebrow gutterBottom={false} className="mb-3">
+          What clients say
+        </SectionEyebrow>
+        <p className="mb-6 max-w-xl text-sm font-medium leading-snug tracking-tight text-white/50 md:mb-8">
+          Trusted by SMEs, founders, and ops teams across Africa.
+        </p>
+
+        {/* Main: rails + quote */}
+        <div className="flex flex-1 items-center gap-8 sm:gap-12 lg:gap-16">
+
+          {/* Vertical navigation rails */}
+          <div className="flex shrink-0 flex-col gap-2.5" role="tablist" aria-label="Choose testimonial">
+            {homeTestimonials.map((item, i) => (
+              <button
+                key={item.id}
+                type="button"
+                role="tab"
+                aria-selected={i === current}
+                onClick={() => setCurrent(i)}
+                className="group relative h-0.5 w-10 rounded-full bg-white/[0.12] transition-colors hover:bg-white/25"
+                aria-label={`Quote from ${item.company}`}
               >
-                {[...row, ...row].map((testimonial, index) => {
-                  const gradient = gradients[index % gradients.length]
+                {i === current && (
+                  <motion.span
+                    layoutId="rail-active"
+                    className="absolute inset-0 rounded-full bg-brand-500"
+                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                  />
+                )}
+              </button>
+            ))}
+          </div>
 
-                  return (
-                    <div
-                      key={`${testimonial.name}-${index}`}
-                      className="flex min-w-[280px] sm:min-w-[320px] max-w-[420px] flex-1 flex-col gap-4 sm:gap-5 rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 px-4 py-5 sm:px-6 sm:py-6 shadow-[0_18px_60px_-45px_rgba(15,23,42,0.55)] backdrop-blur"
-                    >
-                      <p className="text-sm text-black/70 leading-relaxed">
-                        &ldquo;{testimonial.quote}&rdquo;
-                      </p>
-                      <div className="mt-auto flex items-center gap-3 sm:gap-4">
-                        <span
-                          className={`relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br ${gradient} text-white font-semibold shadow-[0_12px_30px_-20px_rgba(15,23,42,0.55)] flex-shrink-0`}
-                        >
-                          <Image
-                            src={testimonial.avatar}
-                            alt={testimonial.name}
-                            fill
-                            sizes="(max-width: 640px) 48px, 56px"
-                            className={`object-cover ${
-                              testimonial.name.includes("Kwame") || 
-                              testimonial.name.includes("Kevin") || 
-                              testimonial.name.includes("Fatima") 
-                                ? "object-top" 
-                                : ""
-                            }`}
-                          />
-                        </span>
-                        <div className="text-left min-w-0">
-                          <div className="text-sm font-semibold text-black truncate">{testimonial.name}</div>
-                          <div className="text-xs uppercase tracking-[0.18em] text-black/40 truncate">{testimonial.role}</div>
-                        </div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </motion.div>
-            </div>
-          ))}
+          {/* Quote */}
+          <div className="flex-1">
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.blockquote
+                key={t.id}
+                initial={{ opacity: 0, y: 18 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -12 }}
+                transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                className="text-pretty text-[1.45rem] font-medium leading-[1.35] tracking-tight text-white sm:text-2xl md:text-[1.85rem] md:leading-[1.28] lg:text-[2.15rem]"
+              >
+                <h2 id="testimonials-heading" className="sr-only">Client testimonials</h2>
+                &ldquo;{t.quote}&rdquo;
+              </motion.blockquote>
+            </AnimatePresence>
+          </div>
         </div>
 
-        <div className="mt-10 sm:mt-14 text-center text-sm text-black/55 px-4 sm:px-0">
-          Want to speak to a previous partner? <span className="font-medium text-brand-500">We&apos;re happy to make introductions.</span>
+        {/* Bottom bar: thumbnails + attribution + arrows */}
+        <div className="mt-12 flex flex-col gap-5 border-t border-white/[0.04] pt-8 sm:flex-row sm:items-center sm:justify-between">
+
+          {/* Left: thumbnails + attribution */}
+          <div className="flex items-center gap-3 sm:gap-4">
+            {/* Thumbnail squares */}
+            <div className="flex items-center gap-1.5">
+              {homeTestimonials.map((item, i) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setCurrent(i)}
+                  aria-label={`Show quote from ${item.company}`}
+                  className={`relative h-11 w-11 shrink-0 overflow-hidden rounded-card transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#FFA91F] ${
+                    i === current
+                      ? `ring-2 ring-[#FFA91F]/70 ring-offset-2 ${avatarRingOffset}`
+                      : 'opacity-70 ring-1 ring-white/[0.08] hover:opacity-100 hover:ring-white/20'
+                  }`}
+                >
+                  <Image
+                    src={item.avatarSrc}
+                    alt={item.avatarAlt}
+                    fill
+                    className="object-cover"
+                    sizes="44px"
+                  />
+                </button>
+              ))}
+            </div>
+
+            {/* Attribution */}
+            <AnimatePresence mode="wait" initial={false}>
+              <motion.div
+                key={t.id}
+                initial={{ opacity: 0, x: 8 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -8 }}
+                transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+                className="border-l-2 border-brand-500 pl-3.5"
+              >
+                <p className="text-sm font-semibold text-white">{t.displayName}</p>
+                <p className="mt-0.5 text-xs text-white/45">{t.role}</p>
+              </motion.div>
+            </AnimatePresence>
+          </div>
+
+          {/* Right: case study link + arrows */}
+          <div className="flex shrink-0 items-center gap-3 self-end sm:self-center">
+            <Link
+              href={`/case-studies/${t.caseSlug}`}
+              className="hidden text-xs font-semibold text-brand-500/70 transition hover:text-brand-400 sm:block"
+            >
+              Read case study →
+            </Link>
+            <button
+              type="button"
+              onClick={() => go(-1)}
+              aria-label="Previous testimonial"
+              className="flex h-11 w-11 items-center justify-center rounded-sm border border-white/[0.1] bg-white/[0.04] text-white/50 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+            >
+              <ChevronLeft size={18} strokeWidth={2} />
+            </button>
+            <button
+              type="button"
+              onClick={() => go(1)}
+              aria-label="Next testimonial"
+              className="flex h-11 w-11 items-center justify-center rounded-sm border border-white/[0.1] bg-white/[0.04] text-white/50 transition hover:border-white/20 hover:bg-white/[0.08] hover:text-white"
+            >
+              <ChevronRight size={18} strokeWidth={2} />
+            </button>
+          </div>
         </div>
       </div>
     </section>

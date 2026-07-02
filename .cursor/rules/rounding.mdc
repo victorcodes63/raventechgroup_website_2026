@@ -1,0 +1,50 @@
+---
+description: Border-radius standard — all cards, panels, buttons, and interactive elements must use the rounded-card token
+globs: **/*.tsx,**/*.ts,**/*.css
+alwaysApply: true
+---
+
+# Border-Radius Standard
+
+All cards, panels, buttons, and interactive elements use a **single design token**: `rounded-card`.
+
+The value is defined in `app/globals.css`:
+```css
+--radius-card: 0.125rem; /* 2px — subtle, near-square; matches Hero accordion panels */
+```
+
+And registered in `tailwind.config.ts`:
+```ts
+borderRadius: { card: 'var(--radius-card)' }
+```
+
+## Rules
+
+- ✅ Use `rounded-card` for all cards, panels, buttons, icon rings, nav buttons, dropdowns, and modal surfaces
+- ✅ Use `rounded-b-card` / `rounded-t-card` etc. for partial rounding on attached elements (e.g. mobile menu dropdowns)
+- ✅ `rounded-full` is allowed only for pills, avatars, progress bars, and circular elements
+- ❌ Never hardcode `rounded-sm`, `rounded-md`, `rounded-lg`, `rounded-xl`, `rounded-[Npx]`, or `rounded-[Nrem]` on card/button surfaces
+- ❌ Never use different radius values on different components — consistency is enforced via the CSS variable
+
+## Changing the radius
+
+To update the radius site-wide, change **only** the CSS variable in `globals.css`:
+```css
+--radius-card: 0.25rem; /* change here → propagates everywhere */
+```
+
+Do not change individual component classes.
+
+## Examples
+
+```tsx
+// ✅ Correct
+<div className="rounded-card border bg-white">...</div>
+<button className="rounded-card px-4 py-2">Submit</button>
+<div className="rounded-b-card border-t">Mobile dropdown</div>
+
+// ❌ Wrong
+<div className="rounded-lg border bg-white">...</div>
+<button className="rounded-md px-4 py-2">Submit</button>
+<div className="rounded-b-[11px] border-t">Mobile dropdown</div>
+```

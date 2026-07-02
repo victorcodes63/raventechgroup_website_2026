@@ -26,6 +26,8 @@ export type CaseStudy = {
   year: string
   heroImage: string
   heroImageAlt: string
+  /** Curated static capture for cards when live screenshots break SVG/text logos */
+  cardImage?: string
   services: string[]
   stack: string[]
   tagline: string
@@ -64,9 +66,15 @@ export function caseStudyPrimaryMetric(study: CaseStudy): string | undefined {
 }
 
 /**
- * Homepage case-study grid: live screenshot when `siteUrl` is set and public; else static hero art.
+ * Case-study card media: `cardImage` when Microlink breaks logos; else live screenshot when `siteUrl` is set; else `heroImage`.
  */
 export function getCaseStudyImageSrc(study: CaseStudy): { src: string; unoptimized: boolean } {
+  if (study.slug === 'r4-automotive') {
+    return { src: '/images/photos/r4-auto-screen.png', unoptimized: false }
+  }
+  if (study.cardImage) {
+    return { src: study.cardImage, unoptimized: false }
+  }
   if (study.siteUrl) {
     return {
       src: `/api/screenshot?url=${encodeURIComponent(study.siteUrl)}`,
@@ -85,7 +93,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Nairobi, Kenya',
     engagementLength: '6 months ongoing',
     year: '2024 — ongoing',
-    heroImage: '/images/case-studies/eagle-hr/hero.jpg',
+    heroImage: '/images/photos/eaglehrscreen.png',
     heroImageAlt: 'Eagle HR Consultants platform dashboard on a laptop',
     services: ['Software Development', 'Web Development', 'Digital Transformation'],
     stack: ['Next.js 14', 'TypeScript', 'PostgreSQL', 'Tailwind CSS', 'Vercel', 'Resend'],
@@ -126,7 +134,7 @@ export const caseStudies: CaseStudy[] = [
         heading: 'Platform modules, shipped as one system',
         body:
           'The platform we built for Eagle HR consists of six tightly integrated modules — all sharing one user directory, one audit log, one permissions model. Recruitment ATS handles job posting, applications, candidate screening, and interview scheduling. Finance & Payroll handles contracts, invoices, payroll calculations with KRA iTax and P9 formula compliance, and payment records. Outsourcing & Employees tracks placed staff, their reviews, and client satisfaction. Vendor Management handles supplier onboarding and invoice processing. The Client Portal gives clients a single login to view their outsourced staff, placement pipeline, and invoicing. The public website is the seventh piece — a marketing surface that captures leads directly into the ATS.',
-        image: '/images/case-studies/eagle-hr/platform-overview.png',
+        image: '/images/eagle-dashboard.png',
         imageAlt: 'Eagle HR platform dashboard showing integrated modules',
       },
       {
@@ -155,7 +163,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Nairobi, Kenya',
     engagementLength: '4 months (phase one)',
     year: '2025 — launching Q2 2026',
-    heroImage: '/images/case-studies/r4-automotive/hero.jpg',
+    heroImage: '/images/photos/r4-auto-screen.png',
     heroImageAlt: 'R4 Automotive parts search interface',
     services: ['System Integration', 'Software Development', 'Web Development'],
     stack: ['Next.js 14', 'TypeScript', 'Neon PostgreSQL', 'Vercel', 'M-Pesa Daraja API'],
@@ -209,7 +217,7 @@ export const caseStudies: CaseStudy[] = [
     location: 'Nairobi, Kenya',
     engagementLength: '6 weeks',
     year: '2025',
-    heroImage: '/images/case-studies/honey-box/hero.jpg',
+    heroImage: '/images/clients/honeybox-store.png',
     heroImageAlt: 'Honey Box Accessories jewellery on the Shopify storefront',
     services: ['Web Development', 'System Integration'],
     stack: ['Shopify', 'Liquid', 'Custom Theme Development'],
@@ -247,6 +255,127 @@ export const caseStudies: CaseStudy[] = [
         heading: 'Operations after launch',
         body:
           'Orders land in Shopify admin with the same SKUs the Instagram shop references, so the founder is not maintaining two truths. Shipping profiles cover nationwide delivery; label printing is standard Shopify workflow. The brand finally scales the front door without hiring a full-time order desk first.',
+      },
+    ],
+  },
+  {
+    slug: 'youthplus-festival-2026',
+    client: 'Youth+ Africa',
+    industry: 'Events · Youth innovation',
+    industrySlug: 'events',
+    location: 'Nairobi, Kenya',
+    engagementLength: '10 weeks to production launch',
+    year: '2026',
+    heroImage: '/images/case-studies/youthplus-africa-preview.png',
+    cardImage: '/images/case-studies/youthplus-africa-preview.png',
+    heroImageAlt: 'Youth+ Africa homepage at youthplusafrica.com — hero, tickets, and partner strip',
+    services: ['Web Development', 'Software Development', 'Digital Transformation'],
+    stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
+    tagline: 'A flagship festival front door with programme depth and ticket clarity.',
+    problem:
+      "Youth+ runs one of the continent's highest-signal large-format youth gatherings — multi-day labs at Sarit, tiered passes in KES, and a speaker bench that has to read credible on first scroll. They needed a web experience that matched the ambition: editorial storytelling, a dense programme surface, and checkout expectations around M-Pesa and cards — without looking like a generic events template.",
+    solution:
+      'Raven built the production marketing site on Next.js and shipped it on Vercel. The experience centres a four-day lab grid with dates, tracks, and tier labels; a speaker bench with profile depth and direct links; pass economics surfaced before checkout; and narrative sections that explain outcomes for founders and operators. Supporting rails — FAQs, agenda framing, partner strip, and ecosystem case stories — sit in the same visual system so nothing feels bolted on.',
+    outcomeHeadline: 'Festival-week positioning, speaker authority, and ticket paths on one surface.',
+    outcomeSummary:
+      'Visitors move from headline promise to programme detail to pass selection with consistent typography and motion. The site carries twenty curated speaker profiles, four daily lab rows, three visible pass tiers with stock messaging, and buyer reassurance on QR delivery and payment modes — all deployed as a single responsive product.',
+    metrics: [
+      { value: '20', label: 'Curated speaker profiles' },
+      { value: '4', label: 'Festival lab days on programme' },
+      { value: '3', label: 'Pass tiers with availability signal' },
+    ],
+    featured: false,
+    status: 'live',
+    siteUrl: 'https://youthplusafrica.com',
+    publishedAt: '2026-05-19',
+    tags: ['Events', 'Next.js', 'Conversion UX'],
+    platformModules: [
+      'Festival hero and editorial storytelling',
+      'Speaker bench with external credibility links',
+      'Session grid with Sarit programme framing',
+      'Pass tiers, FAQs, and checkout reassurance',
+    ],
+    cta: 'Read the Youth+ Africa story',
+    sections: [
+      {
+        heading: 'Why the site had to feel like the event',
+        body:
+          'A summit landing page that reads thin costs trust before anyone reaches checkout. Youth+ competes for founder attention against pan-African programmes — the UI needed density without clutter: clear dates, session naming, and tier economics so operators could decide fast. We structured the page as a narrative spine with programme proof in the middle and commerce truth at the bottom.',
+      },
+      {
+        heading: 'Programme and passes as one story',
+        body:
+          'Each lab day maps to a track label — AI, growth, policy, capital — with seat counts visible at the tier level. Pass names stay consistent across the grid and pricing band so marketing and finance stay aligned. Buyers see what “Early Bird” buys them before they leave the page.',
+      },
+      {
+        heading: 'Speaker bench as social proof',
+        body:
+          'Twenty profiles ship with role lines and short mandate copy — enough for credibility without turning into a CRM export. Cards invite exploration on desktop and swipe-style browsing on mobile so the roster feels alive, not indexed.',
+      },
+      {
+        heading: 'What runs in production',
+        body:
+          'The festival marketing site is live at youthplusafrica.com — Next.js App Router, strict TypeScript, Tailwind, and Vercel in production. Visitors get programme depth, speaker proof, pass tiers, and checkout reassurance on one domain; ticket purchase routes through integrated commerce partners while the Raven-built front door stays fast on mobile networks across Kenya.',
+      },
+    ],
+  },
+  {
+    slug: 'all-axs-events',
+    client: 'All AXS',
+    industry: 'Events · Corporate ticketing',
+    industrySlug: 'events',
+    location: 'Nairobi, Kenya · Pan-Africa catalogue',
+    engagementLength: '12 weeks to first production release',
+    year: '2026',
+    heroImage: '/images/photos/meeting.png',
+    heroImageAlt: 'All AXS — corporate events discovery and ticketing experience',
+    services: ['Web Development', 'Software Development', 'System Integration'],
+    stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
+    tagline: 'Discovery, purchase, and door-ready passes on one disciplined surface.',
+    problem:
+      'Corporate forums and summits fail when discovery, fees, and entry feel like three different products. Delegates need honest totals before they pay; organisers need listings that stay on-brand when Wi‑Fi at the venue drops; operations teams need QR delivery that survives queues. All AXS set out to keep everything on one thread — from browse to badge scan — without the noise of bolt-on tools.',
+    solution:
+      'Raven implemented the All AXS web product end-to-end on Next.js and Vercel: moderated listings, transparent tier and fee language, calendar-first discovery, organiser onboarding storytelling, buyer-protection policies, and a three-step journey narrative (discover, checkout, attend) tuned for low-bandwidth mobile. Production includes demo events in the catalogue so buyers and organisers can see the shape of a live listing before their own drop.',
+    outcomeHeadline: 'One platform narrative for delegates and organisers — calm copy, clear economics.',
+    outcomeSummary:
+      'The live site carries upcoming events with pricing from published tiers, organiser acquisition flows, policy pages that reduce support load, and venue-ready messaging on QR delivery. Filters (calendar, format, tone) give repeat visitors a faster path as the catalogue grows.',
+    metrics: [
+      { value: '3', label: 'Product stages: discover, pay, attend' },
+      { value: '2', label: 'Demo events in launch catalogue' },
+      { value: '5', label: 'Trust and ops pages in v1' },
+    ],
+    featured: false,
+    status: 'live',
+    siteUrl: 'https://allaxs.vercel.app',
+    publishedAt: '2026-04-18',
+    tags: ['Event platform', 'Ticketing UX', 'Next.js'],
+    platformModules: [
+      'Event discovery with calendar and filters',
+      'Listing templates with fee transparency',
+      'Organiser onboarding and payout narrative',
+      'Buyer policies, QR delivery, and support positioning',
+    ],
+    cta: 'Read the All AXS story',
+    sections: [
+      {
+        heading: 'Corporate events need product discipline',
+        body:
+          'When listing quality and checkout tone diverge, delegates blame the organiser even when the fault sits in software. All AXS treats every surface — browse grid, detail header, fee breakdown, door copy — as part of one brand promise. That is the brief Raven executed for v1.',
+      },
+      {
+        heading: 'Trust surfaces above the fold',
+        body:
+          'Fees are stated before payment; refunds reference organiser policy on every listing; QR passes land in email and account copy so venue teams can set expectations in training. Those are product decisions written into layout, not footnotes.',
+      },
+      {
+        heading: 'Organiser acquisition without spreadsheet chaos',
+        body:
+          'The organiser path walks profile creation, tier design, publish, and door scanning as four numbered moves — mirroring how operators actually run a show. It keeps sales conversations aligned with what the product truly ships today.',
+      },
+      {
+        heading: 'Built for African payment realities',
+        body:
+          'Checkout copy calls out M-Pesa and cards explicitly; the experience stays usable on constrained networks because heavy interaction sits behind short flows and server-rendered pages. Future payment rails can extend the same pattern without rewriting the buyer story.',
       },
     ],
   },

@@ -3,7 +3,9 @@
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X } from 'lucide-react'
+import { CTAButtonElement } from '@/components/ui/CTAButton'
+
+const CONSENT_EVENT = 'cookie-consent-updated'
 
 export function CookieBanner() {
   const [isVisible, setIsVisible] = useState(false)
@@ -22,11 +24,13 @@ export function CookieBanner() {
 
   const handleAccept = () => {
     localStorage.setItem('cookie-consent', 'accepted')
+    window.dispatchEvent(new Event(CONSENT_EVENT))
     setIsVisible(false)
   }
 
   const handleReject = () => {
     localStorage.setItem('cookie-consent', 'rejected')
+    window.dispatchEvent(new Event(CONSENT_EVENT))
     setIsVisible(false)
   }
 
@@ -40,7 +44,7 @@ export function CookieBanner() {
           transition={{ duration: 0.3, ease: 'easeOut' }}
           className="fixed bottom-0 left-0 right-0 z-50 border-t border-white/10 bg-black/95 backdrop-blur-sm px-4 py-4 sm:px-6 sm:py-5"
         >
-          <div className="container mx-auto max-w-6xl">
+          <div className="site-shell mx-auto max-w-6xl">
             <div className="flex flex-col gap-4 text-center sm:flex-row sm:items-center sm:justify-between sm:text-left">
               <div className="flex-1 sm:pr-8">
                 <p className="text-sm text-white/80 leading-relaxed">
@@ -51,18 +55,19 @@ export function CookieBanner() {
                 </p>
               </div>
               <div className="flex items-center justify-center gap-3 sm:justify-start">
-                <button
+                <CTAButtonElement
                   onClick={handleReject}
-                  className="rounded-full border border-white/20 bg-white/5 px-4 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  variant="light-outline"
+                  className="px-4 py-2 text-sm"
                 >
                   Decline
-                </button>
-                <button
+                </CTAButtonElement>
+                <CTAButtonElement
                   onClick={handleAccept}
-                  className="rounded-full bg-brand-500 px-4 py-2 text-sm font-semibold text-black transition-colors hover:bg-brand-400"
+                  className="px-4 py-2 text-sm"
                 >
                   Accept
-                </button>
+                </CTAButtonElement>
               </div>
             </div>
           </div>

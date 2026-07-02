@@ -6,6 +6,7 @@ import type { CaseStudy } from '@/lib/data/caseStudies'
 import { getCaseStudyImageSrc } from '@/lib/data/caseStudies'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
+import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 
 type CaseStudyCardProps = {
   study: CaseStudy
@@ -41,9 +42,16 @@ export function CaseStudyCard({ study, variant, priority }: CaseStudyCardProps) 
               unoptimized={unoptimized}
             />
             <div
-              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-transparent lg:bg-gradient-to-r"
+              className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/55 via-black/20 to-transparent lg:bg-gradient-to-r"
               aria-hidden
             />
+            {study.clientLogo ? (
+              <CaseStudyClientLogoBadge
+                clientLogo={study.clientLogo}
+                clientName={study.client}
+                placement="card"
+              />
+            ) : null}
           </div>
           <div className="flex flex-1 flex-col justify-center p-8 lg:p-10">
             <div className="mb-4 flex flex-wrap gap-2">
@@ -88,7 +96,13 @@ export function CaseStudyCard({ study, variant, priority }: CaseStudyCardProps) 
           priority={priority}
           unoptimized={unoptimized}
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/65 to-transparent" aria-hidden />
+        <div
+          className="pointer-events-none absolute inset-0 z-[1] bg-gradient-to-t from-black/65 to-transparent"
+          aria-hidden
+        />
+        {study.clientLogo ? (
+          <CaseStudyClientLogoBadge clientLogo={study.clientLogo} clientName={study.client} placement="card" />
+        ) : null}
       </Link>
       <div className="flex flex-1 flex-col p-6">
         <div className="mb-3 flex flex-wrap gap-2">

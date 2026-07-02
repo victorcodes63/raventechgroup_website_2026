@@ -6,6 +6,7 @@ import { ScrollReveal } from '@/components/motion/ScrollReveal'
 import { CaseStudyStickyMetricsBar } from '@/components/case-studies/CaseStudyStickyMetricsBar'
 import { RelatedContent } from '@/components/shared/RelatedContent'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
+import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { caseStudies, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
 import type { CaseStudy } from '@/lib/data/caseStudies'
 
@@ -115,9 +116,16 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
             unoptimized={unoptimized}
           />
           <div
-            className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-[#0A0A0A]/45"
+            className="absolute inset-0 z-[1] bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/80 to-[#0A0A0A]/45"
             aria-hidden
           />
+          {study.clientLogo ? (
+            <CaseStudyClientLogoBadge
+              clientLogo={study.clientLogo}
+              clientName={study.client}
+              placement="hero"
+            />
+          ) : null}
         </div>
         <div className="relative mx-auto flex min-h-[52vh] max-w-7xl flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-20 md:pt-40 lg:px-12">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFA91F]">

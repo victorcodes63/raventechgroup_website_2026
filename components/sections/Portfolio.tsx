@@ -52,7 +52,7 @@ const projects = [
 export function Portfolio() {
   return (
     <section id="portfolio" className="py-24 bg-white">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="site-shell">
         <motion.div
           variants={staggerContainer}
           initial="hidden"
@@ -77,7 +77,7 @@ export function Portfolio() {
                 key={project.title}
                 variants={scrollReveal}
                 whileHover={hoverScale}
-                className="group bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-200 border border-dark-100"
+                className="group bg-white rounded-sm overflow-hidden shadow-sm hover:shadow-xl transition-shadow duration-200 border border-dark-100"
               >
                 <div className="relative h-64 bg-gradient-to-br from-primary-100 to-primary-200 overflow-hidden">
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -90,14 +90,14 @@ export function Portfolio() {
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="w-12 h-12 bg-white rounded-full flex items-center justify-center"
+                        className="flex h-12 w-12 items-center justify-center rounded-sm bg-white"
                       >
                         <ExternalLink className="text-dark-900" size={20} />
                       </motion.button>
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        className="w-12 h-12 bg-white rounded-full flex items-center justify-center"
+                        className="flex h-12 w-12 items-center justify-center rounded-sm bg-white"
                       >
                         <Github className="text-dark-900" size={20} />
                       </motion.button>
@@ -116,7 +116,7 @@ export function Portfolio() {
                     {project.tags.map((tag) => (
                       <span
                         key={tag}
-                        className="px-3 py-1 bg-dark-100 text-dark-700 rounded-full text-xs font-medium"
+                        className="rounded-sm bg-dark-100 px-3 py-1 text-xs font-medium text-dark-700"
                       >
                         {tag}
                       </span>
@@ -135,7 +135,7 @@ export function Portfolio() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
-              className="px-8 py-4 bg-dark-900 text-white rounded-lg font-semibold text-lg hover:bg-dark-800 transition-colors duration-200"
+              className="px-8 py-4 bg-dark-900 text-white rounded-sm font-semibold text-lg hover:bg-dark-800 transition-colors duration-200"
             >
               View All Projects
             </motion.button>

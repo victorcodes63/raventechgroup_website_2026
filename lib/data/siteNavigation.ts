@@ -1,6 +1,8 @@
+import { getLiveProducts } from '@/lib/data/products'
+
 /**
  * Primary header navigation — single source of truth for desktop + mobile.
- * Order: Services → Case studies → Resources → Company; CTAs in Header.tsx.
+ * Order: Services → Products → Case studies → Insights → Company; CTAs in Header.tsx.
  */
 
 export type SiteNavDropdownItem = {
@@ -11,7 +13,7 @@ export type SiteNavDropdownItem = {
 
 export type SiteNavDropdown = {
   type: 'dropdown'
-  id: 'resources' | 'company'
+  id: 'company' | 'products'
   label: string
   items: SiteNavDropdownItem[]
 }
@@ -30,23 +32,28 @@ export type SiteNavEntry = SiteNavServices | SiteNavLink | SiteNavDropdown
 
 export const SITE_HEADER_NAV: SiteNavEntry[] = [
   { type: 'services' },
-  { type: 'link', label: 'Case studies', href: '/case-studies' },
   {
     type: 'dropdown',
-    id: 'resources',
-    label: 'Resources',
+    id: 'products',
+    label: 'Products',
     items: [
       {
-        label: 'Insights',
-        href: '/insights',
-        description: 'Field notes — engineering, strategy, Kenya market.',
+        label: 'All products',
+        href: '/products',
+        description: 'Software Raven builds and operates.',
       },
-      {
-        label: 'Playbooks',
-        href: '/playbooks',
-        description: 'Downloadable guides and frameworks we use with clients.',
-      },
+      ...getLiveProducts().map((product) => ({
+        label: product.name,
+        href: product.bridgeHref,
+        description: product.navDescription,
+      })),
     ],
+  },
+  { type: 'link', label: 'Case studies', href: '/case-studies' },
+  {
+    type: 'link',
+    label: 'Insights',
+    href: '/insights',
   },
   {
     type: 'dropdown',
@@ -63,19 +70,14 @@ export const SITE_HEADER_NAV: SiteNavEntry[] = [
         href: '/careers',
         description: 'Open roles and how to reach us.',
       },
-      {
-        label: 'Book a call',
-        href: '/book',
-        description: 'Schedule a discovery session — no pitch deck.',
-      },
     ],
   },
 ]
 
 /** Routes that belong to a dropdown — for active state under parent label */
 export const SITE_NAV_DROPDOWN_ROUTE_PREFIX: Record<SiteNavDropdown['id'], string[]> = {
-  resources: ['/insights', '/playbooks'],
-  company: ['/about', '/careers', '/book'],
+  products: ['/products'],
+  company: ['/about', '/careers'],
 }
 
 export function siteNavLinkIsActive(pathname: string, href: string): boolean {

@@ -1,167 +1,145 @@
 'use client'
 
-import NextLink from 'next/link'
-import { motion } from 'framer-motion'
-import { fadeInUp, staggerContainer } from '@/lib/animations'
-import { ArrowRight, ClipboardCheck, Layers, ShieldCheck, Wrench, Shield, Award, Users, CheckCircle } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { motion, useReducedMotion } from 'framer-motion'
 
-type Step = {
-  icon: typeof ClipboardCheck
+import { CTAButton } from '@/components/ui/CTAButton'
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
+import { howWeWorkSteps } from '@/lib/data/howWeWork'
+
+function ProcessStepCard({
+  index,
+  title,
+  description,
+  prefersReducedMotion,
+}: {
+  index: number
   title: string
   description: string
+  prefersReducedMotion: boolean
+}) {
+  const cardRef = useRef<HTMLElement | null>(null)
+  const [isActive, setIsActive] = useState(false)
+
+  useEffect(() => {
+    const el = cardRef.current
+    if (!el) return
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsActive(entry.isIntersecting)
+      },
+      {
+        root: null,
+        rootMargin: '-40px 0px -40px 0px',
+        threshold: 0.15,
+      },
+    )
+
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  const stepNo = String(index + 1).padStart(2, '0')
+
+  const motionProps = prefersReducedMotion
+    ? {}
+    : {
+        initial: { opacity: 0, y: 24 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: '-40px' },
+        transition: {
+          duration: 0.55,
+          ease: [0.21, 0.47, 0.32, 0.98],
+          delay: index * 0.12,
+        },
+      }
+
+  return (
+    <motion.article
+      ref={cardRef}
+      {...motionProps}
+      className={[
+        'relative min-h-0 overflow-hidden px-0 pb-14 pt-10 transition-colors duration-200 lg:min-h-[240px]',
+        isActive
+          ? 'border-t-[1.5px] border-[#FFA91F]/70'
+          : 'border-t border-white/[0.06]',
+        'hover:border-t-[1.5px] hover:border-[#FFA91F]/70',
+      ].join(' ')}
+    >
+      <span
+        className="absolute right-0 top-6 z-0 select-none text-[180px] font-bold leading-none tracking-[-0.04em] text-white/[0.06] lg:text-[220px]"
+        aria-hidden
+      >
+        {stepNo}
+      </span>
+
+      <div className="relative z-10 w-full min-w-0">
+        <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FFA91F]/80">{stepNo}</p>
+        <h3 className="text-xl font-bold leading-tight tracking-tight text-white lg:text-2xl">{title}</h3>
+        <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-white/55 lg:text-[15px]">{description}</p>
+      </div>
+    </motion.article>
+  )
 }
 
-const steps: Step[] = [
-  {
-    icon: ClipboardCheck,
-    title: 'Scope & align',
-    description: 'Discovery sessions, success metrics, and governance agreed upfront so everyone knows what “done” looks like.',
-  },
-  {
-    icon: Layers,
-    title: 'Architecture sprint',
-    description: 'Reference architecture, rapid prototypes, and risk validation to keep surprises out of delivery.',
-  },
-  {
-    icon: Wrench,
-    title: 'Delivery cadence',
-    description: 'Sprint rituals, demos, CI/CD automation, and honest status reports—accountable progress every iteration.',
-  },
-  {
-    icon: ShieldCheck,
-    title: 'Operate & uplift',
-    description: 'Handover playbooks, observability, and ongoing optimisation so the platform keeps performing long after launch.',
-  },
-]
-
-const badges = [
-  {
-    icon: Shield,
-    title: 'Enterprise Security',
-    description: 'ISO 27001 compliant',
-  },
-  {
-    icon: Award,
-    title: 'Quality Assured',
-    description: 'Certified development processes',
-  },
-  {
-    icon: Users,
-    title: 'Trusted Partners',
-    description: '50+ successful projects',
-  },
-  {
-    icon: CheckCircle,
-    title: 'Proven Track Record',
-    description: '98% client satisfaction',
-  },
-]
-
 export function Process() {
-  return (
-    <section className="relative overflow-hidden border-t border-white/10 bg-white text-black">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(14,14,18,0.06),_transparent_60%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,169,30,0.08)_0%,transparent_45%,rgba(14,14,18,0.06)_85%)]" />
-      </div>
-      <div className="container relative mx-auto px-4 py-12 sm:py-16 md:py-20 sm:px-6 lg:px-8">
-        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} className="mx-auto max-w-5xl">
-          <motion.div variants={fadeInUp} className="text-center">
-            <p className="text-xs font-semibold uppercase tracking-[0.25em] text-black/50">How we partner</p>
-            <h2 className="mt-2 sm:mt-3 text-2xl sm:text-3xl md:text-4xl font-semibold text-black">From first workshop to steady-state operations</h2>
-            <p className="mx-auto mt-3 sm:mt-4 max-w-3xl text-sm text-black/65 sm:text-base px-4 sm:px-0">
-              We stay embedded—from aligning the roadmap and validating the architecture, to shipping the work and keeping it resilient in production.
-            </p>
-          </motion.div>
+  const reduced = useReducedMotion()
 
-          <div className="mt-8 sm:mt-12 space-y-4 sm:space-y-6">
-            {steps.map(({ icon: Icon, title, description }, index) => (
-              <motion.div key={title} variants={fadeInUp} className="group relative overflow-hidden rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 p-5 sm:p-6 md:p-8 transition duration-300 hover:border-brand-400/60 hover:bg-brand-500/10 shadow-[0_18px_60px_-45px_rgba(15,23,42,0.35)] backdrop-blur">
-                <div className="absolute left-4 top-4 sm:left-6 sm:top-6 text-xs sm:text-sm font-semibold uppercase tracking-[0.25em] text-black/40">
-                  {`0${index + 1}`}
-                </div>
-                <div className="flex items-start gap-4 sm:gap-6">
-                  <span className="mt-1 inline-flex h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 items-center justify-center rounded-2xl bg-brand-500/10 text-brand-500 transition duration-200 group-hover:bg-brand-500/20 group-hover:text-brand-600">
-                    <Icon size={20} className="sm:w-6 sm:h-6" />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <h3 className="text-lg sm:text-xl font-semibold text-black">{title}</h3>
-                    <p className="mt-2 sm:mt-3 text-sm text-black/65 leading-relaxed">{description}</p>
-                    <ArrowRight className="mt-4 sm:mt-6 h-4 w-4 text-black/20 transition duration-200 group-hover:translate-x-1 group-hover:text-brand-500" />
-                  </div>
-                </div>
-              </motion.div>
-            ))}
+  return (
+    <section
+      id="how-we-work"
+      aria-labelledby="how-we-work-heading"
+      className="relative bg-[#0A0A0A] py-24 lg:py-32 xl:py-40"
+    >
+      <div className="w-full">
+        <div className="site-shell">
+          <div className="mb-8 md:mb-10 xl:mb-12">
+            <SectionEyebrow gutterBottom={false} className="mb-2 md:mb-3">
+              How we work
+            </SectionEyebrow>
+            <h2
+              id="how-we-work-heading"
+              className="max-w-4xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:max-w-5xl md:text-4xl lg:text-5xl xl:max-w-6xl 2xl:max-w-[72rem]"
+            >
+              From discovery to systems you can run with confidence
+            </h2>
+            <p className="mt-3 max-w-2xl text-base leading-snug text-white/60 sm:max-w-3xl sm:text-[1.0625rem] sm:leading-relaxed xl:max-w-4xl">
+              Four phases — same team end to end. No hand-offs to anonymous builders.
+            </p>
           </div>
 
-          {/* Trust Badges Section */}
-          <motion.div variants={fadeInUp} className="mt-16 sm:mt-20">
-            <div className="mx-auto max-w-3xl text-center mb-8 sm:mb-12">
-              <h2 className="mb-4 text-2xl sm:text-3xl md:text-4xl font-semibold text-black">
-                Why businesses trust us
-              </h2>
-              <p className="text-sm text-black/65 sm:text-base">
-                We deliver results with security, quality, and reliability at the core.
-              </p>
+          <div className="relative w-full">
+            <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16">
+              {howWeWorkSteps.map(({ title, description }, index) => (
+                <ProcessStepCard
+                  key={title}
+                  index={index}
+                  title={title}
+                  description={description}
+                  prefersReducedMotion={!!reduced}
+                />
+              ))}
             </div>
+          </div>
 
-            <div className="grid grid-cols-2 gap-4 sm:gap-6 sm:grid-cols-4">
-              {badges.map((badge) => {
-                const Icon = badge.icon
-                return (
-                  <motion.div
-                    key={badge.title}
-                    variants={fadeInUp}
-                    whileHover={{ y: -4, scale: 1.02 }}
-                    className="flex flex-col items-center rounded-xl border border-black/10 bg-white/90 p-5 sm:p-6 text-center shadow-sm transition-shadow hover:shadow-md hover:border-brand-400/60"
-                  >
-                    <div className="mb-3 sm:mb-4 flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-full bg-brand-500/10">
-                      <Icon className="h-5 w-5 sm:h-6 sm:w-6 text-brand-500" />
-                    </div>
-                    <h3 className="mb-2 text-sm font-semibold text-black sm:text-base">
-                      {badge.title}
-                    </h3>
-                    <p className="text-xs text-black/60 sm:text-sm">
-                      {badge.description}
-                    </p>
-                  </motion.div>
-                )
-              })}
-            </div>
-          </motion.div>
-
-          <motion.div
-            variants={fadeInUp}
-            className="mt-12 sm:mt-16 overflow-hidden rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 p-6 sm:p-10 md:p-16 text-center shadow-[0_24px_80px_-50px_rgba(15,23,42,0.35)] backdrop-blur"
-          >
-            <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-4 sm:gap-6">
-              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-black/60">Explore our approach</span>
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-black">Want to dive deeper into our delivery methods?</h3>
-              <p className="text-sm text-black/70 sm:text-base px-4 sm:px-0">
-                Browse our services to see how we apply these principles, or check out our playbooks for detailed frameworks and best practices.
-              </p>
-              <div className="flex flex-col gap-3 sm:flex-row w-full sm:w-auto">
-                <NextLink
-                  href="/services"
-                  className="inline-flex items-center justify-center gap-2 rounded-full bg-brand-500 px-6 sm:px-8 py-3 text-sm font-semibold text-black transition duration-200 hover:bg-brand-400 min-h-[44px] touch-manipulation"
-                >
-                  Explore Services
-                  <ArrowRight size={16} />
-                </NextLink>
-                <NextLink
-                  href="/playbooks"
-                  className="inline-flex items-center justify-center gap-2 rounded-full border border-black/20 bg-white/60 px-6 sm:px-8 py-3 text-sm font-semibold text-black transition duration-200 hover:bg-white/90 min-h-[44px] touch-manipulation"
-                >
-                  View Playbooks
-                  <ArrowRight size={16} />
-                </NextLink>
+          <div className="mt-20 border-t border-white/[0.06] pt-12">
+            <div className="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+              <div>
+                <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FFA91F]/80">
+                  What you get
+                </p>
+                <h3 className="max-w-xl text-2xl font-bold tracking-tight text-white lg:text-3xl">
+                  One team. One accountable delivery lead. Zero black-box work.
+                </h3>
               </div>
+              <CTAButton href="/process" variant="outline" className="shrink-0">
+                How we engage
+              </CTAButton>
             </div>
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </section>
   )
 }
-
-

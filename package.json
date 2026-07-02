@@ -9,7 +9,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
     "download:service-images": "node scripts/download-service-images.js"
   },
   "dependencies": {
@@ -26,9 +26,14 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-markdown": "^10.1.0",
+    "rehype-parse": "^9.0.1",
+    "rehype-pretty-code": "^0.14.3",
+    "rehype-stringify": "^10.0.1",
     "remark-gfm": "^4.0.1",
     "resend": "^4.0.0",
+    "shiki": "^4.0.2",
     "tailwind-merge": "^3.5.0",
+    "unified": "^11.0.5",
     "zod": "^4.3.6"
   },
   "devDependencies": {

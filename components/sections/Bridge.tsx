@@ -11,7 +11,7 @@ export function BridgeStatement() {
         <div className="absolute inset-0 opacity-[0.16]" style={{ backgroundImage: 'radial-gradient(rgba(255,169,30,0.35) 1px, transparent 1px)', backgroundSize: '28px 28px' }} />
         <div className="absolute inset-0 opacity-[0.12]" style={{ backgroundImage: 'radial-gradient(rgba(255,169,30,0.18) 1.5px, transparent 1.5px)', backgroundSize: '140px 140px' }} />
       </div>
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="site-shell relative">
         <div className="mx-auto max-w-4xl text-center">
           <p className="text-xl sm:text-2xl md:text-3xl font-semibold tracking-tight text-black leading-relaxed px-4 sm:px-0">
           At Raven, we integrate seamlessly with your team to engineer and operate robust platforms that empower every release to propel your business forward with clarity and confidence.

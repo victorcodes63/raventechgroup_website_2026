@@ -101,7 +101,7 @@
   }
 
   .prose-raven pre {
-    @apply rounded-card border border-white/[0.12] bg-[#111111] p-4 text-sm leading-relaxed;
+    @apply rounded-card border border-white/[0.08] bg-[#050505] p-4 text-sm leading-relaxed;
   }
 
   .prose-raven code {
@@ -113,7 +113,15 @@
   }
 
   .prose-raven blockquote {
-    @apply border-l-2 border-[#FFA91F] pl-6 text-xl italic text-white/75;
+    @apply my-10 border-l-2 border-[#FFA91F] pl-6 text-xl italic font-light leading-relaxed text-white/80;
+  }
+
+  .prose-raven pre [data-line] {
+    @apply px-2;
+  }
+
+  .prose-raven pre [data-highlighted-line] {
+    @apply bg-white/[0.04];
   }
 }
 

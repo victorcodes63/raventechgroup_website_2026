@@ -6,10 +6,12 @@ import { AuthorByline } from '@/components/shared/AuthorByline'
 import { NewsletterSignup } from '@/components/shared/NewsletterSignup'
 import { ProseContent } from '@/components/shared/ProseContent'
 import { RelatedContent } from '@/components/shared/RelatedContent'
-import { ShareButtons } from '@/components/shared/ShareButtons'
 import { TableOfContents } from '@/components/shared/TableOfContents'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
+import { FloatingShareRail } from '@/components/insights/FloatingShareRail'
+import { InsightReadingProgress } from '@/components/insights/InsightReadingProgress'
 import { getInsightBySlug, insights } from '@/lib/data/insights'
+import { formatInsightHtml } from '@/lib/insightsHtml'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.raventechgroup.com'
 
@@ -66,6 +68,20 @@ function blogPostingJsonLd(args: {
   )
 }
 
+function insightBreadcrumbJsonLd(slug: string, title: string) {
+  const data = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: `${siteUrl}/` },
+      { '@type': 'ListItem', position: 2, name: 'Insights', item: `${siteUrl}/insights` },
+      { '@type': 'ListItem', position: 3, name: title, item: `${siteUrl}/insights/${slug}` },
+    ],
+  }
+
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params
   const insight = getInsightBySlug(slug)
@@ -93,7 +109,9 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       title: insight.metaTitle,
       description: insight.metaDescription,
     },
-    robots: { index: true, follow: true },
+    robots: insight.isPublished
+      ? { index: true, follow: true }
+      : { index: false, follow: false },
   }
 }
 
@@ -105,7 +123,10 @@ export default async function InsightArticlePage({ params }: PageProps) {
   const pageUrl = `${siteUrl}/insights/${insight.slug}`
   const related = insight.relatedSlugs
     .map((s) => getInsightBySlug(s))
-    .filter((i): i is NonNullable<ReturnType<typeof getInsightBySlug>> => i != null)
+    .filter(
+      (i): i is NonNullable<ReturnType<typeof getInsightBySlug>> =>
+        i != null && i.isPublished,
+    )
     .slice(0, 3)
 
   const relatedCards = related.map((r) => ({
@@ -115,9 +136,11 @@ export default async function InsightArticlePage({ params }: PageProps) {
     image: r.heroImage,
     imageAlt: r.heroImageAlt,
   }))
+  const formattedBody = await formatInsightHtml(insight.body)
 
   return (
     <main className="bg-[#0A0A0A] pb-24 text-white">
+      <InsightReadingProgress />
       {blogPostingJsonLd({
         title: insight.title,
         description: insight.metaDescription,
@@ -128,6 +151,7 @@ export default async function InsightArticlePage({ params }: PageProps) {
         category: insight.categoryLabel,
         keywords: insight.keywords,
       })}
+      {insightBreadcrumbJsonLd(insight.slug, insight.title)}
 
       <article>
         <header className="border-b border-white/[0.06] pt-28 pb-10 md:pt-32">
@@ -163,7 +187,10 @@ export default async function InsightArticlePage({ params }: PageProps) {
           </div>
         </div>
 
-        <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 lg:py-16 lg:px-12">
+        <div className="relative mx-auto max-w-7xl px-5 py-12 md:px-8 lg:py-16 lg:px-12">
+          <div className="absolute left-4 top-0 hidden xl:block">
+            <FloatingShareRail url={pageUrl} title={insight.title} />
+          </div>
           <div className="lg:grid lg:grid-cols-[minmax(0,200px)_minmax(0,680px)_minmax(0,200px)] lg:gap-12 xl:gap-16">
             <aside className="mb-10 hidden lg:mb-0 lg:block">
               <div className="sticky top-28">
@@ -172,46 +199,31 @@ export default async function InsightArticlePage({ params }: PageProps) {
             </aside>
 
             <div className="min-w-0">
-              <div className="mb-10 lg:hidden">
-                <ShareButtons url={pageUrl} title={insight.title} />
-              </div>
-              <ProseContent html={insight.body} />
+              <ProseContent html={formattedBody} />
             </div>
 
-            <aside className="mt-12 hidden lg:mt-0 lg:block">
-              <div className="sticky top-28 space-y-8">
-                <ShareButtons url={pageUrl} title={insight.title} />
-                <div className="rounded-card border border-white/[0.08] bg-[#111111] p-6">
-                  <p className="text-sm font-semibold text-white">Talk to Victor</p>
-                  <p className="mt-2 text-sm leading-relaxed text-white/60">
-                    Want this pattern on your stack? Send context — we reply with a concrete next step.
-                  </p>
-                  <CTAButton href="/book" variant="primary" className="mt-5 w-full justify-center px-4 py-3 text-sm">
-                    Book a call
-                  </CTAButton>
-                </div>
-              </div>
-            </aside>
+            <aside className="mt-12 hidden lg:mt-0 lg:block" />
           </div>
         </div>
 
         <ScrollReveal>
           <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-16">
             <div className="mx-auto max-w-7xl px-5 md:px-8 lg:px-12">
-              <div className="flex flex-col gap-8 rounded-card border border-white/[0.08] bg-[#111111] p-8 lg:flex-row lg:items-center lg:gap-12 lg:p-10">
-                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-full border border-white/[0.1]">
+              <div className="grid gap-8 rounded-card border border-white/[0.08] bg-[#111111] p-8 lg:grid-cols-[100px_minmax(0,1fr)] lg:items-center lg:p-10">
+                <div className="relative h-20 w-20 overflow-hidden rounded-full border border-white/[0.12]">
                   <SafeRasterImage
                     src={insight.author.avatar ?? '/images/team/victor-chumo.jpg'}
                     alt={`${insight.author.name} portrait`}
-                    width={96}
-                    height={96}
+                    fill
+                    sizes="80px"
                     className="object-cover"
                   />
                 </div>
-                <div className="min-w-0 flex-1">
-                  <h2 className="text-xl font-bold text-white">{insight.author.name}</h2>
-                  <p className="mt-1 text-sm text-[#FFA91F]/90">{insight.author.role}</p>
-                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/65">{insight.author.bio}</p>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">About the author</p>
+                  <h2 className="mt-3 text-xl font-bold text-white">{insight.author.name}</h2>
+                  <p className="mt-1 text-sm text-white/65">{insight.author.role}</p>
+                  <p className="mt-4 max-w-3xl text-sm leading-relaxed text-white/65">{insight.author.bio}</p>
                   <div className="mt-6">
                     <CTAButton href="/book" variant="outline" className="text-sm">
                       Book a call with Victor
@@ -225,7 +237,12 @@ export default async function InsightArticlePage({ params }: PageProps) {
       </article>
 
       {relatedCards.length > 0 ? (
-        <RelatedContent eyebrow="Keep reading" heading="Related insights" cards={relatedCards} />
+        <RelatedContent
+          eyebrow="Keep reading"
+          heading="Related reading from Raven"
+          cards={relatedCards}
+          footerLink={{ href: '/insights', label: 'More from Raven' }}
+        />
       ) : null}
 
       <NewsletterSignup

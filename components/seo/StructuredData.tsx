@@ -10,7 +10,8 @@ export function OrganizationSchema() {
       width: 512,
       height: 512,
     },
-    description: 'Raven Tech Group provides cutting-edge technology solutions, software development, and IT consulting services across Africa and Europe.',
+    description:
+      'Raven Tech Group builds, transforms, and secures technology infrastructure for SACCOs, fintechs, and growth-stage businesses across East Africa.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Western Heights, Karuna Road, Westlands',
@@ -28,16 +29,10 @@ export function OrganizationSchema() {
       availableLanguage: ['en'],
     },
     sameAs: [
-      // Add your social media profiles here
-      // 'https://www.linkedin.com/company/raventechgroup',
-      // 'https://twitter.com/raventechgroup',
-      // 'https://www.facebook.com/raventechgroup',
+      'https://www.linkedin.com/company/raven-tech-group',
+      'https://twitter.com/ravetechgroup',
+      'https://getstride.co.ke',
     ],
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: '4.8',
-      reviewCount: '24',
-    },
   }
 
   return (
@@ -54,18 +49,11 @@ export function WebSiteSchema() {
     '@type': 'WebSite',
     name: 'Raven Tech Group',
     url: 'https://www.raventechgroup.com',
-    description: 'Innovative technology solutions, software development, and IT consulting services.',
+    description:
+      'Technology consultancy for software development, cloud, integration, and advisory — Nairobi, Kenya.',
     publisher: {
       '@type': 'Organization',
       name: 'Raven Tech Group',
-    },
-    potentialAction: {
-      '@type': 'SearchAction',
-      target: {
-        '@type': 'EntryPoint',
-        urlTemplate: 'https://www.raventechgroup.com/search?q={search_term_string}',
-      },
-      'query-input': 'required name=search_term_string',
     },
   }
 
@@ -84,7 +72,8 @@ export function LocalBusinessSchema() {
     '@id': 'https://www.raventechgroup.com',
     name: 'Raven Tech Group',
     image: 'https://www.raventechgroup.com/images/logos/raven_logo.png',
-    description: 'Technology solutions, software development, and IT consulting services.',
+    description:
+      'Software development, cloud, integration, and IT consulting for businesses in Nairobi and East Africa.',
     address: {
       '@type': 'PostalAddress',
       streetAddress: 'Western Heights, Karuna Road, Westlands',
@@ -118,7 +107,7 @@ export function LocalBusinessSchema() {
     priceRange: '$$',
     areaServed: {
       '@type': 'Place',
-      name: 'Africa and Europe',
+      name: 'East Africa',
     },
   }
 
@@ -129,4 +118,3 @@ export function LocalBusinessSchema() {
     />
   )
 }
-

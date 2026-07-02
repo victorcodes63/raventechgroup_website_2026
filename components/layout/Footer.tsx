@@ -6,8 +6,10 @@ import { type ReactNode } from 'react'
 import { Linkedin, Twitter } from 'lucide-react'
 
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
+import { FooterGlowOutro } from '@/components/layout/FooterGlowOutro'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { services } from '@/lib/data/services'
+import { getLiveProducts } from '@/lib/data/products'
 const FOOTER_SERVICE_SLUGS = [
   'software-development',
   'cloud-solutions',
@@ -21,9 +23,7 @@ const companyLinks = [
   { name: 'About', href: '/about' },
   { name: 'Case Studies', href: '/case-studies' },
   { name: 'Insights', href: '/insights' },
-  { name: 'Playbooks', href: '/playbooks' },
   { name: 'Careers', href: '/careers' },
-  { name: 'Blog', href: '/blog' },
 ] as const
 
 const legalLinks = [
@@ -52,6 +52,7 @@ export function Footer() {
   const footerServices = FOOTER_SERVICE_SLUGS.map((slug) => services.find((s) => s.slug === slug)).filter(
     (s): s is (typeof services)[number] => s != null,
   )
+  const footerProducts = getLiveProducts()
 
   return (
     <footer className="relative overflow-x-clip bg-[#0A0A0A]">
@@ -133,6 +134,11 @@ export function Footer() {
               </Link>
               <p className="mt-5 max-w-xs text-sm leading-relaxed text-white/55">
                 Technology consultancy helping Kenyan and African businesses build the systems their ambition requires.
+                We also build and operate our own products — starting with{' '}
+                <Link href="/products/stride" className="text-white/70 transition-colors hover:text-white">
+                  Stride
+                </Link>
+                .
               </p>
               <div className="mt-8">
                 <p className="mb-4 text-[10px] font-semibold uppercase tracking-[0.2em] text-white/30">
@@ -146,12 +152,6 @@ export function Footer() {
                     className="group relative flex h-11 w-11 items-center justify-center rounded-card border border-white/[0.1] text-white/50 transition-all duration-200 hover:border-[#FFA91F]/40 hover:bg-[#FFA91F]/[0.03] hover:text-[#FFA91F] touch-manipulation"
                     aria-label="LinkedIn"
                   >
-                    <span
-                      className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.1em] text-white/60 opacity-0 transition-opacity group-hover:opacity-100"
-                      aria-hidden
-                    >
-                      LinkedIn
-                    </span>
                     <Linkedin size={20} />
                   </a>
                   <a
@@ -161,12 +161,6 @@ export function Footer() {
                     className="group relative flex h-11 w-11 items-center justify-center rounded-card border border-white/[0.1] text-white/50 transition-all duration-200 hover:border-[#FFA91F]/40 hover:bg-[#FFA91F]/[0.03] hover:text-[#FFA91F] touch-manipulation"
                     aria-label="Twitter/X"
                   >
-                    <span
-                      className="pointer-events-none absolute -top-8 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.1em] text-white/60 opacity-0 transition-opacity group-hover:opacity-100"
-                      aria-hidden
-                    >
-                      X
-                    </span>
                     <Twitter size={20} />
                   </a>
                 </div>
@@ -192,7 +186,7 @@ export function Footer() {
             </div>
 
             <div className="lg:col-span-8">
-              <div className="grid grid-cols-2 gap-8 md:grid-cols-3">
+              <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
                 <NavColumn label="Services">
                   {footerServices.map((s) => (
                     <li key={s.href}>
@@ -206,6 +200,20 @@ export function Footer() {
                       Process
                     </Link>
                   </li>
+                </NavColumn>
+                <NavColumn label="Products">
+                  <li>
+                    <Link href="/products" className={navLinkClass}>
+                      All products
+                    </Link>
+                  </li>
+                  {footerProducts.map((product) => (
+                    <li key={product.slug}>
+                      <Link href={product.bridgeHref} className={navLinkClass}>
+                        {product.name}
+                      </Link>
+                    </li>
+                  ))}
                 </NavColumn>
                 <NavColumn label="Company">
                   {companyLinks.map((item) => (
@@ -231,21 +239,8 @@ export function Footer() {
         </div>
       </ScrollReveal>
 
-      {/* Zone 3 — Copyright */}
-      <ScrollReveal
-        y={0}
-        duration={0.5}
-        delay={0.2}
-        viewportMargin={VIEWPORT_EDGE}
-        className="border-t border-white/[0.04] bg-[#050505]"
-      >
-        <div className="site-shell py-5">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
-            <p className="text-xs text-white/30">© {year} Raven Tech Group. All rights reserved.</p>
-            <p className="text-xs text-white/25">Crafted in Westlands, Nairobi</p>
-          </div>
-        </div>
-      </ScrollReveal>
+      {/* Zone 3 — Interactive amber aurora outro + copyright */}
+      <FooterGlowOutro year={year} />
     </footer>
   )
 }

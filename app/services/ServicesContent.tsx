@@ -1,422 +1,476 @@
 'use client'
 
+import { useRef, useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
+import { ArrowUpRight } from 'lucide-react'
 
-import { fadeInUp, staggerContainer, pageHeroBadgeVariants, pageHeroTitleVariants, pageHeroWordVariants, pageHeroDescriptionVariants, pageHeroButtonVariants } from '@/lib/animations'
-import { services as catalogServices } from '@/lib/data/services'
-import type { ServiceItem as CatalogService } from '@/lib/data/services'
+import { ScrollReveal } from '@/components/motion/ScrollReveal'
+import { ServiceIntakeWizard } from '@/components/sections/ServiceIntakeWizard'
+import { Services as ServicesShowcase } from '@/components/sections/Services'
+import { CTAButton } from '@/components/ui/CTAButton'
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
+import { fadeInUp, staggerContainer } from '@/lib/animations'
+import {
+  SERVICE_MEGA_CATEGORIES,
+  SERVICE_MEGA_CATEGORY_SERVICES,
+  type MegaMenuServiceItem,
+  type ServiceMegaCategoryId,
+} from '@/lib/data/serviceMegaGroups'
+import { SERVICE_MEGA_MENU_ICONS } from '@/lib/data/serviceMegaMenuIcons'
+import { services } from '@/lib/data/services'
+import { SITE_SECTION_STAGGER } from '@/lib/siteScrollMotion'
 
-const HERO_GRID_SVG = `
-  <svg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'>
-    <rect x='0.4' y='0.4' width='59.2' height='59.2' fill='none' stroke='rgba(255,169,30,0.18)' stroke-width='0.8' />
-    <path d='M30 0 V60 M0 30 H60' fill='none' stroke='rgba(255,169,30,0.08)' stroke-width='0.65' />
-    <circle cx='0' cy='0' r='1.6' fill='rgba(255,169,30,0.12)' />
-    <circle cx='60' cy='0' r='1.6' fill='rgba(255,169,30,0.12)' />
-    <circle cx='0' cy='60' r='1.6' fill='rgba(255,169,30,0.12)' />
-    <circle cx='60' cy='60' r='1.6' fill='rgba(255,169,30,0.12)' />
-    <circle cx='30' cy='0' r='1' fill='rgba(255,169,30,0.08)' />
-    <circle cx='0' cy='30' r='1' fill='rgba(255,169,30,0.08)' />
-    <circle cx='60' cy='30' r='1' fill='rgba(255,169,30,0.08)' />
-    <circle cx='30' cy='60' r='1' fill='rgba(255,169,30,0.08)' />
-  </svg>
-`
+const heroStats = [
+  { value: '7', label: 'Core services' },
+  { value: '4', label: 'Delivery phases' },
+  { value: '1', label: 'Accountable team' },
+] as const
 
-const HERO_GRID_PATTERN = `url("data:image/svg+xml,${encodeURIComponent(HERO_GRID_SVG)}")`
-
-type ServicesPageService = CatalogService & {
-  intro: string
-  detail?: string
-  bullets?: string[]
-}
-
-const serviceEnhancements: Record<string, Partial<ServicesPageService>> = {
-  'software-development': {
-    intro: 'Custom platforms, portals, and internal tools engineered with TypeScript-first stacks.',
-    detail:
-      'We move from prototypes to production with documented architecture decisions, automated testing, and cadence your leadership can rely on.',
-    bullets: [
-      'Next.js, React, Node.js, and typed APIs as the default toolset',
-      'Design systems, Storybook documentation, and onboarding guides',
-      'CI/CD pipelines and observability wired in before launch',
-    ],
-  },
-  'cloud-solutions': {
-    intro: 'Landing zones, migrations, and day-two operations for AWS-led teams.',
-    detail:
-      'Infrastructure-as-code foundations, security guardrails, and cost frameworks keep your cloud environments predictable.',
-    bullets: [
-      'Terraform or AWS CDK builds with compliance baked in',
-      'Cost, resilience, and backup reviews on an agreed cadence',
-      'Incident response runbooks and hybrid connectivity plans',
-    ],
-  },
-  cybersecurity: {
-    intro: 'Threat modelling, secure SDLC, and compliance readiness for regulated organisations.',
-    detail:
-      'We pair assessments with remediation roadmaps and establish security rituals the whole team can follow.',
-    bullets: [
-      'Application & infrastructure reviews with prioritised fixes',
-      'Role-based access, logging, and data retention policies',
-      'Tabletop exercises, incident drills, and reporting templates',
-    ],
-  },
-  'digital-transformation': {
-    intro: 'Strategy sprints that align leadership on scope, budgets, and measurable outcomes.',
-    detail:
-      'We surface constraints, map dependencies, and co-author a pragmatic roadmap before any code is written.',
-    bullets: [
-      'Executive workshops, stakeholder interviews, and risk mapping',
-      'Prioritised initiative backlog with effort and value scoring',
-      'Operating cadence and governance recommendations',
-    ],
-  },
-  'it-consulting': {
-    intro: 'On-demand product, engineering, and operations advisors embedded alongside your team.',
-    detail:
-      'Bring in highly experienced leads to stress-test decisions, accelerate delivery, or mentor internal squads.',
-    bullets: [
-      'Architecture and roadmap reviews grounded in experience',
-      'Delivery coaching, process audits, and tooling upgrades',
-      'Capability building and hiring support for critical roles',
-    ],
-  },
-  'system-integration': {
-    intro: 'Connect platforms and automate processes so information flows without manual work.',
-    detail:
-      'We orchestrate APIs, ETL pipelines, and automation with documentation that keeps your ops teams in control.',
-    bullets: [
-      'Event-driven & scheduled integrations with monitoring',
-      'ETL/ELT pipelines, data quality checks, and alerting',
-      'Change management plans and rollback playbooks agreed up front',
-    ],
-  },
-}
-
-const operatingPillars = [
+const engagementSteps = [
   {
-    title: 'Scope & align first',
+    label: 'Discover',
+    title: 'Map the constraint',
     description:
-      'Every engagement begins with a structured immersion to surface constraints, define outcomes, and agree on governance before delivery starts.',
+      'We start by understanding the business process, existing tools, stakeholders, and risk before recommending a service line.',
   },
   {
-    title: 'Build in the open',
+    label: 'Scope',
+    title: 'Turn ambiguity into a sprint plan',
     description:
-      'We ship in increments, keep stakeholders in the loop, and document decisions so teams can maintain momentum long after launch.',
+      'You get clear workstreams, owners, assumptions, dependencies, and handover requirements before delivery starts.',
   },
   {
-    title: 'Operate responsibly',
+    label: 'Ship',
+    title: 'Release in working increments',
     description:
-      'Runbooks, observability, and support rotations stay in place so reliability, security, and cost remain visible as platforms scale.',
+      'Software, infrastructure, integrations, and security improvements move in visible stages. No big reveal at the end.',
   },
-]
-
-const calloutPoints = [
-  'Transparent staffing and pricing—no surprises mid-engagement.',
-  'Access to delivery leads, architects, and operations specialists on the same call.',
-  'Knowledge transfer is mandatory: we leave behind playbooks, not black boxes.',
-]
+  {
+    label: 'Transfer',
+    title: 'Leave the system operable',
+    description:
+      'Runbooks, observability, access controls, documentation, and team walkthroughs are part of the engagement.',
+  },
+] as const
 
 const servicesFaq = [
   {
-    question: 'How do you scope and price engagements?',
+    question: 'What if we are not sure which service we need?',
     answer:
-      'We start with a short architecture or discovery sprint to clarify scope, risks, and staffing. Pricing is tied to the squad we agree on after that sprint—no change orders unless we both sign off on new scope.',
+      'Use the service fit questionnaire or book a discovery call. We will map the constraint first, then recommend the smallest responsible starting point.',
   },
   {
-    question: 'Who will we work with day to day?',
+    question: 'Can one project combine multiple services?',
     answer:
-      'The leads you meet during scoping stay on the project. Every engagement includes a delivery lead, engineering or cloud specialists, and operations support when needed. No handoffs to an unknown team.',
+      'Yes. Most serious projects do. A portal might need software development, M-Pesa integration, cloud architecture, and security review in one delivery plan.',
   },
   {
-    question: 'Can you embed alongside our existing team?',
+    question: 'Can Raven work with our internal team?',
     answer:
-      'Yes. We prefer hybrid teams where internal product or engineering talent works alongside Raven squads. We adopt your tooling, share rituals, and document decisions so everyone stays aligned.',
+      'Yes. We often work beside internal product, IT, finance, or engineering teams. We use your tools where possible and document decisions so your team can own the system.',
   },
   {
     question: 'What happens after launch?',
     answer:
-      'We offer managed operations and reliability support, but only if it remains measurable. Otherwise we hand over playbooks, runbooks, and documentation so your internal team can take over confidently.',
+      'We can stay involved through managed operations, improvement sprints, or advisory support. If you want full handover, we leave the runbooks and technical context your team needs.',
   },
-]
+] as const
 
-export function ServicesContent() {
-  const services: ServicesPageService[] = catalogServices.map((service) => ({
-    ...service,
-    intro: serviceEnhancements[service.slug]?.intro ?? service.description,
-    detail: serviceEnhancements[service.slug]?.detail,
-    bullets: serviceEnhancements[service.slug]?.bullets,
-  }))
+type FaqItem = (typeof servicesFaq)[number]
+
+function ServicesHero() {
+  const reduced = useReducedMotion()
 
   return (
-    <main className="bg-black text-white">
-      <section className="relative overflow-hidden">
-        <div className="pointer-events-none absolute inset-0">
+    <section className="relative flex h-full min-h-[100svh] items-center overflow-hidden bg-[#0A0A0A]">
+      <div className="pointer-events-none absolute inset-0" aria-hidden>
+        <motion.div
+          initial={reduced ? false : { opacity: 0, scale: 0.96 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.1, ease: 'easeOut' }}
+          className="absolute inset-0 bg-[radial-gradient(circle_at_20%_18%,rgba(255,169,31,0.16),transparent_30%),radial-gradient(circle_at_82%_28%,rgba(255,255,255,0.07),transparent_28%),radial-gradient(circle_at_center,transparent_0%,rgba(10,10,10,0.9)_72%)]"
+        />
+        <motion.div
+          initial={reduced ? false : { opacity: 0, y: 36 }}
+          animate={{ opacity: 0.5, y: 0 }}
+          transition={{ duration: 1.4, ease: 'easeOut', delay: 0.12 }}
+          className="absolute bottom-[-160px] left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-brand-500/14 blur-[150px]"
+        />
+      </div>
+
+      <div className="site-shell relative z-10 w-full py-28 lg:py-32">
+        <div className="grid gap-12 lg:grid-cols-12 lg:items-end">
           <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 0.4, scale: 1 }}
-            transition={{ duration: 1.4, ease: 'easeOut' }}
-            className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(26,26,30,0.6),_rgba(0,0,0,0.9))]"
-          />
-          <motion.div
-            aria-hidden
-            className="absolute inset-0"
-            style={{
-              backgroundImage: HERO_GRID_PATTERN,
-              backgroundSize: '60px 60px',
-              backgroundRepeat: 'repeat',
-              opacity: 0.55,
-            }}
-            animate={{ backgroundPosition: ['0px 0px', '40px 28px', '0px 0px'] }}
-            transition={{
-              backgroundPosition: {
-                duration: 26,
-                ease: 'easeInOut',
-                repeat: Infinity,
-              },
-            }}
-          />
-          <motion.div
-            initial={{ opacity: 0, y: 48 }}
-            animate={{ opacity: 0.6, y: 0 }}
-            transition={{ duration: 2, ease: 'easeOut', delay: 0.2 }}
-            className="absolute bottom-[-150px] left-1/2 h-[560px] w-[560px] -translate-x-1/2 rounded-full bg-brand-500/16 blur-[150px]"
-          />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0),_rgba(0,0,0,0.86) 70%)]" />
-        </div>
-
-        <div className="container relative z-10 mx-auto px-4 pb-24 pt-32 sm:px-6 lg:px-8">
-          <motion.div initial="hidden" animate="visible" className="mx-auto max-w-4xl text-center">
-            <motion.span
-              variants={pageHeroBadgeVariants}
-              initial="hidden"
-              animate="visible"
-              className="inline-flex items-center justify-center rounded-full border border-white/15 bg-white/[0.03] px-4 py-1.5 text-xs font-semibold uppercase tracking-[0.28em] text-white/65"
-            >
-              Services overview
-            </motion.span>
-            <motion.h1
-              variants={pageHeroTitleVariants}
-              initial="hidden"
-              animate="visible"
-              className="mt-6 text-4xl font-semibold tracking-tight text-white sm:text-5xl lg:text-6xl"
-            >
-              {'Engineering, operations, and strategy under one roof.'.split(' ').map((word, index) => (
-                <motion.span
-                  key={index}
-                  variants={pageHeroWordVariants}
-                  className="inline-block mr-2"
-                >
-                  {word}
-                </motion.span>
-              ))}
-            </motion.h1>
-            <motion.p
-              variants={pageHeroDescriptionVariants}
-              initial="hidden"
-              animate="visible"
-              className="mx-auto mt-6 max-w-3xl text-base text-white/70 sm:text-lg"
-            >
-              We step in when reliability, security, and measurable outcomes matter just as much as speed. Explore how our squads help teams launch, scale,
-              and operate technology without guesswork.
-            </motion.p>
-            <motion.div
-              variants={pageHeroButtonVariants}
-              initial="hidden"
-              animate="visible"
-              className="mt-10 flex items-center justify-center gap-4"
-            >
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center rounded-full bg-brand-500 px-8 py-3 text-sm font-semibold text-black transition duration-200 hover:bg-brand-400"
-              >
-                Start a conversation
-              </Link>
-              <Link href="#services-catalog" className="text-sm font-semibold text-white/70 underline-offset-4 transition hover:text-white">
-                Jump to services
-              </Link>
-            </motion.div>
+            initial={reduced ? false : { opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.65, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="lg:col-span-8"
+          >
+            <SectionEyebrow gutterBottom={false}>Services</SectionEyebrow>
+            <h1 className="mt-6 max-w-5xl text-5xl font-bold leading-[1.0] tracking-[-0.03em] text-white md:text-7xl lg:text-[88px]">
+              Seven services. One delivery standard.
+            </h1>
+            <p className="mt-7 max-w-2xl text-lg leading-[1.75] text-white/60">
+              Build, connect, secure, migrate, or modernise the systems your business runs on. Start with the service
+              you know, or use the fit guide below when the next move is not obvious.
+            </p>
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+              <CTAButton href="#service-fit" variant="primary" className="px-7 py-3.5">
+                Find the right start
+              </CTAButton>
+              <CTAButton href="/book" variant="light-outline" className="px-7 py-3.5">
+                Book a discovery call
+              </CTAButton>
+            </div>
           </motion.div>
-        </div>
-      </section>
 
-      <section className="relative overflow-hidden border-t border-white/10 bg-white text-black" id="services-catalog">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-12%] top-[-14%] h-72 w-72 rounded-full bg-black/5 blur-[140px]" />
-          <div className="absolute right-[-16%] bottom-[-12%] h-[340px] w-[420px] rounded-full bg-brand-500/15 blur-[180px]" />
-        </div>
-        <div className="relative container mx-auto px-4 py-20 sm:px-6 lg:px-8">
-          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-120px' }} className="mx-auto max-w-6xl">
-            <motion.div variants={fadeInUp} className="max-w-3xl">
-              <span className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">Services catalogue</span>
-              <h2 className="mt-4 text-3xl font-semibold text-black sm:text-4xl">What we’re accountable for</h2>
-              <p className="mt-4 text-base text-black/70 sm:text-lg">
-                Each service is delivered by a multidisciplinary squad that stays close to your team. Hover or tap for deeper detail, then explore the
-                dedicated page for scope, outcomes, and engagement models.
+          <motion.aside
+            initial={reduced ? false : { opacity: 0, y: 18 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: reduced ? 0 : 0.16, ease: [0.21, 0.47, 0.32, 0.98] }}
+            className="lg:col-span-4"
+          >
+            <div className="border-y border-white/[0.08] py-6">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">
+                How to read this page
               </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="mt-12 grid gap-6 md:grid-cols-2">
-              {services.map(({ slug, title, intro, detail, bullets, href, Icon }) => (
-                <Link
-                  key={slug}
-                  href={href}
-                  className="group relative flex h-full flex-col overflow-hidden rounded-3xl border border-black/10 bg-white/85 p-8 shadow-[0_34px_120px_-70px_rgba(15,23,42,0.45)] transition duration-300 hover:-translate-y-1 hover:border-brand-400/60 hover:bg-brand-400/10"
-                >
-                  <span className="mb-6 inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-black/5 text-brand-500 transition duration-200 group-hover:bg-brand-400/20 group-hover:text-brand-100">
-                    <Icon className="h-6 w-6" aria-hidden />
-                  </span>
-                  <h3 className="text-xl font-semibold text-black">{title}</h3>
-                  <p className="mt-3 text-sm text-black/65">{intro}</p>
-
-                  {detail && (
-                    <div className="mt-5 space-y-3 text-sm text-black/70">
-                      <p>{detail}</p>
-                      {bullets && (
-                        <ul className="space-y-2">
-                          {bullets.map((bullet) => (
-                            <li key={bullet} className="flex gap-2">
-                              <span className="relative top-[6px] block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-500" />
-                              <span>{bullet}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
-                    </div>
-                  )}
-
-                  <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-500">
-                    View service
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-brand-400/60">→</span>
-                  </span>
-                </Link>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden border-t border-white/10 bg-[#0d0d0f] text-white">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-14%] top-[-10%] h-72 w-72 rounded-full bg-brand-500/14 blur-[160px]" />
-          <div className="absolute right-[-18%] bottom-[-12%] h-72 w-72 rounded-full bg-white/10 blur-[170px]" />
-        </div>
-        <div className="relative container mx-auto px-4 py-20 sm:px-6 lg:px-8">
-          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} className="mx-auto max-w-5xl space-y-12">
-            <motion.div variants={fadeInUp} className="text-center">
-              <span className="text-xs font-semibold uppercase tracking-[0.28em] text-white/55">Engagement pillars</span>
-              <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">How every engagement runs</h2>
-              <p className="mt-4 text-base text-white/65 sm:text-lg">
-                Whether you engage us for software, cloud, or advisory work, these pillars stay the same. They keep delivery honest, predictable, and
-                measurable.
+              <p className="mt-4 text-sm leading-relaxed text-white/55">
+                The first section helps you choose a starting point. The service accordion shows the full catalogue.
+                The capability groups explain how those services combine in real work.
               </p>
-            </motion.div>
-
-            <motion.div variants={fadeInUp} className="grid gap-6 md:grid-cols-3">
-              {operatingPillars.map(({ title, description }) => (
-                <div key={title} className="rounded-3xl border border-white/12 bg-white/[0.04] p-8">
-                  <h3 className="text-lg font-semibold text-white">{title}</h3>
-                  <p className="mt-3 text-sm text-white/65">{description}</p>
-                </div>
-              ))}
-            </motion.div>
-          </motion.div>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden border-t border-white/10 bg-white text-black">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-12%] top-[-8%] h-64 w-64 rounded-full bg-black/5 blur-[130px]" />
-          <div className="absolute right-[-14%] bottom-[-12%] h-72 w-72 rounded-full bg-brand-500/15 blur-[150px]" />
-        </div>
-        <div className="relative container mx-auto px-4 py-20 sm:px-6 lg:px-8">
-          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} className="mx-auto max-w-4xl">
-            <motion.div variants={fadeInUp} className="rounded-3xl border border-black/10 bg-white/85 p-10 shadow-[0_40px_140px_-90px_rgba(15,23,42,0.55)]">
-              <h2 className="text-2xl font-semibold text-black sm:text-3xl">What it’s like to work with us</h2>
-              <p className="mt-4 text-sm text-black/70 sm:text-base">
-                We only take on work where we can stay accountable from discovery to operations. Here’s what you can expect from day one.
-              </p>
-              <ul className="mt-6 space-y-4 text-sm text-black/70">
-                {calloutPoints.map((point) => (
-                  <li key={point} className="flex gap-3">
-                    <span className="relative top-[7px] block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-500" />
-                    <span>{point}</span>
-                  </li>
+              <div className="mt-7 grid grid-cols-3 gap-4 border-t border-white/[0.08] pt-6">
+                {heroStats.map((stat) => (
+                  <div key={stat.label}>
+                    <p className="text-2xl font-bold tracking-[-0.03em] text-white">{stat.value}</p>
+                    <p className="mt-1 text-[10px] font-semibold uppercase leading-relaxed tracking-[0.12em] text-white/35">
+                      {stat.label}
+                    </p>
+                  </div>
                 ))}
-              </ul>
-            </motion.div>
+              </div>
+            </div>
+          </motion.aside>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function serviceForSlug(slug: string) {
+  return services.find((service) => service.slug === slug)
+}
+
+function CapabilityNav() {
+  return (
+    <ScrollReveal>
+      <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-20 lg:py-24">
+        <div className="site-shell">
+          <div className="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <SectionEyebrow gutterBottom={false}>Capability groups</SectionEyebrow>
+              <h2 className="mt-4 max-w-3xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl">
+                Same services, grouped by outcome
+              </h2>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/55">
+                This is how we usually combine the catalogue into real programmes: engineering, advisory, data, risk,
+                and senior delivery support.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {SERVICE_MEGA_CATEGORIES.map((category) => (
+                <a
+                  key={category.id}
+                  href={`#${category.id}`}
+                  className="rounded-full border border-white/[0.1] bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/60 transition-colors hover:border-brand-500/40 hover:text-white"
+                >
+                  {category.label}
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+    </ScrollReveal>
+  )
+}
+
+function GroupServiceLink({ item }: { item: MegaMenuServiceItem }) {
+  const service = serviceForSlug(item.slug)
+  const Icon = SERVICE_MEGA_MENU_ICONS[item.slug]
+  if (!service || !Icon) return null
+
+  return (
+    <Link href={service.href} className="group grid gap-4 border-t border-white/[0.08] py-5 first:border-t-0 sm:grid-cols-[2.5rem_1fr_auto] sm:items-start">
+      <span className="flex h-10 w-10 items-center justify-center rounded-card border border-brand-500/20 bg-brand-500/10 text-brand-500">
+        <Icon size={18} weight="bold" aria-hidden />
+      </span>
+      <span>
+        <span className="block text-base font-semibold text-white transition-colors group-hover:text-brand-400">
+          {item.title}
+        </span>
+        <span className="mt-1 block max-w-xl text-sm leading-relaxed text-white/50">{item.sub}</span>
+      </span>
+      <span className="inline-flex items-center gap-2 text-xs font-semibold uppercase tracking-[0.14em] text-brand-500 transition-all group-hover:gap-3 sm:pt-1">
+        View
+        <ArrowUpRight size={13} aria-hidden />
+      </span>
+    </Link>
+  )
+}
+
+function CapabilityGroups() {
+  return (
+    <section className="bg-[#0A0A0A]">
+      {SERVICE_MEGA_CATEGORIES.map((category, index) => {
+        const items = SERVICE_MEGA_CATEGORY_SERVICES[category.id as ServiceMegaCategoryId]
+
+        return (
+          <ScrollReveal key={category.id}>
+            <section id={category.id} className="scroll-mt-28 border-t border-white/[0.06] bg-[#0A0A0A] py-20 lg:py-24">
+              <div className="site-shell">
+                <div className="grid gap-12 lg:grid-cols-12">
+                  <div className="lg:col-span-5">
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-500">
+                      {String(index + 1).padStart(2, '0')} · {category.label}
+                    </p>
+                    <h3 className="mt-5 max-w-xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-4xl">
+                      {category.highlight}
+                    </h3>
+                    <p className="mt-5 max-w-xl text-base leading-relaxed text-white/55">{category.description}</p>
+                  </div>
+                  <div className="lg:col-span-7">
+                    <div className="border-y border-white/[0.08]">
+                      {items.map((item) => (
+                        <GroupServiceLink key={`${category.id}-${item.slug}-${item.title}`} item={item} />
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+          </ScrollReveal>
+        )
+      })}
+    </section>
+  )
+}
+
+function EngagementModel() {
+  return (
+    <ScrollReveal>
+      <section className="relative border-t border-white/[0.06] bg-[#0A0A0A] py-24 lg:py-32 xl:py-40">
+        <div className="site-shell">
+          <div className="mb-8 md:mb-10 xl:mb-12">
+            <SectionEyebrow gutterBottom={false} className="mb-2 md:mb-3">
+              How we work
+            </SectionEyebrow>
+            <h2 className="max-w-5xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-4xl lg:text-5xl">
+              From unclear brief to systems your team can run
+            </h2>
+            <p className="mt-3 max-w-3xl text-base leading-relaxed text-white/60">
+              The service changes. The delivery discipline does not.
+            </p>
+          </div>
+
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-60px' }}
+            className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16"
+          >
+            {engagementSteps.map((step, index) => (
+              <motion.article
+                key={step.label}
+                variants={fadeInUp}
+                className="relative min-h-0 overflow-hidden border-t border-white/[0.06] px-0 pb-14 pt-10 transition-colors duration-200 hover:border-t-[1.5px] hover:border-brand-500/70 lg:min-h-[240px]"
+              >
+                <span
+                  className="absolute right-0 top-6 z-0 select-none text-[150px] font-bold leading-none tracking-[-0.04em] text-white/[0.05] lg:text-[190px]"
+                  aria-hidden
+                >
+                  {String(index + 1).padStart(2, '0')}
+                </span>
+                <div className="relative z-10">
+                  <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500/80">
+                    {String(index + 1).padStart(2, '0')} · {step.label}
+                  </p>
+                  <h3 className="text-xl font-bold leading-tight tracking-tight text-white lg:text-2xl">{step.title}</h3>
+                  <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-white/55 lg:text-[15px]">
+                    {step.description}
+                  </p>
+                </div>
+              </motion.article>
+            ))}
           </motion.div>
         </div>
       </section>
+    </ScrollReveal>
+  )
+}
 
-      <section className="relative overflow-hidden border-t border-white/10 bg-white">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-[-16%] top-[-10%] h-60 w-60 rounded-full bg-brand-500/12 blur-[140px]" />
-          <div className="absolute right-[-14%] bottom-[-12%] h-64 w-64 rounded-full bg-black/5 blur-[120px]" />
-        </div>
-        <div className="relative container mx-auto px-4 py-20 sm:px-6 lg:px-8">
-          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} className="mx-auto max-w-4xl space-y-10">
-            <motion.div variants={fadeInUp} className="text-center">
-              <span className="text-xs font-semibold uppercase tracking-[0.28em] text-black/50">Services FAQ</span>
-              <h2 className="mt-4 text-3xl font-semibold text-black sm:text-4xl">Questions we cover in scoping calls</h2>
-              <p className="mt-4 text-base text-black/70 sm:text-lg">
-                The answers stay the same regardless of which service you choose—transparency first, so you know what partnering with Raven feels like.
+function ServicesFaqAccordion({ items }: { items: readonly FaqItem[] }) {
+  const reducedMotion = useReducedMotion()
+  const [openKeys, setOpenKeys] = useState<Set<string>>(new Set())
+
+  const toggle = (key: string) => {
+    setOpenKeys((prev) => {
+      const next = new Set(prev)
+      if (next.has(key)) next.delete(key)
+      else next.add(key)
+      return next
+    })
+  }
+
+  const transition = reducedMotion
+    ? { duration: 0 }
+    : { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const }
+
+  return (
+    <div className="divide-y divide-white/[0.08]">
+      {items.map((faq, index) => {
+        const isOpen = openKeys.has(faq.question)
+        const triggerId = `services-faq-trigger-${index}`
+        const panelId = `services-faq-panel-${index}`
+
+        return (
+          <div key={faq.question} className="py-4 sm:py-5">
+            <button
+              type="button"
+              id={triggerId}
+              aria-expanded={isOpen}
+              aria-controls={panelId}
+              onClick={() => toggle(faq.question)}
+              className="flex w-full cursor-pointer items-center justify-between gap-4 text-left text-sm font-semibold text-white sm:text-[15px] outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0A0A]"
+            >
+              <span className="pr-2">{faq.question}</span>
+              <motion.span
+                aria-hidden
+                animate={{ rotate: isOpen ? 45 : 0 }}
+                transition={transition}
+                className={`text-lg leading-none ${isOpen ? 'text-brand-500' : 'text-white/40'}`}
+              >
+                +
+              </motion.span>
+            </button>
+            <AnimatePresence initial={false}>
+              {isOpen && (
+                <motion.div
+                  id={panelId}
+                  role="region"
+                  aria-labelledby={triggerId}
+                  initial={reducedMotion ? false : { height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={reducedMotion ? undefined : { height: 0, opacity: 0 }}
+                  transition={transition}
+                  className="overflow-hidden"
+                >
+                  <div className="mt-3 border-t border-white/[0.06] pt-3">
+                    <p className="text-sm leading-relaxed text-white/55 sm:text-[15px]">{faq.answer}</p>
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function ServicesFaq() {
+  return (
+    <ScrollReveal>
+      <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-24 text-white lg:py-32">
+        <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12">
+          <div className="grid w-full gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-14">
+            <motion.div
+              variants={fadeInUp}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              className="space-y-6"
+            >
+              <SectionEyebrow>Before you choose</SectionEyebrow>
+              <h2 className="text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-4xl lg:text-5xl">
+                Quick answers before scoping
+              </h2>
+              <p className="max-w-md text-base leading-relaxed text-white/50 sm:text-lg">
+                No jargon here. The first call is for sorting the work, not forcing you into a package.
               </p>
             </motion.div>
-            <motion.div variants={fadeInUp} className="space-y-4">
-              {servicesFaq.map(({ question, answer }) => (
-                <details
-                  key={question}
-                  className="group overflow-hidden rounded-3xl border border-black/10 bg-white/85 px-6 py-5 text-left shadow-[0_24px_90px_-70px_rgba(15,23,42,0.4)] transition duration-200 open:border-brand-400/60 open:bg-brand-400/10"
-                >
-                  <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-black sm:text-base">
-                    <span>{question}</span>
-                    <span className="inline-flex h-7 w-7 items-center justify-center rounded-full border border-black/15 text-black/60 transition duration-200 group-open:border-brand-400 group-open:text-brand-500">
-                      +
-                    </span>
-                  </summary>
-                  <p className="mt-4 text-sm text-black/70 sm:text-base">{answer}</p>
-                </details>
-              ))}
-            </motion.div>
-          </motion.div>
+            <ServicesFaqAccordion items={servicesFaq} />
+          </div>
         </div>
       </section>
+    </ScrollReveal>
+  )
+}
 
-      <section className="relative overflow-hidden bg-black py-20">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 opacity-[0.3]" style={{ backgroundImage: HERO_GRID_PATTERN, backgroundSize: '60px 60px' }} />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_rgba(0,0,0,0),_rgba(0,0,0,0.85) 70%)]" />
-        </div>
-        <div className="relative container mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-80px' }} className="mx-auto max-w-4xl text-center">
-            <motion.span
-              variants={fadeInUp}
-              className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/[0.05] px-4 py-1 text-xs font-semibold uppercase tracking-[0.28em] text-white/60"
-            >
-              Ready when you are
-            </motion.span>
-            <motion.h2 variants={fadeInUp} className="mt-6 text-4xl font-semibold text-white sm:text-5xl">
-              Let’s map your next release, migration, or operating playbook.
-            </motion.h2>
-            <motion.p variants={fadeInUp} className="mx-auto mt-6 max-w-2xl text-base text-white/70 sm:text-lg">
-              Share where your platform needs reinforcement and we’ll propose a sprint-by-sprint plan with the right mix of architecture, delivery, and
-              operations support.
-            </motion.p>
-            <motion.div variants={fadeInUp} className="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <Link
-                href="/contact"
-                className="inline-flex items-center justify-center rounded-full bg-brand-500 px-8 py-4 text-base font-semibold text-black transition duration-200 hover:bg-brand-400"
-              >
-                Book a consultation
-              </Link>
-              <Link href="/playbooks" className="text-sm font-semibold text-white/70 underline-offset-4 transition hover:text-white">
-                Explore our playbooks
-              </Link>
-            </motion.div>
-          </motion.div>
+function FinalCta() {
+  return (
+    <ScrollReveal>
+      <section className="relative overflow-hidden border-t border-white/[0.06] bg-[#0A0A0A] py-24 lg:py-32">
+        <div className="pointer-events-none absolute inset-0 opacity-[0.12] about-hero-grid" aria-hidden />
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#0A0A0A_75%)]" aria-hidden />
+        <div className="site-shell relative mx-auto max-w-4xl text-center">
+          <SectionEyebrow align="center" className="mx-auto justify-center" gutterBottom={false}>
+            Ready when you are
+          </SectionEyebrow>
+          <h2 className="mt-6 text-3xl font-bold tracking-[-0.02em] text-white sm:text-4xl lg:text-5xl">
+            Bring us the constraint
+          </h2>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-[1.75] text-white/55">
+            We will tell you what to build, what to fix first, and what not to spend money on yet.
+          </p>
+          <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+            <CTAButton href="/book" variant="primary" className="px-8 py-3.5">
+              Book a discovery call
+            </CTAButton>
+            <CTAButton href="/contact" variant="light-outline" className="px-8 py-3.5">
+              Send project details
+            </CTAButton>
+          </div>
         </div>
       </section>
-    </main>
+    </ScrollReveal>
+  )
+}
+
+export function ServicesContent() {
+  const serviceFitSectionRef = useRef<HTMLElement | null>(null)
+  const s = (n: number) => n * SITE_SECTION_STAGGER
+
+  return (
+    <div className="w-full min-w-0 overflow-x-clip bg-[#0A0A0A] text-white">
+      <div className="sticky top-0 z-10 h-svh min-h-0 w-full max-w-full min-w-0">
+        <ServicesHero />
+      </div>
+
+      <div className="relative z-20 -mt-7 min-w-0 overflow-x-clip rounded-t-card bg-[linear-gradient(180deg,rgba(10,10,10,0.98)_0%,#0A0A0A_2rem,#0A0A0A_100%)]">
+        <ScrollReveal delay={s(0)}>
+          <div id="service-fit">
+            <ServiceIntakeWizard registerSectionRef={serviceFitSectionRef} />
+          </div>
+        </ScrollReveal>
+
+        <ServicesShowcase />
+
+        <ScrollReveal delay={s(3)}>
+          <CapabilityNav />
+        </ScrollReveal>
+        <CapabilityGroups />
+        <ScrollReveal delay={s(4)}>
+          <EngagementModel />
+        </ScrollReveal>
+        <ScrollReveal delay={s(5)}>
+          <ServicesFaq />
+        </ScrollReveal>
+        <ScrollReveal delay={s(6)}>
+          <FinalCta />
+        </ScrollReveal>
+      </div>
+    </div>
   )
 }

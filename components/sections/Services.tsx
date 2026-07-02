@@ -1,180 +1,299 @@
 'use client'
 
-import Link from 'next/link'
-import { useMemo } from 'react'
-import type { ServiceItem as CatalogService } from '@/lib/data/services'
-import { services as catalogServices } from '@/lib/data/services'
+import { useState, useCallback, useRef, type RefObject } from 'react'
+import Image from 'next/image'
+import { motion, AnimatePresence, useReducedMotion, useSpring, useTransform } from 'framer-motion'
+import { Plus, Minus } from 'lucide-react'
 
-type HomepageService = CatalogService & {
-  intro: string
-  detail?: string
-  bullets?: string[]
-  spotlight?: boolean
-}
+import { useSectionScrollProgress } from '@/components/motion/ScrollDrivenTypography'
+import { CTAButton } from '@/components/ui/CTAButton'
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
+import { services as allServices } from '@/lib/data/services'
 
-const serviceEnhancements: Record<string, Omit<HomepageService, keyof CatalogService> | undefined> = {
-  'software-development': {
-    intro: 'Custom platforms, internal tools, and customer-facing apps engineered with resilient TypeScript foundations.',
-    detail:
-      'We rapidly prototype, document architecture decisions, and ship accountable increments so stakeholders see progress every sprint.',
-    bullets: [
-      'Next.js, React, and Node.js as the core stack with typed APIs',
-      'Design systems, Storybook docs, and onboarding guides for your team',
-      'CI/CD pipelines, automated testing, and performance guardrails baked in',
-    ],
-    spotlight: true,
-  },
-  'cloud-solutions': {
-    intro: 'Cloud landing zones, migrations, and day-two operations tuned for AWS-first teams.',
-    detail:
-      'We codify infrastructure, security baselines, and runbooks so environments stay reproducible and secure as you scale.',
-    bullets: [
-      'Infrastructure-as-code foundations with Terraform or AWS CDK',
-      'Cost, resilience, and monitoring guardrails reviewed monthly',
-      'Incident response playbooks and on-call rotations defined up front',
-    ],
-  },
-  cybersecurity: {
-    intro: 'Threat modelling, secure SDLC, and compliance readiness for regulated organisations.',
-    bullets: [
-      'Application and infrastructure assessments with prioritised remediation',
-      'Policies, access controls, and logging tuned for audits',
-      'Playbooks for incident response, tabletop exercises, and recovery drills',
-    ],
-  },
-  'digital-transformation': {
-    intro: 'Strategy sprints that align leadership on scope, budgets, and measurable outcomes.',
-    detail:
-      'We run structured discovery to surface constraints, align stakeholders, and co-author the programme roadmap before build begins.',
-    bullets: [
-      'Executive workshops, risk mapping, and measurable KPIs',
-      'Prioritised initiative backlogs with effort and dependency views',
-      'Operating cadence recommendations for steering and delivery teams',
-    ],
-  },
-  'it-consulting': {
-    intro: 'Product, engineering, and operations advisors embedded alongside your team.',
-    bullets: [
-      'Architecture guidance, technical due diligence, and roadmap reviews',
-      'Delivery coaching, tooling audits, and hiring support',
-      'Knowledge transfer sessions and documentation clean-up',
-    ],
-  },
-  'system-integration': {
-    intro: 'Connect platforms, data, and automation pipelines so information moves without manual steps.',
-    detail:
-      'We model data flows, orchestrate APIs, and deliver documentation so your teams can maintain integrations confidently.',
-    bullets: [
-      'Event-driven and scheduled integrations with monitoring and alerts',
-      'ETL/ELT pipelines with governance and change management plans',
-      'Runbooks and rollback paths agreed before go-live',
-    ],
-  },
-}
+/** The seven services shown in the homepage accordion */
+const ACCORDION_SLUGS = [
+  'software-development',
+  'web-development',
+  'it-consulting',
+  'cloud-solutions',
+  'cybersecurity',
+  'digital-transformation',
+  'system-integration',
+]
+
+const services = ACCORDION_SLUGS
+  .map((slug) => allServices.find((s) => s.slug === slug))
+  .filter((s): s is (typeof allServices)[number] => Boolean(s))
 
 export function Services() {
-  const services = useMemo<HomepageService[]>(
-    () =>
-      catalogServices.map((service) => ({
-        ...service,
-        intro: serviceEnhancements[service.slug]?.intro ?? service.description,
-        detail: serviceEnhancements[service.slug]?.detail,
-        bullets: serviceEnhancements[service.slug]?.bullets,
-        spotlight: serviceEnhancements[service.slug]?.spotlight ?? false,
-      })),
-    []
-  )
+  const reduced = useReducedMotion()
+  const sectionRef = useRef<HTMLElement | null>(null)
+  const { scrollYProgress, isReduced } = useSectionScrollProgress(sectionRef as RefObject<HTMLElement | null>)
 
-  const rows = useMemo(() => {
-    const grouped: HomepageService[][] = []
-    services.forEach((service, index) => {
-      if (index % 2 === 0) {
-        grouped.push([service])
-      } else {
-        grouped[grouped.length - 1].push(service)
-      }
+  const panelSnapYRaw = useTransform(scrollYProgress, [0.12, 0.3], isReduced ? [0, 0] : [76, 0], { clamp: true })
+  const panelSnapScaleRaw = useTransform(scrollYProgress, [0.12, 0.3], isReduced ? [1, 1] : [0.965, 1], { clamp: true })
+  const panelSnapY = useSpring(panelSnapYRaw, { stiffness: 330, damping: 24, mass: 0.76 })
+  const panelSnapScale = useSpring(panelSnapScaleRaw, { stiffness: 330, damping: 24, mass: 0.76 })
+
+  const contentOpacity = useTransform(scrollYProgress, [0.32, 0.5], isReduced ? [1, 1] : [0, 1], { clamp: true })
+  const contentYRaw = useTransform(scrollYProgress, [0.32, 0.5], isReduced ? [0, 0] : [20, 0], { clamp: true })
+  const contentY = useSpring(contentYRaw, { stiffness: 300, damping: 26, mass: 0.8 })
+
+  const [active, setActive]   = useState<string>('software-development')
+  const [hovered, setHovered] = useState<string | null>(null)
+  const [imgErrors, setImgErrors] = useState<Set<string>>(new Set())
+
+  /** Hover previews the image; active shows expanded content */
+  const displaySlug    = hovered ?? active
+  const displayService = services.find((s) => s.slug === displaySlug) ?? services[0]
+  const displayIndex   = services.findIndex((s) => s.slug === displaySlug)
+  const DisplayIcon    = displayService.Icon
+
+  const handleImgError = useCallback((slug: string) => {
+    setImgErrors((prev) => {
+      const next = new Set(prev)
+      next.add(slug)
+      return next
     })
-    return grouped
-  }, [services])
+  }, [])
+
+  const showImage =
+    Boolean(displayService.imagePath) && !imgErrors.has(displaySlug)
 
   return (
-    <section id="services" className="relative overflow-hidden border-t border-white/10 bg-white py-12 sm:py-16 md:py-20 text-black">
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-[12%] top-20 h-72 w-72 rounded-full bg-black/7 blur-[120px]" />
-        <div className="absolute -right-[18%] bottom-[-10%] h-[420px] w-[480px] rounded-full bg-brand-500/18 blur-[160px]" />
-      </div>
+    <section
+      ref={sectionRef}
+      id="services"
+      className="bg-[#0A0A0A] py-24 lg:flex lg:min-h-svh lg:items-center lg:py-0"
+    >
+      <motion.div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12 lg:py-16" style={{ y: panelSnapY, scale: panelSnapScale }}>
 
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="relative mx-auto max-w-6xl">
-          <div className="mb-10 sm:mb-14 grid gap-6 sm:gap-10 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-center">
-            <div className="space-y-4 sm:space-y-5">
-              <span className="text-xs font-semibold uppercase tracking-[0.25em] text-black/50">What we do</span>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-black">
-                Delivery partners for the platforms and operations you're planning next.
-              </h2>
-              <p className="text-sm text-black/70 sm:text-base leading-relaxed">
-                We scope carefully, collaborate in the open, and keep your team in the loop each step. The outcome is predictable delivery and systems that
-                remain yours to evolve.
-              </p>
+        {/* ── Section header ──────────────────────────────────────────── */}
+        <div className="mb-16 lg:mb-20">
+          <SectionEyebrow>What we build</SectionEyebrow>
+          <h2 className="mb-6 max-w-2xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-5xl lg:max-w-none lg:whitespace-nowrap">
+            Seven services. One technology partner.
+          </h2>
+          <p className="max-w-2xl text-lg leading-relaxed text-white/60 lg:max-w-none lg:whitespace-nowrap">
+            From SACCO portals to cloud migrations — we cover the full technology stack for Nairobi and Kenya teams.
+          </p>
+        </div>
+
+        <motion.div className="hidden lg:block" style={{ opacity: contentOpacity, y: contentY }}>
+        {/* ── Desktop: sticky image + accordion ───────────────────────── */}
+        <div className="lg:grid lg:grid-cols-2">
+
+          {/* Left — sticky image panel */}
+          <div className="pr-12">
+            <div className="sticky top-24 h-[600px] overflow-hidden rounded-card bg-[#111111]">
+
+              {/* Image / icon fallback — fades on service change */}
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={displaySlug}
+                  className="absolute inset-0"
+                  initial={reduced ? false : { opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.4 }}
+                >
+                  {showImage ? (
+                    <Image
+                      src={displayService.imagePath!}
+                      alt={displayService.title}
+                      fill
+                      className="object-cover"
+                      onError={() => handleImgError(displaySlug)}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#161616]">
+                      <DisplayIcon className="h-24 w-24 text-white/[0.06]" aria-hidden />
+                    </div>
+                  )}
+                </motion.div>
+              </AnimatePresence>
+
+              {/* Dark overlay */}
+              <div className="absolute inset-0 bg-black/30" aria-hidden />
+
+              {/* Large faded index number */}
+              <span
+                className="pointer-events-none absolute bottom-4 left-6 select-none text-[120px] font-bold leading-none text-white/[0.06]"
+                aria-hidden
+              >
+                {String(displayIndex + 1).padStart(2, '0')}
+              </span>
+
+              {/* Active service label */}
+              <span className="absolute bottom-8 right-8 text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">
+                {displayService.title}
+              </span>
             </div>
-            <div className="hidden lg:block" />
           </div>
 
-          <div className="space-y-4 sm:space-y-5">
-            {rows.map((row, rowIndex) => (
-              <div key={rowIndex} className="flex flex-col gap-3 sm:gap-4 sm:flex-row">
-                {row.map((service) => {
-                  const Icon = service.Icon
-                  const isSpotlight = service.spotlight || Boolean(service.detail)
+          {/* Right — vertical accordion list */}
+          <div>
+            {services.map((service, i) => {
+              const isActive = service.slug === active
 
-                  return (
-                    <Link
-                      key={service.slug}
-                      href={service.href}
-                      className={`group relative flex cursor-pointer flex-col rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 px-4 py-5 sm:px-6 sm:py-6 md:px-7 md:py-7 transition duration-300 hover:border-brand-400/60 hover:bg-brand-400/10 touch-manipulation ${
-                        isSpotlight ? 'sm:basis-[68%] shadow-[0_24px_80px_-50px_rgba(15,23,42,0.55)]' : 'sm:basis-[32%]'
+              return (
+                <div
+                  key={service.slug}
+                  className={`border-b border-white/[0.05]${i === 0 ? ' border-t border-white/[0.05]' : ''}`}
+                  onMouseEnter={() => setHovered(service.slug)}
+                  onMouseLeave={() => setHovered(null)}
+                >
+                  {/* Row header — click locks expanded state */}
+                  <button
+                    type="button"
+                    onClick={() => setActive(service.slug)}
+                    aria-expanded={isActive}
+                    className="group flex w-full cursor-pointer items-center justify-between px-8 py-6"
+                  >
+                    <span
+                      className={`text-xl font-semibold transition-colors duration-200 ${
+                        isActive
+                          ? 'text-white'
+                          : 'text-white/50 group-hover:text-white'
                       }`}
                     >
-                      <span className="mb-4 sm:mb-5 inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-black/5 text-brand-400 transition duration-200 group-hover:bg-brand-400/20 group-hover:text-brand-100">
-                        <Icon className="h-5 w-5 sm:h-6 sm:w-6" aria-hidden />
-                      </span>
-                      <h3 className="text-base sm:text-lg md:text-xl font-semibold text-black">{service.title}</h3>
-                      <p className="mt-2 text-sm text-black/60 leading-relaxed">{service.intro}</p>
+                      {service.title}
+                    </span>
+                    <span
+                      className={`transition-colors duration-200 ${
+                        isActive
+                          ? 'text-[#FFA91F]'
+                          : 'text-white/30 group-hover:text-white/60'
+                      }`}
+                      aria-hidden
+                    >
+                      {isActive
+                        ? <Minus size={18} />
+                        : <Plus size={18} />
+                      }
+                    </span>
+                  </button>
 
-                      {service.detail && (
-                        <div className="mt-4 sm:mt-5 space-y-2 sm:space-y-3 text-sm text-black/70">
-                          <p className="leading-relaxed">{service.detail}</p>
-                          {service.bullets && (
-                            <ul className="space-y-1.5 sm:space-y-2">
-                              {service.bullets.map((item) => (
-                                <li key={item} className="flex gap-2 leading-relaxed">
-                                  <span className="relative top-[7px] block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-400" />
-                                  <span>{item}</span>
-                                </li>
+                  {/* Expanded content */}
+                  <AnimatePresence initial={false}>
+                    {isActive && (
+                      <motion.div
+                        initial={reduced ? false : { height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={reduced ? { opacity: 0 } : { height: 0, opacity: 0 }}
+                        transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                        className="overflow-hidden"
+                      >
+                        <div className="rounded-card bg-[#111111] p-8">
+                          <p className="mt-3 max-w-sm text-[13px] leading-relaxed text-white/60">
+                            {service.accordionDescription ?? service.description}
+                          </p>
+
+                          {service.tags && (
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              {service.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="inline-flex items-center rounded-card border border-[#FFA91F]/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#FFA91F]"
+                                >
+                                  {tag}
+                                </span>
                               ))}
-                            </ul>
+                            </div>
                           )}
+
+                          <CTAButton
+                            href={service.href}
+                            variant="light-outline"
+                            className="mt-5 px-5 py-2 text-sm"
+                          >
+                            View service
+                          </CTAButton>
                         </div>
-                      )}
-
-                      <span className="mt-4 sm:mt-6 inline-flex items-center gap-2 text-sm font-medium text-brand-500">
-                        Learn more
-                        <span className="inline-flex h-6 w-6 sm:h-7 sm:w-7 items-center justify-center rounded-full border border-brand-400/60">→</span>
-                      </span>
-                    </Link>
-                  )
-                })}
-
-                {row.length === 1 && <div className="hidden flex-1 sm:block" />}
-              </div>
-            ))}
-          </div>
-
-          <div className="mt-10 sm:mt-14 rounded-2xl sm:rounded-3xl border border-black/10 bg-white/80 px-4 py-5 sm:px-6 sm:py-6 md:px-10 md:py-7 text-center text-sm text-black/60">
-            Not seeing exactly what you need? We're happy to workshop a scope or point you to another specialist if we're not the best fit yet.
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )
+            })}
           </div>
         </div>
-      </div>
+
+        </motion.div>
+
+        {/* ── Mobile: horizontal swipe cards ─────────────────────────── */}
+        <div className="lg:hidden">
+          <p className="-mt-2 mb-3 text-[11px] text-white/35">Swipe services</p>
+          <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+          {services.map((service) => {
+            const Icon = service.Icon
+            const hasThumb = Boolean(service.imagePath) && !imgErrors.has(service.slug)
+            return (
+              <article
+                key={service.slug}
+                className="w-[min(88vw,420px)] shrink-0 snap-start overflow-hidden rounded-card border border-white/[0.06] bg-[#111111]"
+              >
+                <div className="relative h-36 w-full overflow-hidden border-b border-white/[0.06] bg-[#0A0A0A]">
+                  {hasThumb ? (
+                    <Image
+                      src={service.imagePath!}
+                      alt={service.title}
+                      fill
+                      sizes="(max-width: 768px) 88vw, 420px"
+                      className="object-cover"
+                      onError={() => handleImgError(service.slug)}
+                    />
+                  ) : (
+                    <div className="absolute inset-0 flex items-center justify-center bg-[#161616]">
+                      <Icon className="h-10 w-10 text-white/[0.14]" aria-hidden />
+                    </div>
+                  )}
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/70 via-black/35 to-transparent"
+                  />
+                  <div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/75 to-transparent backdrop-blur-[2px]"
+                  />
+                </div>
+                <div className="p-5">
+                <div className="mb-3 flex items-center gap-3">
+                  <h3 className="text-lg font-semibold text-white">{service.title}</h3>
+                </div>
+
+                <p className="text-sm leading-relaxed text-white/60">
+                  {service.accordionDescription ?? service.description}
+                </p>
+
+                {service.tags && (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    {service.tags.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center rounded-card border border-[#FFA91F]/30 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.1em] text-[#FFA91F]"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                )}
+
+                <CTAButton
+                  href={service.href}
+                  variant="light-outline"
+                  className="mt-4 px-5 py-2 text-sm"
+                >
+                  View service
+                </CTAButton>
+                </div>
+              </article>
+            )
+          })}
+          </div>
+        </div>
+
+      </motion.div>
     </section>
   )
 }

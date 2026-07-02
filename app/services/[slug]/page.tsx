@@ -1,115 +1,255 @@
 import { Metadata } from 'next'
-import Link from 'next/link'
-import Image from 'next/image'
+
 import { notFound } from 'next/navigation'
+import { ServiceSideNavLayout } from '@/components/services/ServiceSideNavLayout'
+import {
+  SERVICE_INDUSTRIES,
+  SERVICE_NUMBERED_BENEFITS,
+  SERVICE_PAGE_RELATED_INSIGHTS,
+  SERVICE_SUPPORTING_IMAGES,
+  SOFTWARE_DEVELOPMENT_CUSTOMER_FEEDBACK,
+} from '@/lib/data/servicePageOverlays'
+import { SERVICE_CLOSING_CTA } from '@/lib/data/serviceClosingCta'
+import { getServiceIntakeSpotlightImageSrc } from '@/lib/data/serviceIntakeSpotlights'
 import { services } from '@/lib/data/services'
+import { ServiceSections } from './ServiceSections'
 import { ServiceHero } from './ServiceHero'
+import type { ServiceClosingCta, ServiceDetail } from './service-page-types'
+import { buildServiceNavItems } from './serviceNavItems'
 
-type Capability = {
-  title: string
-  description: string
-  points?: string[]
+function defaultClosingCta(slug: string): ServiceClosingCta {
+  const title = services.find((s) => s.slug === slug)?.title ?? slug
+  return {
+    eyebrow: 'Next step',
+    headline: `Talk to us about ${title.toLowerCase()}.`,
+    body:
+      'Share context, constraints, and timeline — we reply with a clear next step, not a generic brochure.',
+    primaryLabel: 'Contact Raven',
+    contactPrefill: `I'm interested in ${title} — brief context:`,
+  }
 }
 
-type DeliveryStep = {
-  title: string
-  description: string
+function mergeServiceDetail(slug: string, detail: ServiceDetail): ServiceDetail {
+  const supporting = SERVICE_SUPPORTING_IMAGES[slug]
+  return {
+    ...detail,
+    numberedBenefits: SERVICE_NUMBERED_BENEFITS[slug],
+    industries: SERVICE_INDUSTRIES[slug],
+    relatedInsights: SERVICE_PAGE_RELATED_INSIGHTS,
+    heroSupportingImage: supporting.image,
+    heroSupportingImageAlt: supporting.alt,
+    customerFeedback:
+      slug === 'software-development' ? SOFTWARE_DEVELOPMENT_CUSTOMER_FEEDBACK : detail.customerFeedback,
+    closingCta: SERVICE_CLOSING_CTA[slug] ?? defaultClosingCta(slug),
+  }
 }
 
-type ServiceFaq = {
-  question: string
-  answer: string
+const SERVICE_SEO_TITLES: Record<string, string> = {
+  'software-development':
+    'Custom Software Development Kenya | SACCO, Fintech & HRMS | Raven Tech Group',
+  'cloud-solutions':
+    'AWS Cloud Migration Kenya | Fintech & SACCO Cloud Solutions | Raven Tech Group',
+  cybersecurity: 'Cybersecurity Services Kenya | CBK Compliance, Pen Testing | Raven Tech Group',
+  'digital-transformation':
+    'Digital Transformation Kenya | Process Automation for SMEs | Raven Tech Group',
+  'it-consulting': 'Fractional CTO Kenya | IT Consulting & Architecture Advisory | Raven Tech Group',
+  'system-integration': 'System Integration Kenya | M-Pesa, APIs, ETL | Raven Tech Group',
+  'web-development': 'Web Development Kenya | Fast, SEO-Ready Websites & Portals | Raven Tech Group',
 }
 
-type TeamRole = {
-  role: string
-  focus: string
+const SERVICE_SEO_DESCRIPTIONS: Record<string, string> = {
+  'software-development':
+    'Kenyan custom software development — SACCO platforms, M-Pesa integration, HRMS, ERP systems. Built in Westlands Nairobi, shipped in 8-12 weeks. Discovery call free.',
+  'cloud-solutions':
+    'AWS and Azure cloud migration for Kenyan fintechs, SACCOs, and growth businesses. Infrastructure as code, FinOps, 24/7 support. Nairobi-based team.',
+  cybersecurity:
+    'Penetration testing, CBK compliance, incident response for Kenyan fintechs and SACCOs. ISO 27001 aligned. Westlands Nairobi.',
+  'digital-transformation':
+    'Digital transformation for Kenyan businesses — process automation, data platforms, change management. From 12-week pilots to enterprise programs.',
+  'it-consulting':
+    'Fractional CTO and IT consulting for Kenyan founders and CTOs. Architecture reviews, delivery coaching, technical due diligence. Nairobi-based.',
+  'system-integration':
+    'M-Pesa integration, API orchestration, ETL pipelines, enterprise system connections for Kenyan businesses. Specialists in fintech and e-commerce.',
+  'web-development':
+    'Next.js websites, customer portals, and Shopify stores built for Kenyan mobile users. 90+ Lighthouse scores. Westlands Nairobi.',
 }
 
-type TimelineStage = {
-  phase: string
-  duration: string
-  focus: string
+const SERVICE_SEO_KEYWORDS: Record<string, string[]> = {
+  'software-development': [
+    'custom software development Kenya',
+    'SACCO software Nairobi',
+    'HRMS development Kenya',
+    'M-Pesa integration developers',
+    'fintech software East Africa',
+    'business software Westlands',
+    'ATS recruitment platform Kenya',
+    'ERP Kenya SME',
+    'software consultancy Nairobi',
+    'Next.js development Kenya',
+    'PostgreSQL Kenya',
+    'technology partner Africa',
+  ],
+  'cloud-solutions': [
+    'AWS migration Kenya',
+    'Azure cloud Nairobi',
+    'SACCO cloud infrastructure',
+    'fintech cloud compliance Kenya',
+    'Terraform Kenya',
+    'FinOps Kenya',
+    'cloud landing zone East Africa',
+    'Kubernetes Nairobi',
+    'multi-cloud Kenya',
+    'cloud cost optimisation Africa',
+    'Neon Postgres Kenya',
+    'infrastructure as code Kenya',
+  ],
+  cybersecurity: [
+    'cybersecurity Kenya',
+    'penetration testing Nairobi',
+    'CBK compliance IT',
+    'fintech security Africa',
+    'SACCO cybersecurity',
+    'ISO 27001 Kenya',
+    'incident response Nairobi',
+    'SIEM Kenya',
+    'GRC advisory East Africa',
+    'application security Kenya',
+    'threat assessment Africa',
+    'secure SDLC Kenya',
+  ],
+  'digital-transformation': [
+    'digital transformation Kenya',
+    'process automation Nairobi',
+    'SME digital strategy',
+    'change management Kenya',
+    'data platform East Africa',
+    'workflow automation Kenya',
+    'executive technology roadmap',
+    'KPI-led transformation',
+    'business process redesign Nairobi',
+    'low-code automation Kenya',
+    'analytics enablement Africa',
+    'digital operating model',
+  ],
+  'it-consulting': [
+    'fractional CTO Kenya',
+    'IT consulting Nairobi',
+    'technology advisory East Africa',
+    'architecture review Kenya',
+    'technical due diligence Nairobi',
+    'delivery coaching Kenya',
+    'engineering leadership Africa',
+    'vendor evaluation Kenya',
+    'CTO-as-a-service Nairobi',
+    'technology roadmap Kenya',
+    'board technology briefing',
+    'startup CTO Kenya',
+  ],
+  'system-integration': [
+    'system integration Kenya',
+    'M-Pesa API integration',
+    'API orchestration Nairobi',
+    'ETL pipelines East Africa',
+    'enterprise integration Kenya',
+    'e-commerce integration Kenya',
+    'middleware Kenya',
+    'Kafka Nairobi',
+    'iPaaS Kenya',
+    'data sync SACCO',
+    'payment integration Africa',
+    'ERP integration Kenya',
+  ],
+  'web-development': [
+    'web development Kenya',
+    'Next.js agency Nairobi',
+    'SEO website Kenya',
+    'Shopify Kenya',
+    'customer portal development',
+    'Core Web Vitals Kenya',
+    'headless CMS Kenya',
+    'corporate website Nairobi',
+    'e-commerce development East Africa',
+    'technical SEO Kenya',
+    'Lighthouse optimisation',
+    'Vercel deployment Kenya',
+  ],
 }
 
-type ServiceDetail = {
-  overview: string
-  highlights: string[]
-  outcomes: string[]
-  ctaLabel: string
-  heroImage?: string
-  heroImageAlt?: string
-  capabilities?: Capability[]
-  deliveryApproach?: DeliveryStep[]
-  tooling?: string[]
-  faqs?: ServiceFaq[]
-  engagementSignals?: string[]
-  clientCommitments?: string[]
-  teamStructure?: TeamRole[]
-  sampleTimeline?: TimelineStage[]
-  successMetrics?: string[]
-}
-
-const serviceDetails: Record<string, ServiceDetail> = {
+const serviceDetailsBase: Record<string, ServiceDetail> = {
   'software-development': {
     overview:
-      'We design, engineer, and ship high-performing software solutions tailored to your business—clean architecture, thoughtful design systems, and resilient infrastructure delivered by squads that stay embedded until the job is done.',
+      'When spreadsheets, phone calls, and workarounds start costing you real time and revenue, we help you turn priorities into software that works—customer-facing platforms, internal tools, and mobile apps with clear milestones, honest updates, and explanations in plain language. You stay focused on the business; we handle the build.',
     highlights: [
-      'Product discovery workshops and measurable roadmap planning',
-      'Full-stack engineering with TypeScript, React, and Node.js',
-      'Automated testing, CI/CD pipelines, and observability baked in',
-      'Ongoing maintenance, feature iteration, and technical advisory',
+      'Discovery sessions that translate goals into a roadmap you can share with your board',
+      'Product builds with regular demos—so you always see progress, not surprises',
+      'Security-minded delivery with documentation your team can actually use',
+      'Support after launch: improvements, training, and a partner who picks up the phone',
     ],
     outcomes: [
-      'Accelerated time-to-market with accountable, two-week release cadences',
-      'Secure, scalable systems ready for new features and user growth',
-      'Cross-functional squads embedded with your stakeholders from day one',
+      'Fewer manual steps and fewer errors as routine work moves into one reliable system',
+      'A platform that can grow with you—new features without starting from scratch',
+      'One accountable team aligned to your leadership, not a black box',
     ],
-    ctaLabel: 'Build your next product',
-    heroImage: '/images/photos/coding.png',
-    heroImageAlt: 'Software engineers pairing at a workstation',
+    ctaLabel: 'Get expert advice',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Software that ships.',
+    heroHeadlineSub: 'Outcomes that last.',
+    heroImageAlt: 'Business leaders collaborating in a modern office',
     engagementSignals: [
-      'You have a clear product owner or leadership sponsor ready to make decisions quickly.',
-      'You need to modernise an existing platform or ship a new product within the next 3–6 months.',
-      'Reliability, security, and documentation matter as much as velocity.',
+      'You can name who will own decisions on your side—so we never wait weeks for an answer.',
+      'You want something live in the next few months, not a never-ending study.',
+      'You care that the system is safe and dependable, not just that it launches.',
     ],
     clientCommitments: [
-      'Provide access to subject-matter experts for weekly alignment sessions.',
-      'Agree on success metrics up front and review them with us every two weeks.',
-      'Adopt shared tooling for backlog, documentation, and observability so information stays transparent.',
+      'Put the right people in the room when we need context—finance, operations, or frontline staff.',
+      'Agree up front what “success” looks like, and review it with us on a steady rhythm.',
+      'Use the simple shared tools we set up for updates and documents so nothing gets lost in email.',
     ],
     capabilities: [
       {
-        title: 'Platform & product builds',
-        description: 'Customer-facing platforms, internal tools, and multi-tenant applications engineered for resilience and flexibility.',
-        points: ['Next.js and React frontends with modular design systems', 'GraphQL/REST APIs with typed contracts and documentation', 'Event-driven architectures with audit trails and telemetry'],
+        title: 'Products your customers and staff actually use',
+        description:
+          'From customer portals to internal dashboards—interfaces that feel intentional, load quickly, and hold up as you add users.',
+        points: [
+          'Web and mobile experiences designed around your real workflows',
+          'Systems that talk to each other so you are not retyping the same data',
+          'Room to grow: new features without rebuilding from zero',
+        ],
       },
       {
-        title: 'Experience & interface systems',
-        description: 'Design operations and design-to-dev collaboration that keep teams aligned without slowing delivery.',
-        points: ['Shared component libraries in Storybook', 'Accessibility and localisation baked into acceptance criteria', 'Design QA, UAT, and visual regression suites'],
+        title: 'Design and delivery in step',
+        description: 'We keep design, testing, and build in one rhythm so approvals are fast and surprises are rare.',
+        points: [
+          'Shared references everyone can see—not ambiguous PDFs',
+          'Accessibility and clarity treated as part of quality, not an afterthought',
+          'Review checkpoints before anything goes live',
+        ],
       },
       {
-        title: 'Lifecycle management',
-        description: 'Post-launch support that blends performance tuning, feature iteration, and incident readiness.',
-        points: ['Observability dashboards and alerting thresholds', 'Runbooks for incident response and escalation paths', 'Weekly optimisation reviews with product and engineering leads'],
+        title: 'After launch, we do not disappear',
+        description: 'Training, tuning, and a clear path when something needs to change or scale.',
+        points: [
+          'Monitoring that flags issues before your customers do',
+          'Plain-language runbooks for your team',
+          'Regular check-ins with leadership on what to improve next',
+        ],
       },
     ],
     deliveryApproach: [
       {
-        title: 'Architecture immersion',
+        title: 'Align on the real problem',
         description:
-          '10-day sprint to map current state, align on success metrics, and blueprint the foundations—data models, domain boundaries, guardrails.',
+          'A focused start: we map how work gets done today, agree what success looks like for your business, and produce a plan you can stand behind—usually within about two weeks.',
       },
       {
-        title: 'Incremental delivery',
+        title: 'Build in visible slices',
         description:
-          'Cross-functional squad executes in two-week slices with demos, decision logs, and documented technical debt for visibility.',
+          'You see working software on a regular cadence, with short updates and space to adjust priorities. No six-month blackout period.',
       },
       {
-        title: 'Operate & evolve',
+        title: 'Launch and support',
         description:
-          'Launch preparations, runbooks, and enablement so the platform is ready for scale. We stay on for feature velocity or hand over cleanly.',
+          'Go-live prep your team understands, then either ongoing improvements with us or a clean handover—with documentation that is meant to be read.',
       },
     ],
     teamStructure: [
@@ -164,9 +304,9 @@ const serviceDetails: Record<string, ServiceDetail> = {
     tooling: ['TypeScript', 'Next.js', 'React', 'Node.js', 'PostgreSQL', 'GraphQL', 'Docker', 'Terraform', 'GitHub Actions', 'Sentry', 'Storybook'],
     faqs: [
       {
-        question: 'How quickly can a squad start?',
+        question: 'How quickly can delivery start?',
         answer:
-          'Discovery wraps in 10 days. With scope agreed, we stand up a core squad—tech lead, engineers, designer, delivery lead—within two weeks of sign-off.',
+          'Discovery wraps in 10 days. With scope agreed, we stand up a core team—tech lead, engineers, designer, delivery lead—within two weeks of sign-off.',
       },
       {
         question: 'Do you work with existing teams?',
@@ -179,10 +319,17 @@ const serviceDetails: Record<string, ServiceDetail> = {
           'We offer ongoing feature velocity and operations support. If you prefer, we hand over runbooks, documentation, and training sessions to your team.',
       },
     ],
+    relatedCaseStudies: [
+      {
+        slug: 'eagle-hr-consultants',
+        client: 'Eagle HR Consultants',
+        outcome: 'Full business operating system with ATS, HRMS, and Finance modules',
+      },
+    ],
   },
   'cloud-solutions': {
     overview:
-      'Unlock the full potential of AWS, Azure, and Google Cloud with migration roadmaps, infrastructure automation, cost governance, and ongoing reliability engineering.',
+      'When cloud costs spiral or environments become unpredictable, we help Kenyan and East African businesses take back control — migration roadmaps, infrastructure codified in Terraform, and operations your team can actually run. No vendor lock-in theatre. No surprise invoices. Just cloud environments that scale with your business.',
     highlights: [
       'Cloud readiness assessments and architecture design',
       'Infrastructure as Code with Terraform and Pulumi',
@@ -195,8 +342,9 @@ const serviceDetails: Record<string, ServiceDetail> = {
       'Compliance-ready environments aligned to ISO 27001 and SOC 2',
     ],
     ctaLabel: 'Modernize in the cloud',
-    heroImage:
-      'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?auto=format&fit=crop&w=1400&q=80',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Cloud infrastructure you can trust.',
+    heroHeadlineSub: 'Delivery you can verify.',
     heroImageAlt: 'Engineers reviewing cloud infrastructure dashboards',
     engagementSignals: [
       'You are planning a cloud migration or need to stabilise an existing footprint.',
@@ -268,10 +416,11 @@ const serviceDetails: Record<string, ServiceDetail> = {
         answer: 'We can run managed operations or co-manage with your team. Otherwise we hand over documentation, dashboards, and training sessions.',
       },
     ],
+    relatedCaseStudies: [],
   },
   'cybersecurity': {
     overview:
-      'Guard your organization with proactive security assessments, governance programs, and incident readiness from a certified cybersecurity squad.',
+      'From CBK compliance to fintech data protection, we help Kenyan businesses harden systems before breaches become headlines. Threat assessments, secure SDLC reviews, and incident readiness built for the regulatory realities of SACCOs, fintechs, and regulated organisations in East Africa. We find the gaps before attackers do.',
     highlights: [
       'Security posture reviews and penetration testing',
       'Zero Trust architecture blueprints and implementation',
@@ -284,8 +433,9 @@ const serviceDetails: Record<string, ServiceDetail> = {
       'Security culture uplift with executive and team training',
     ],
     ctaLabel: 'Secure your systems',
-    heroImage:
-      'https://images.unsplash.com/photo-1510511459019-5dda7724fd87?auto=format&fit=crop&w=1400&q=80',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Find the gaps',
+    heroHeadlineSub: 'before attackers do.',
     heroImageAlt: 'Cybersecurity analyst monitoring threat dashboards',
     engagementSignals: [
       'Upcoming audits, certifications, or regulatory reviews require structured preparation.',
@@ -326,6 +476,12 @@ const serviceDetails: Record<string, ServiceDetail> = {
       { role: 'Cloud security engineer', focus: 'Hardens infrastructure, implements controls, and tunes detection tooling.' },
       { role: 'GRC specialist', focus: 'Maps policies to obligations, prepares audits, and manages risk registers.' },
     ],
+    sampleTimeline: [
+      { phase: 'Weeks 1–2', duration: 'Security posture assessment', focus: 'Current state review, threat modelling, stakeholder interviews, risk register baseline.' },
+      { phase: 'Weeks 3–6', duration: 'Remediation sprint', focus: 'Priority vulnerability fixes, policy gaps addressed, tooling configuration, secure SDLC rollout.' },
+      { phase: 'Weeks 7–10', duration: 'Detection & response setup', focus: 'SIEM tuning, alerting, incident runbooks, tabletop exercises with your team.' },
+      { phase: 'Weeks 11–12', duration: 'Handover & governance', focus: 'Documentation, team training, executive reporting templates, ongoing review cadence.' },
+    ],
     successMetrics: [
       'Critical vulnerabilities remediated within agreed SLAs.',
       'Security scorecards improved across people, process, and technology categories.',
@@ -341,10 +497,11 @@ const serviceDetails: Record<string, ServiceDetail> = {
         answer: 'We can operate your tooling or integrate with preferred partners. Our focus is on building processes and response runbooks that work.',
       },
     ],
+    relatedCaseStudies: [],
   },
   'digital-transformation': {
     overview:
-      'Align teams, processes, and technology with a digital-first strategy that combines automation, analytics, and change management.',
+      'Digital transformation is not a slide deck. It is changing how your team works, what systems they trust, and how leadership sees the business. We run strategy sprints that align leadership on real outcomes, build the operating model to deliver them, and stay on to make sure the change actually sticks.',
     highlights: [
       'Vision and roadmap creation anchored in measurable KPIs',
       'Process mining and automation across business units',
@@ -357,8 +514,9 @@ const serviceDetails: Record<string, ServiceDetail> = {
       'Decision intelligence built on unified data platforms',
     ],
     ctaLabel: 'Transform with confidence',
-    heroImage:
-      'https://images.unsplash.com/photo-1531297484001-80022131f5a1?auto=format&fit=crop&w=1400&q=80',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Strategy that survives',
+    heroHeadlineSub: 'contact with reality.',
     heroImageAlt: 'Digital transformation workshop with collaborative teams',
     engagementSignals: [
       'Multiple departments need to align on a shared technology roadmap.',
@@ -400,6 +558,28 @@ const serviceDetails: Record<string, ServiceDetail> = {
       { role: 'Change manager', focus: 'Runs communication plans, training, and adoption tracking.' },
       { role: 'Automation engineer', focus: 'Implements workflows, integrations, and supporting applications.' },
     ],
+    sampleTimeline: [
+      {
+        phase: 'Weeks 1–3',
+        duration: 'Immersion & blueprint',
+        focus: 'Executive workshops, KPI baselines, process maps, dependency analysis, transformation charter.',
+      },
+      {
+        phase: 'Weeks 4–10',
+        duration: 'Pilot delivery',
+        focus: 'Automation and data pilots, adoption metrics, steering reviews, risk and change logs.',
+      },
+      {
+        phase: 'Weeks 11–16',
+        duration: 'Scale & embed',
+        focus: 'Rollout playbooks, training waves, governance cadence, benefit tracking vs baseline.',
+      },
+      {
+        phase: 'Weeks 17–20',
+        duration: 'Handover & optimise',
+        focus: 'Centre-of-excellence setup or transition to business owners, continuous improvement backlog.',
+      },
+    ],
     successMetrics: [
       'Operational KPIs improved (cycle time, error rate, cost per transaction).',
       'Adoption targets hit for new tools/processes, with training completion tracked.',
@@ -415,10 +595,17 @@ const serviceDetails: Record<string, ServiceDetail> = {
         answer: 'Absolutely. We evaluate your current ecosystem and identify gaps before recommending new tooling or integrations.',
       },
     ],
+    relatedCaseStudies: [
+      {
+        slug: 'eagle-hr-consultants',
+        client: 'Eagle HR Consultants',
+        outcome: 'Zero digital presence to fully digitised operations in 12 weeks',
+      },
+    ],
   },
   'it-consulting': {
     overview:
-      'On-demand engineering leadership, architecture guidance, and delivery acceleration for teams that need a trusted technology partner.',
+      'On-demand technology leadership for Kenyan founders, CTOs, and engineering leads who need senior guidance without hiring a full-time executive. Fractional CTO engagements, architecture reviews, delivery coaching, and technical due diligence — we embed with your team and make the hard calls with you.',
     highlights: [
       'CTO-as-a-service and advisory retainers',
       'Architecture reviews and modernization strategies',
@@ -431,7 +618,9 @@ const serviceDetails: Record<string, ServiceDetail> = {
       'Stronger alignment between engineering and leadership',
     ],
     ctaLabel: 'Partner with our specialists',
-    heroImage: '/images/photos/Consulting Image.jpg',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Senior engineering judgment,',
+    heroHeadlineSub: 'on demand.',
     heroImageAlt: 'Technology leadership team collaborating over strategy documents',
     engagementSignals: [
       'You need interim technology leadership or advisory to guide critical decisions.',
@@ -471,6 +660,12 @@ const serviceDetails: Record<string, ServiceDetail> = {
       { role: 'Delivery coach', focus: 'Improves rituals, backlog health, and cross-team communication.' },
       { role: 'Solutions architect', focus: 'Validates technical decisions, roadmaps, and vendor selections.' },
     ],
+    sampleTimeline: [
+      { phase: 'Weeks 1–2', duration: 'Assessment & alignment', focus: 'Strategy review, team interviews, system audits, priority mapping with leadership.' },
+      { phase: 'Weeks 3–8', duration: 'Embedded coaching', focus: 'Weekly leadership forums, delivery cadence establishment, architecture decisions, hiring support.' },
+      { phase: 'Weeks 9–12', duration: 'Optimisation cycle', focus: 'Process refinement, retrospectives, capability uplift measurement, knowledge transfer.' },
+      { phase: 'Weeks 13+', duration: 'Continuous advisory', focus: 'Monthly strategy reviews, board support, on-demand architecture and decision advisory.' },
+    ],
     successMetrics: [
       'Delivery KPIs (cycle time, throughput, predictability) improve within agreed windows.',
       'Leadership alignment achieved with regular steering forums and decision logs.',
@@ -486,10 +681,11 @@ const serviceDetails: Record<string, ServiceDetail> = {
         answer: 'We prepare technical narratives, roadmaps, and risk assessments tailored to investor and board expectations.',
       },
     ],
+    relatedCaseStudies: [],
   },
   'system-integration': {
     overview:
-      'Connect platforms, data, and teams with integrations that are secure, observable, and future-ready.',
+      'Your systems should work together — not force your team to manually copy data between them. We connect platforms, build M-Pesa and payment integrations, orchestrate APIs, and design data pipelines so information moves automatically, accurately, and auditably. Whether it is replacing a spreadsheet bridge or building enterprise-wide integration infrastructure, we start with what is actually breaking today.',
     highlights: [
       'API strategy, design, and lifecycle management',
       'Enterprise system integrations and data sync services',
@@ -502,7 +698,9 @@ const serviceDetails: Record<string, ServiceDetail> = {
       'Extensible architecture ready for new product offerings',
     ],
     ctaLabel: 'Integrate everything',
-    heroImage: '/images/photos/system_intergration.png',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Your systems,',
+    heroHeadlineSub: 'finally talking to each other.',
     heroImageAlt: 'Systems integration dashboard with interconnected services',
     engagementSignals: [
       'Manual data handoffs or siloed systems are slowing operations or reporting.',
@@ -543,6 +741,12 @@ const serviceDetails: Record<string, ServiceDetail> = {
       { role: 'Data engineer', focus: 'Ensures data quality, transformation, and lineage tracking.' },
       { role: 'Ops lead', focus: 'Sets up monitoring, incident response, and change management cadence.' },
     ],
+    sampleTimeline: [
+      { phase: 'Weeks 1–2', duration: 'Integration mapping', focus: 'System inventory, data flow analysis, API documentation review, success criteria agreed.' },
+      { phase: 'Weeks 3–6', duration: 'Build wave one', focus: 'Priority integrations implemented, testing framework setup, monitoring baseline.' },
+      { phase: 'Weeks 7–10', duration: 'Build wave two', focus: 'Remaining integrations, data quality validation, runbooks drafted, performance tuning.' },
+      { phase: 'Weeks 11–12', duration: 'Operate & optimise', focus: 'Go-live, observability validation, training, ongoing support cadence established.' },
+    ],
     successMetrics: [
       'Data flow SLAs achieved with measurable uptime and latency targets.',
       'Manual effort reduced—tracked through automation adoption metrics.',
@@ -558,8 +762,140 @@ const serviceDetails: Record<string, ServiceDetail> = {
         answer: 'We set up versioning, release cadences, and rollback plans so integrations evolve without disrupting operations.',
       },
     ],
+    relatedCaseStudies: [
+      {
+        slug: 'r4-automotive',
+        client: 'R4 Automotive',
+        outcome: 'M-Pesa integration with European parts supplier APIs and live pricing',
+      },
+    ],
+  },
+  'web-development': {
+    overview:
+      'Websites, portals, and web applications built to perform — not just look good. For Kenyan businesses tired of slow, generic templates that break when traffic grows, we build fast, accessible, search-optimised sites with content systems your team can actually use.',
+    highlights: [
+      'Next.js sites with 90+ Lighthouse scores out of the box',
+      'CMS integration so your team updates content without calling a developer',
+      'Search-optimised structure — technical SEO baked in from day one',
+      'Analytics, conversion tracking, and A/B testing ready from launch',
+    ],
+    outcomes: [
+      'Sites that rank on Google and load under 2 seconds on Kenyan mobile networks',
+      'Content your marketing team can publish without engineering support',
+      'Measurable traffic, engagement, and conversion improvements within 90 days',
+    ],
+    ctaLabel: 'Book a web audit',
+    heroEyebrow: 'Engineering',
+    heroHeadline: 'Sites that convert.',
+    heroHeadlineSub: 'Pages that rank.',
+    heroHeadlineSub2: 'Stack that scales.',
+    heroImageAlt: 'Web development team reviewing designs on large monitors',
+    engagementSignals: [
+      'Your current site is slow, outdated, or not converting visitors into enquiries.',
+      'You need a content system your team can update without calling an agency.',
+      'You want a site that ranks on Google for Kenyan searches, not just looks good in pitches.',
+    ],
+    clientCommitments: [
+      'Share brand assets, current analytics data, and competitor references upfront.',
+      'Nominate one decision-maker for approvals so reviews do not stall.',
+      'Commit to a content plan — even a simple one — so the site has something to say at launch.',
+    ],
+    capabilities: [
+      {
+        title: 'Corporate websites that convert',
+        description: 'Credibility-focused sites for consultancies, B2B service firms, and established businesses wanting to look the part online.',
+        points: [
+          'Strategic information architecture mapped to buyer journey',
+          'Performance and accessibility built in, not bolted on',
+          'CMS integration so marketing owns content, not engineering',
+        ],
+      },
+      {
+        title: 'Customer portals and dashboards',
+        description: 'Logged-in experiences for customers, members, partners, or staff.',
+        points: [
+          'Role-based access, authentication, and audit trails',
+          'Integrations with your existing systems — CRMs, ERPs, payment platforms',
+          'Responsive interfaces designed for mobile-first Kenyan users',
+        ],
+      },
+      {
+        title: 'SEO and performance engineering',
+        description: 'Sites built to be found — not just to exist.',
+        points: [
+          'Core Web Vitals optimisation from the ground up',
+          'Schema markup, canonical URLs, and search-ready metadata',
+          'Programmatic SEO for service and location-specific landing pages',
+        ],
+      },
+    ],
+    deliveryApproach: [
+      {
+        title: 'Strategy and structure',
+        description: 'Brand, buyer, and content audit. We map the site architecture, define conversion goals, and agree success metrics before design starts.',
+      },
+      {
+        title: 'Design and build in sprints',
+        description: 'Wireframes, design system, and iterative builds with weekly reviews. You see progress every Friday, not at the end of a three-month contract.',
+      },
+      {
+        title: 'Launch and optimise',
+        description: 'Pre-launch QA, analytics setup, and post-launch optimisation based on real user behaviour. Ongoing support or a clean handover — your choice.',
+      },
+    ],
+    teamStructure: [
+      { role: 'Product lead', focus: 'Owns strategy, stakeholder alignment, and launch criteria.' },
+      { role: 'Design lead', focus: 'Creates the design system, wireframes, and page templates.' },
+      { role: 'Full-stack engineer', focus: 'Builds the frontend, CMS integration, and performance optimisations.' },
+      { role: 'SEO specialist', focus: 'Technical SEO setup, schema, and content optimisation.' },
+    ],
+    sampleTimeline: [
+      { phase: 'Weeks 1–2', duration: 'Discovery & strategy', focus: 'Audit current site, brand review, buyer interviews, sitemap, success metrics.' },
+      { phase: 'Weeks 3–4', duration: 'Design sprint', focus: 'Wireframes, design system, key page designs reviewed with stakeholders.' },
+      { phase: 'Weeks 5–8', duration: 'Build & integrate', focus: 'Frontend build, CMS setup, content migration, integrations.' },
+      { phase: 'Weeks 9–10', duration: 'Launch & optimise', focus: 'QA, analytics, soft launch, training, and first optimisation cycle.' },
+    ],
+    successMetrics: [
+      'Lighthouse performance score 90+ on mobile and desktop at launch.',
+      'Organic search impressions measurable within 30 days via Google Search Console.',
+      'Content system adopted by marketing team — publishing within the first week post-launch.',
+    ],
+    tooling: ['Next.js', 'React', 'TypeScript', 'Tailwind CSS', 'Sanity CMS', 'Vercel', 'Google Analytics 4', 'Search Console', 'Hotjar'],
+    faqs: [
+      {
+        question: 'How much does a website cost?',
+        answer:
+          'Costs depend on scope — a corporate site with 8-12 pages typically ranges KES 250,000 to 800,000. Customer portals and complex applications are scoped separately after discovery.',
+      },
+      {
+        question: 'Do you work with Shopify or WordPress?',
+        answer:
+          'We build e-commerce on Shopify when it is the right fit — Honey Box Accessories is a live example. For content sites we usually recommend Next.js with a headless CMS for better performance and control.',
+      },
+      {
+        question: 'Can you take over a site built by someone else?',
+        answer:
+          'Yes. We audit the existing build, identify performance and SEO issues, and propose either a rebuild or an optimisation programme depending on what is salvageable.',
+      },
+    ],
+    relatedCaseStudies: [
+      {
+        slug: 'honey-box-accessories',
+        client: 'Honey Box Accessories',
+        outcome: 'Shopify store with 6 product collections and gift package bundles',
+      },
+      {
+        slug: 'eagle-hr-consultants',
+        client: 'Eagle HR Consultants',
+        outcome: 'Corporate website plus full platform ecosystem',
+      },
+    ],
   },
 }
+
+const serviceDetails: Record<string, ServiceDetail> = Object.fromEntries(
+  Object.entries(serviceDetailsBase).map(([slug, detail]) => [slug, mergeServiceDetail(slug, detail)])
+) as Record<string, ServiceDetail>
 
 type ServicePageProps = {
   params: Promise<{ slug: string }>
@@ -578,26 +914,24 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
     return {}
   }
 
-  const title = `${service.title} Services | Raven Tech Group`
-  const description = detail.overview ?? service.description
-  const url = `https://raventechgroup.com/services/${slug}`
-  const image = detail.heroImage ? `https://raventechgroup.com${detail.heroImage}` : 'https://raventechgroup.com/og-image.jpg'
+  const title = SERVICE_SEO_TITLES[slug] ?? `${service.title} | Raven Tech Group`
+  const description = SERVICE_SEO_DESCRIPTIONS[slug] ?? detail.overview ?? service.description
+  const url = `https://www.raventechgroup.com/services/${slug}`
+  const imagePath = getServiceIntakeSpotlightImageSrc(slug)
+  const image = imagePath.startsWith('http') ? imagePath : `https://www.raventechgroup.com${encodeURI(imagePath)}`
+  const keywords = SERVICE_SEO_KEYWORDS[slug] ?? [
+    service.title.toLowerCase(),
+    'technology consultancy Kenya',
+    'Nairobi',
+    'Westlands',
+    'East Africa',
+    'Raven Tech Group',
+  ]
 
   return {
     title,
     description,
-    keywords: [
-      service.title.toLowerCase(),
-      'software development',
-      'custom software',
-      'web development',
-      'application development',
-      'Nairobi',
-      'Kenya',
-      'Africa',
-      'technology consulting',
-      'software engineering',
-    ].join(', '),
+    keywords,
     authors: [{ name: 'Raven Tech Group' }],
     openGraph: {
       title,
@@ -609,10 +943,10 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
           url: image,
           width: 1200,
           height: 630,
-          alt: detail.heroImageAlt ?? `${service.title} services`,
+          alt: detail.heroImageAlt ?? `${service.title} services Kenya — Raven Tech Group`,
         },
       ],
-      locale: 'en_US',
+      locale: 'en_KE',
       type: 'website',
     },
     twitter: {
@@ -623,6 +957,9 @@ export async function generateMetadata({ params }: ServicePageProps): Promise<Me
     },
     alternates: {
       canonical: url,
+      languages: {
+        'en-KE': url,
+      },
     },
     robots: {
       index: true,
@@ -647,278 +984,180 @@ export default async function ServicePage({ params }: ServicePageProps) {
     notFound()
   }
 
-  // Structured data for SEO
-  const structuredData = {
+  const pageUrl = `https://www.raventechgroup.com/services/${service.slug}`
+  const heroSrc = getServiceIntakeSpotlightImageSrc(service.slug)
+  const heroAlt =
+    detail.heroImageAlt ?? `${service.title} services — Raven Tech Group, Nairobi Kenya`
+  const navItems = buildServiceNavItems(detail)
+
+  const serviceSchema: Record<string, unknown> = {
     '@context': 'https://schema.org',
     '@type': 'Service',
     name: service.title,
     description: detail.overview,
+    url: pageUrl,
+    serviceType: service.title,
     provider: {
       '@type': 'Organization',
+      '@id': 'https://www.raventechgroup.com/#organization',
       name: 'Raven Tech Group',
-      url: 'https://raventechgroup.com',
+      url: 'https://www.raventechgroup.com',
       address: {
         '@type': 'PostalAddress',
-        addressLocality: 'Nairobi',
+        addressLocality: 'Westlands, Nairobi',
         addressCountry: 'KE',
       },
     },
-    areaServed: {
-      '@type': 'Place',
-      name: 'Africa and Europe',
-    },
-    serviceType: service.title,
+    areaServed: [
+      { '@type': 'Country', name: 'Kenya' },
+      { '@type': 'Country', name: 'Nigeria' },
+      { '@type': 'Country', name: 'Ghana' },
+      { '@type': 'Country', name: 'Uganda' },
+      { '@type': 'Country', name: 'Tanzania' },
+    ],
   }
+
+  if (detail.capabilities && detail.capabilities.length > 0) {
+    serviceSchema.hasOfferCatalog = {
+      '@type': 'OfferCatalog',
+      name: `${service.title} capabilities`,
+      itemListElement: detail.capabilities.map((c, i) => ({
+        '@type': 'Offer',
+        position: i + 1,
+        itemOffered: {
+          '@type': 'Service',
+          name: c.title,
+          description: c.description,
+        },
+      })),
+    }
+  }
+
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://www.raventechgroup.com/',
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Services',
+        item: 'https://www.raventechgroup.com/services',
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: service.title,
+        item: pageUrl,
+      },
+    ],
+  }
+
+  const faqSchema =
+    detail.faqs && detail.faqs.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'FAQPage',
+          mainEntity: detail.faqs.map((f) => ({
+            '@type': 'Question',
+            name: f.question,
+            acceptedAnswer: {
+              '@type': 'Answer',
+              text: f.answer,
+            },
+          })),
+        }
+      : null
+
+  const howToSchema =
+    detail.deliveryApproach && detail.deliveryApproach.length > 0
+      ? {
+          '@context': 'https://schema.org',
+          '@type': 'HowTo',
+          name: `How to choose a ${service.title} partner`,
+          description:
+            detail.overview.length > 280
+              ? `${detail.overview.slice(0, 277).trimEnd()}…`
+              : detail.overview,
+          step: detail.deliveryApproach.map((s, i) => ({
+            '@type': 'HowToStep',
+            position: i + 1,
+            name: s.title,
+            text: s.description,
+          })),
+        }
+      : null
+
+  const reviewSchemas =
+    detail.customerFeedback?.map((fb) => ({
+      '@context': 'https://schema.org',
+      '@type': 'Review',
+      reviewBody: fb.quote,
+      author: {
+        '@type': 'Organization',
+        name: fb.company,
+      },
+      itemReviewed: {
+        '@type': 'Service',
+        name: service.title,
+        provider: {
+          '@type': 'Organization',
+          name: 'Raven Tech Group',
+        },
+      },
+    })) ?? []
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceSchema) }}
       />
-      <div className="bg-black text-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      {faqSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      ) : null}
+      {howToSchema ? (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+        />
+      ) : null}
+      {reviewSchemas.map((schema, i) => (
+        <script
+          key={`review-${i}`}
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+        />
+      ))}
+      <div className="min-h-screen bg-[#0A0A0A] text-white">
         <ServiceHero
+          slug={service.slug}
           serviceTitle={service.title}
           overview={detail.overview}
+          heroImage={heroSrc}
+          heroImageAlt={heroAlt}
+          heroEyebrow={detail.heroEyebrow}
+          heroHeadline={detail.heroHeadline}
+          heroHeadlineSub={detail.heroHeadlineSub}
+          heroHeadlineSub2={detail.heroHeadlineSub2}
           ctaLabel={detail.ctaLabel}
-          heroImage={detail.heroImage}
-          heroImageAlt={detail.heroImageAlt}
-          serviceSlug={service.slug}
+          awardBadges={detail.awardBadges}
         />
-
-        {/* Service Overview, Delivery Approach & Tooling - Combined */}
-        <section className="border-t border-white/10 bg-black py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-6xl space-y-20">
-              {/* Service Overview */}
-              <div>
-                <div className="mb-12 max-w-3xl">
-                  <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Service Overview</span>
-                  <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">What you get</h2>
-                  <p className="mt-4 text-base text-white/65 sm:text-lg">
-                    Comprehensive delivery that combines strategy, engineering, and operations under one accountable team.
-                  </p>
-                </div>
-                
-                <div className="grid gap-8 lg:grid-cols-2">
-                  {/* What's Included Card */}
-                  <div className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.05] to-white/[0.02] p-8 shadow-[0_40px_120px_-72px_rgba(15,23,42,0.5)]">
-                    <div className="mb-6 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/20">
-                        <svg className="h-6 w-6 text-brand-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-semibold text-white">What&apos;s included</h3>
-                    </div>
-                    <ul className="space-y-4">
-                      {detail.highlights.map((item) => (
-                        <li key={item} className="flex items-start gap-4">
-                          <span className="mt-1 inline-flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-brand-500 text-[11px] font-semibold text-black">
-                            ✓
-                          </span>
-                          <span className="leading-relaxed text-white/80">{item}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-
-                  {/* Expected Outcomes Card */}
-                  <div className="rounded-3xl border border-brand-500/30 bg-gradient-to-br from-brand-500/10 to-brand-500/5 p-8 shadow-[0_40px_120px_-72px_rgba(255,169,30,0.2)]">
-                    <div className="mb-6 flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/30">
-                        <svg className="h-6 w-6 text-brand-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                        </svg>
-                      </div>
-                      <h3 className="text-xl font-semibold text-brand-200">Expected outcomes</h3>
-                    </div>
-                    <ul className="space-y-4">
-                      {detail.outcomes.map((outcome) => (
-                        <li key={outcome} className="flex items-start gap-3">
-                          <span className="mt-2 h-2 w-2 flex-shrink-0 rounded-full bg-brand-400" />
-                          <span className="leading-relaxed text-white/80">{outcome}</span>
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
-              </div>
-
-              {/* Delivery Approach */}
-              {detail.deliveryApproach && detail.deliveryApproach.length > 0 && (
-                <div>
-                  <div className="mb-12 max-w-3xl space-y-3">
-                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Our Process</span>
-                    <h2 className="text-3xl font-semibold text-white sm:text-4xl">Delivery approach</h2>
-                    <p className="mt-4 text-base text-white/65 sm:text-lg">
-                      Transparent cadence from first workshop to steady-state operations. You&apos;ll always know what we&apos;re working on and why.
-                    </p>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-3">
-                    {detail.deliveryApproach.map((step, index) => (
-                      <div key={step.title} className="group relative flex h-full flex-col gap-5 rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-8 transition-all duration-300 hover:border-brand-400/40 hover:bg-white/[0.08]">
-                        <div className="flex items-center gap-4">
-                          <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-brand-400/40 bg-brand-500/15 text-lg font-semibold text-brand-200 transition-all duration-300 group-hover:scale-110 group-hover:bg-brand-500/25">
-                            {index + 1}
-                          </span>
-                          <h3 className="text-lg font-semibold text-white">{step.title}</h3>
-                        </div>
-                        <p className="flex-1 text-sm leading-relaxed text-white/70">{step.description}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Tooling */}
-              {detail.tooling && detail.tooling.length > 0 && (
-                <div>
-                  <div className="mb-8 max-w-3xl">
-                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Technology Stack</span>
-                    <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">Tooling & automation stack</h2>
-                    <p className="mt-4 text-base text-white/65 sm:text-lg">
-                      Opinionated defaults keep delivery reliable, but every stack is tuned to your governance, procurement, and compliance needs.
-                    </p>
-                  </div>
-                  <div className="flex flex-wrap gap-3 text-sm text-white/70">
-                    {detail.tooling.map((tool) => (
-                      <span key={tool} className="rounded-full border border-white/10 bg-white/[0.05] px-4 py-2">
-                        {tool}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-
-      {((detail.teamStructure && detail.teamStructure.length > 0) || (detail.sampleTimeline && detail.sampleTimeline.length > 0) || (detail.successMetrics && detail.successMetrics.length > 0)) && (
-        <section className="border-t border-white/10 bg-black py-20">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="mx-auto max-w-6xl space-y-20">
-              {/* Team Composition */}
-              {detail.teamStructure && detail.teamStructure.length > 0 && (
-                <div>
-                  <div className="mb-12 max-w-3xl space-y-3">
-                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Team Composition</span>
-                    <h2 className="text-3xl font-semibold text-white sm:text-4xl">The squad we assemble</h2>
-                    <p className="mt-4 text-base text-white/65 sm:text-lg">
-                      Multidisciplinary by default—product, engineering, design, and operations working as one team.
-                    </p>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    {detail.teamStructure.map(({ role, focus }) => (
-                      <div key={role} className="group rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6 transition-all duration-300 hover:border-brand-400/40 hover:bg-white/[0.08]">
-                        <h3 className="text-base font-semibold text-white">{role}</h3>
-                        <p className="mt-3 text-sm leading-relaxed text-white/70">{focus}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Timeline */}
-              {detail.sampleTimeline && detail.sampleTimeline.length > 0 && (
-                <div>
-                  <div className="mb-12 max-w-3xl space-y-3">
-                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Timeline</span>
-                    <h2 className="text-3xl font-semibold text-white sm:text-4xl">Sample 16-week roadmap</h2>
-                    <p className="mt-4 text-base text-white/65 sm:text-lg">
-                      Actual timelines depend on scope, but this is the cadence most product builds follow.
-                    </p>
-                  </div>
-                  <div className="grid gap-6 md:grid-cols-2">
-                    {detail.sampleTimeline.map(({ phase, duration, focus }) => (
-                      <div key={phase} className="rounded-3xl border border-white/10 bg-gradient-to-br from-white/[0.06] to-white/[0.02] p-6 shadow-[0_34px_120px_-70px_rgba(15,23,42,0.4)]">
-                        <p className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">{phase}</p>
-                        <h3 className="mt-3 text-lg font-semibold text-white">{duration}</h3>
-                        <p className="mt-2 text-sm text-white/70">{focus}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {/* Success Metrics */}
-              {detail.successMetrics && detail.successMetrics.length > 0 && (
-                <div>
-                  <div className="mb-12 max-w-3xl">
-                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Success Metrics</span>
-                    <h2 className="mt-4 text-3xl font-semibold text-white sm:text-4xl">How we measure success</h2>
-                  </div>
-                  <ul className="space-y-3 text-sm text-white/70">
-                    {detail.successMetrics.map((metric) => (
-                      <li key={metric} className="flex gap-3 rounded-3xl border border-white/10 bg-white/[0.05] p-4">
-                        <span className="mt-[6px] h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-400" />
-                        <span>{metric}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </div>
-          </div>
-        </section>
-      )}
-
-      <section className="border-t border-white/10 bg-black py-12 sm:py-16 md:py-20">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-6xl space-y-16">
-            {/* FAQ Section */}
-            {detail.faqs && detail.faqs.length > 0 && (
-              <div>
-                <div className="grid gap-8 sm:gap-12 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start">
-                  <div className="space-y-4 sm:space-y-5">
-                    <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Common Questions</span>
-                    <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">
-                      Questions teams ask us
-                    </h2>
-                    <p className="text-sm text-white/70 sm:text-base leading-relaxed">
-                      We keep answers consistent so you know exactly how the engagement will run before we start.
-                    </p>
-                  </div>
-                  <div className="space-y-4">
-                    {detail.faqs.map((faq, index) => (
-                      <details
-                        key={faq.question}
-                        className="group overflow-hidden rounded-2xl sm:rounded-3xl border border-white/10 bg-white/[0.05] px-6 py-5 text-left transition duration-200 open:border-brand-400/60 open:bg-brand-400/10 shadow-[0_18px_60px_-45px_rgba(15,23,42,0.35)] backdrop-blur"
-                      >
-                        <summary className="flex cursor-pointer list-none items-center justify-between gap-4 text-sm font-semibold text-white/80 sm:text-base">
-                          <span>{faq.question}</span>
-                          <span className="inline-flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full border border-white/20 text-white/60 transition duration-200 group-open:border-brand-300 group-open:text-brand-200">
-                            <span className="transition-transform duration-200 group-open:rotate-45">+</span>
-                          </span>
-                        </summary>
-                        <p className="mt-4 text-sm text-white/65 sm:text-base leading-relaxed">{faq.answer}</p>
-                      </details>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* CTA Section */}
-            <div className="rounded-3xl border border-white/10 bg-black/60 px-8 py-10 md:px-12 md:py-14">
-              <div className="flex flex-col gap-8 md:flex-row md:items-center md:justify-between">
-                <div>
-                  <h2 className="text-3xl font-semibold text-white">Ready to get started?</h2>
-                  <p className="mt-3 text-white/65">
-                    Share your goals and we&apos;ll assemble a delivery roadmap with estimated timelines and investments.
-                  </p>
-                </div>
-                <Link
-                  href="/contact"
-                  className="inline-flex items-center justify-center rounded-full bg-brand-500 px-6 py-3 text-sm font-semibold text-black transition duration-200 hover:bg-brand-400"
-                >
-                  {detail.ctaLabel}
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
+        <ServiceSideNavLayout navItems={navItems}>
+          <ServiceSections detail={detail} service={{ title: service.title, slug: service.slug }} />
+        </ServiceSideNavLayout>
       </div>
     </>
   )

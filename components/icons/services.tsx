@@ -103,10 +103,47 @@ export function SystemIntegrationIcon(props: IconProps) {
   )
 }
 
+export function WebDevelopmentIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" {...props}>
+      <circle cx="24" cy="24" r="18" strokeWidth="2" />
+      <path
+        d="M24 6c-5.5 6.5-8.5 11.5-8.5 18s3 11.5 8.5 18"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M24 6c5.5 6.5 8.5 11.5 8.5 18s-3 11.5-8.5 18"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path d="M6 24h36M8.5 15h31M8.5 33h31" strokeWidth="2" strokeLinecap="round" />
+    </svg>
+  )
+}
 
-
-
-
-
-
-
+export function HRPlatformIcon(props: IconProps) {
+  return (
+    <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" {...props}>
+      <rect x="6" y="8" width="36" height="32" rx="4" strokeWidth="2" />
+      <circle cx="16" cy="20" r="4" strokeWidth="2" />
+      <path
+        d="M10 32c0-3.314 2.686-6 6-6s6 2.686 6 6"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M28 15h8M28 20h8M28 25h6"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M28 32h8M28 36h6"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}

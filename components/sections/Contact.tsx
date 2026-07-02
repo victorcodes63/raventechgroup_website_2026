@@ -1,41 +1,63 @@
 'use client'
 
 import { useState, FormEvent, useRef } from 'react'
-import { motion } from 'framer-motion'
-import { Send, Mail, Phone, MapPin, ArrowRight, CheckCircle, AlertCircle, Loader2 } from 'lucide-react'
+import { motion, useReducedMotion } from 'framer-motion'
+import { CheckCircle, AlertCircle, Loader2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { fadeInUp, staggerContainer, scrollReveal } from '@/lib/animations'
-import { trackEvent } from '@/components/analytics/GoogleAnalytics'
+import { trackEvent, trackAdsConversion } from '@/components/analytics/GoogleAnalytics'
+import Image from 'next/image'
+import Link from 'next/link'
+import { CTAButtonElement } from '@/components/ui/CTAButton'
+import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
+import { heroClientLogos } from '@/lib/data/clientLogos'
+import { TrustedByLogoMarquee } from '@/components/trust/TrustedByLogoMarquee'
+import { services } from '@/lib/data/services'
 
-const contactMethods = [
+const contactPageTestimonials = [
   {
-    icon: Mail,
-    title: 'Email Us',
-    content: 'hello@raventechgroup.com',
-    href: 'mailto:hello@raventechgroup.com',
+    quote:
+      'We serve banks, regulators, and large employers—work that used to sprawl across sheets and email. One system now runs a mandate from first contact through billing.',
+    name: 'Moses Kirui',
+    role: 'Head of Operations · Eagle HR Consultants',
+    image: '/images/testimonials/kirui-image.webp',
   },
   {
-    icon: Phone,
-    title: 'Call Us',
-    content: '+254 796 349 079',
-    href: 'tel:+254796349079',
-  },
-  {
-    icon: MapPin,
-    title: 'Visit Us',
-    content: 'Western Heights, Karuna Road, Westlands, Nairobi',
-    href: 'https://www.google.com/maps/place/Western+Heights,+Karuna+Road,+Nairobi',
+    quote:
+      'From start to finish, the experience was patient and professional. The site reflects my brand—and I have received strong feedback from customers.',
+    name: 'Huini Macharia',
+    role: 'Founder · Honey Box Accessories',
+    image: '/images/clients/honeybox-store.png',
   },
 ]
 
 interface ContactProps {
   variant?: 'default' | 'homepage'
+  /** Homepage only: omit outer section; parent provides layout (e.g. lead band grid). */
+  embedded?: boolean
+  /** Homepage variant only: overrides default H2 (e.g. route-specific lead-in). */
+  homepageHeadline?: string
+  /** Homepage variant only: overrides default subtext under the H2. */
+  homepageSupporting?: string
+  prefillMessage?: string
 }
 
-export function Contact({ variant = 'default' }: ContactProps) {
+export function Contact({
+  variant = 'default',
+  embedded = false,
+  homepageHeadline,
+  homepageSupporting,
+  prefillMessage = '',
+}: ContactProps) {
   const isHomepage = variant === 'homepage'
+  const leadHeadline = homepageHeadline ?? 'Send a brief. We reply within one business day.'
+  const leadSupporting =
+    homepageSupporting ??
+    'Scope, deadlines, or a one-page problem statement—enough for a substantive first response.'
+  const reducedMotion = useReducedMotion()
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [submitStatus, setSubmitStatus] = useState<'idle' | 'success' | 'error'>('idle')
   const [errorMessage, setErrorMessage] = useState('')
+  const [activeTestimonial, setActiveTestimonial] = useState(0)
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -51,6 +73,10 @@ export function Contact({ variant = 'default' }: ContactProps) {
     }
 
     const formData = new FormData(form)
+    const attachmentEntry = formData.get('attachment')
+    const attachmentName =
+      attachmentEntry instanceof File && attachmentEntry.size > 0 ? attachmentEntry.name : undefined
+
     const data = {
       name: formData.get('name'),
       email: formData.get('email'),
@@ -58,43 +84,33 @@ export function Contact({ variant = 'default' }: ContactProps) {
       company: formData.get('company') || undefined,
       timeline: formData.get('timeline') || undefined,
       services: formData.get('services') || undefined,
-      budget: formData.get('budget') || undefined,
       message: formData.get('message') || undefined,
+      attachmentName,
+      consentUpdates: formData.get('consentUpdates') === 'on',
       projectContext: isHomepage ? formData.get('message') : undefined,
-      honeypot: formData.get('website'), // Honeypot field
+      honeypot: formData.get('website'),
     }
 
     try {
       const response = await fetch('/api/contact', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       })
 
       const result = await response.json()
-
-      if (!response.ok) {
-        throw new Error(result.error || 'Failed to send message')
-      }
+      if (!response.ok) throw new Error(result.error || 'Failed to send message')
 
       setSubmitStatus('success')
-      
-      // Reset form safely
-      if (formRef.current) {
-        formRef.current.reset()
-      } else if (e.currentTarget) {
-        e.currentTarget.reset()
-      }
-      
-      // Track form submission in Google Analytics
+      if (formRef.current) formRef.current.reset()
+      else if (e.currentTarget) e.currentTarget.reset()
+
       trackEvent('form_submit', 'contact', isHomepage ? 'homepage' : 'contact_page')
-      
-      // Reset success message after 5 seconds
-      setTimeout(() => {
-        setSubmitStatus('idle')
-      }, 5000)
+      const adsLeadLabel = process.env.NEXT_PUBLIC_GOOGLE_ADS_LEAD_LABEL || ''
+      if (adsLeadLabel) {
+        trackAdsConversion(adsLeadLabel)
+      }
+      setTimeout(() => setSubmitStatus('idle'), 5000)
     } catch (error) {
       setSubmitStatus('error')
       setErrorMessage(error instanceof Error ? error.message : 'An error occurred. Please try again.')
@@ -102,433 +118,578 @@ export function Contact({ variant = 'default' }: ContactProps) {
       setIsSubmitting(false)
     }
   }
-  
-  return (
-    <section 
-      id="contact" 
-      className={`relative overflow-hidden ${
-        isHomepage 
-          ? 'border-t border-white/10 bg-black py-16 sm:py-20 md:py-28 text-white' 
-          : 'border-t border-white/10 bg-white py-12 sm:py-16 md:py-24 text-black'
-      }`}
-    >
-      <div className="pointer-events-none absolute inset-0">
-        {isHomepage ? (
-          <>
-            {/* Animated gradient orbs */}
-            <motion.div
-              animate={{
-                x: [0, 100, 0],
-                y: [0, -50, 0],
-                scale: [1, 1.2, 1],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: 'easeInOut',
-              }}
-              className="absolute top-20 left-10 h-96 w-96 rounded-full bg-brand-500/20 blur-[120px]"
-            />
-            <motion.div
-              animate={{
-                x: [0, -80, 0],
-                y: [0, 60, 0],
-                scale: [1, 1.1, 1],
-              }}
-              transition={{
-                duration: 25,
-                repeat: Infinity,
-                ease: 'easeInOut',
-                delay: 0.5,
-              }}
-              className="absolute bottom-20 right-10 h-80 w-80 rounded-full bg-brand-500/15 blur-[100px]"
-            />
-            
-            {/* Animated grid pattern */}
-            <motion.div
-              animate={{
-                backgroundPosition: ['0px 0px', '100px 100px', '0px 0px'],
-                opacity: [0.15, 0.25, 0.15],
-              }}
-              transition={{
-                duration: 20,
-                repeat: Infinity,
-                ease: 'linear',
-              }}
-              className="absolute inset-0"
-              style={{
-                backgroundImage:
-                  'linear-gradient(45deg, rgba(255,169,30,0.2) 1px, transparent 1px), linear-gradient(-45deg, rgba(255,169,30,0.2) 1px, transparent 1px)',
-                backgroundSize: '80px 80px',
-              }}
-            />
-            
-            {/* Radial gradient overlay */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_40%,_rgba(255,169,30,0.15),_transparent_60%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_60%,_rgba(255,169,30,0.1),_transparent_60%)]" />
-            
-          </>
-        ) : (
-          <>
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(14,14,18,0.08),_transparent_60%)]" />
-            <div className="absolute inset-0 bg-[linear-gradient(120deg,rgba(255,169,30,0.1)_0%,transparent_45%,rgba(14,14,18,0.08)_85%)]" />
-            <div
-              className="absolute inset-0 opacity-[0.16]"
-              style={{
-                backgroundImage:
-                  'linear-gradient(0deg, rgba(255,169,30,0.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,169,30,0.18) 1px, transparent 1px)',
-                backgroundSize: '140px 140px',
-              }}
-            />
-          </>
-        )}
-      </div>
-      <div className="container relative mx-auto px-4 sm:px-6 lg:px-8">
-        <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: '-100px' }}
-          className="mx-auto max-w-6xl space-y-16"
-        >
-          {!isHomepage && (
-            <motion.div variants={fadeInUp} className="text-center">
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-semibold text-black">
-                Let&apos;s scope your next milestone.
-              </h2>
-              <p className="mt-4 sm:mt-6 text-base sm:text-lg px-4 sm:px-0 max-w-2xl mx-auto text-black/65">
-                Share a brief, link your roadmap, or tell us where you&apos;re stuck. We&apos;ll respond within one business day.
-              </p>
-            </motion.div>
-          )}
 
-          <div className={`grid gap-8 sm:gap-12 ${isHomepage ? 'lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] max-w-6xl mx-auto lg:items-start' : 'lg:grid-cols-[minmax(0,1.05fr)_minmax(0,0.9fr)]'}`}>
-            {isHomepage && (
-              <motion.div variants={scrollReveal} className="space-y-4 sm:space-y-5">
-                <span className="text-xs font-semibold uppercase tracking-[0.25em] text-white/50">Let&apos;s build together</span>
-                <h2 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-white">
-                  Ready to ship <span className="bg-gradient-to-r from-brand-400 to-brand-500 bg-clip-text text-transparent">technology that grows</span> with you?
-                </h2>
-                <p className="text-sm text-white/70 sm:text-base leading-relaxed">
-                  Share your roadmap, RFP, or problem statement. We&apos;ll align on scope, assemble the right squad, and start delivering value within weeks.
-                </p>
-              </motion.div>
-            )}
-            <motion.div 
-              variants={scrollReveal} 
-              className={`relative overflow-hidden rounded-3xl sm:rounded-[2rem] p-6 sm:p-8 md:p-10 backdrop-blur-xl ${
-                isHomepage 
-                  ? 'border border-white/20 bg-gradient-to-br from-white/10 via-white/5 to-transparent shadow-[0_32px_100px_-24px_rgba(255,169,30,0.25)] before:absolute before:inset-0 before:rounded-3xl before:bg-gradient-to-br before:from-brand-500/10 before:via-transparent before:to-transparent before:opacity-0 before:transition-opacity before:duration-500 hover:before:opacity-100' 
-                  : 'border border-black/10 bg-white/90 shadow-[0_24px_80px_-50px_rgba(15,23,42,0.35)]'
-              }`}
-            >
-              {isHomepage && (
-                <div className="absolute top-0 right-0 w-64 h-64 bg-brand-500/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/2" />
-              )}
-              <div className="relative z-10">
-              <form ref={formRef} onSubmit={handleSubmit} className={`grid gap-5 sm:gap-6 ${isHomepage ? 'sm:grid-cols-2' : 'sm:grid-cols-2'}`}>
-                <motion.div
-                  whileFocus={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <label htmlFor={`name-${variant}`} className={`mb-2.5 block text-sm font-semibold ${isHomepage ? 'text-white/90' : 'text-black/70'}`}>
-                    Name *
+  /* ── Homepage variant — matches footer tokens & section anatomy ──── */
+  if (isHomepage) {
+    const fieldShellDefault =
+      'border-b border-white/[0.06] py-4 transition-colors focus-within:border-[#FFA91F]/55 focus-within:border-b-[#FFA91F]'
+    const fieldShellLead = [
+      'rounded-card border border-white/[0.07] bg-[#0A0A0A]/50 px-4 py-3.5 transition-[border-color,background-color] duration-200',
+      'focus-within:border-white/[0.16] focus-within:bg-[#0A0A0A]/65',
+    ].join(' ')
+    const labelLead = 'mb-2 block text-[11px] font-medium uppercase tracking-[0.12em] text-white/40'
+    const inputLead =
+      'w-full border-0 bg-transparent p-0 text-sm text-white/90 placeholder:text-white/25 focus:outline-none focus:ring-0'
+
+    const fieldShell = embedded ? fieldShellLead : fieldShellDefault
+
+    const homepageInner = (
+      <>
+        <SectionEyebrow>Contact</SectionEyebrow>
+        <h2
+          id="homepage-contact-heading"
+          className={
+            embedded
+              ? 'max-w-4xl text-[1.625rem] font-bold leading-[1.15] tracking-[-0.025em] text-white sm:text-[1.875rem] lg:text-[2.125rem]'
+              : 'text-3xl font-bold tracking-[-0.02em] text-white md:text-4xl lg:text-[2.5rem] lg:leading-[1.1] xl:text-[2.75rem]'
+          }
+        >
+          {leadHeadline}
+        </h2>
+        <p
+          className={
+            embedded
+              ? 'mt-5 max-w-3xl text-[15px] leading-[1.7] text-white/48 sm:text-base'
+              : 'mt-4 max-w-2xl text-base leading-relaxed text-white/60 sm:text-lg'
+          }
+        >
+          {leadSupporting}
+        </p>
+
+        <form
+          id="homepage-contact-form"
+          ref={formRef}
+          onSubmit={handleSubmit}
+          className={`relative scroll-mt-28 ${embedded ? 'mt-10 space-y-4' : 'mt-8 space-y-0 sm:mt-10'}`}
+        >
+          {embedded ? (
+            <>
+              <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4 xl:gap-5">
+                <div className={fieldShell}>
+                  <label htmlFor="hp-name" className={labelLead}>
+                    Full name *
                   </label>
-                  <input
-                    id={`name-${variant}`}
-                    name="name"
-                    required
-                    className={`w-full rounded-xl px-5 py-4 text-base transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[52px] touch-manipulation ${
-                      isHomepage 
-                        ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-brand-500/80 focus:bg-white/15 focus:shadow-[0_0_0_4px_rgba(255,169,30,0.1)]' 
-                        : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                    }`}
-                    placeholder="Enter your name"
-                  />
-                </motion.div>
-                {isHomepage ? (
-                  <motion.div
-                    whileFocus={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <label htmlFor={`phone-${variant}`} className={`mb-2.5 block text-sm font-semibold ${isHomepage ? 'text-white/90' : 'text-black/70'}`}>
-                      Phone Number *
-                    </label>
-                    <input
-                      id={`phone-${variant}`}
-                      name="phone"
-                      type="tel"
-                      required
-                      className={`w-full rounded-xl px-5 py-4 text-base transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[52px] touch-manipulation ${
-                        isHomepage 
-                          ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-brand-500/80 focus:bg-white/15 focus:shadow-[0_0_0_4px_rgba(255,169,30,0.1)]' 
-                          : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                      }`}
-                      placeholder="Enter your phone number"
-                    />
-                  </motion.div>
-                ) : null}
-                <motion.div
-                  className={isHomepage ? 'sm:col-span-2' : ''}
-                  whileFocus={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <label htmlFor={`email-${variant}`} className={`mb-2.5 block text-sm font-semibold ${isHomepage ? 'text-white/90' : 'text-black/70'}`}>
+                  <input id="hp-name" name="name" required autoComplete="name" className={inputLead} placeholder="" />
+                </div>
+                <div className={fieldShell}>
+                  <label htmlFor="hp-email" className={labelLead}>
                     Email *
                   </label>
                   <input
-                    id={`email-${variant}`}
+                    id="hp-email"
                     name="email"
                     type="email"
                     required
-                    className={`w-full rounded-xl px-5 py-4 text-base transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[52px] touch-manipulation ${
-                      isHomepage 
-                        ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-brand-500/80 focus:bg-white/15 focus:shadow-[0_0_0_4px_rgba(255,169,30,0.1)]' 
-                        : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                    }`}
-                    placeholder={isHomepage ? "youremail@email.com" : "you@company.com"}
+                    autoComplete="email"
+                    className={inputLead}
+                    placeholder=""
                   />
-                </motion.div>
-                {!isHomepage && (
-                  <>
-                    <div>
-                      <label htmlFor={`company-${variant}`} className={`mb-2 block text-sm font-medium ${isHomepage ? 'text-white/80' : 'text-black/70'}`}>
-                        Company
-                      </label>
-                      <input
-                        id={`company-${variant}`}
-                        name="company"
-                        className={`w-full rounded-lg px-4 py-3.5 sm:py-3 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[44px] touch-manipulation ${
-                          isHomepage 
-                            ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-brand-500/60' 
-                            : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                        }`}
-                        placeholder="Where you work"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor={`timeline-${variant}`} className={`mb-2 block text-sm font-medium ${isHomepage ? 'text-white/80' : 'text-black/70'}`}>
-                        Timeline
-                      </label>
-                      <input
-                        id={`timeline-${variant}`}
-                        name="timeline"
-                        className={`w-full rounded-lg px-4 py-3.5 sm:py-3 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[44px] touch-manipulation ${
-                          isHomepage 
-                            ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-brand-500/60' 
-                            : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                        }`}
-                        placeholder="e.g. Q1 pilot, ongoing support"
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor={`services-${variant}`} className={`mb-2 block text-sm font-medium ${isHomepage ? 'text-white/80' : 'text-black/70'}`}>
-                        Area of interest
-                      </label>
-                      <select
-                        id={`services-${variant}`}
-                        name="services"
-                        defaultValue=""
-                        className={`w-full rounded-lg px-4 py-3.5 sm:py-3 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[44px] touch-manipulation ${
-                          isHomepage 
-                            ? 'border border-white/20 bg-white/10 text-white focus:border-brand-500/60' 
-                            : 'border border-black/10 bg-white text-black'
-                        }`}
-                      >
-                        <option value="" disabled className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>
-                          Select a service
-                        </option>
-                        <option value="software" className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>Software platforms</option>
-                        <option value="cloud" className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>Cloud foundations</option>
-                        <option value="security" className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>Security readiness</option>
-                        <option value="delivery" className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>Embedded delivery support</option>
-                        <option value="integration" className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>Systems integration & automation</option>
-                        <option value="advisory" className={isHomepage ? 'bg-black text-white' : 'bg-white text-black'}>Advisory & discovery</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor={`budget-${variant}`} className={`mb-2 block text-sm font-medium ${isHomepage ? 'text-white/80' : 'text-black/70'}`}>
-                        Budget range
-                      </label>
-                      <input
-                        id={`budget-${variant}`}
-                        name="budget"
-                        className={`w-full rounded-lg px-4 py-3.5 sm:py-3 text-base sm:text-sm focus:outline-none focus:ring-2 focus:ring-brand-500/60 min-h-[44px] touch-manipulation ${
-                          isHomepage 
-                            ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/40 focus:border-brand-500/60' 
-                            : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                        }`}
-                        placeholder="Optional – helps us tailor the plan"
-                      />
-                    </div>
-                  </>
-                )}
-                <motion.div
-                  className={isHomepage ? 'sm:col-span-2' : 'sm:col-span-2'}
-                  whileFocus={{ scale: 1.02 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <label htmlFor={`message-${variant}`} className={`mb-2.5 block text-sm font-semibold ${isHomepage ? 'text-white/90' : 'text-black/70'}`}>
-                    Message
+                </div>
+                <div className={fieldShell}>
+                  <label htmlFor="hp-phone" className={labelLead}>
+                    Phone number *
                   </label>
-                  <textarea
-                    id={`message-${variant}`}
-                    name="message"
-                    rows={isHomepage ? 5 : 6}
-                    className={`w-full rounded-xl px-5 py-4 text-base transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-brand-500/60 touch-manipulation resize-y ${
-                      isHomepage 
-                        ? 'border border-white/20 bg-white/10 text-white placeholder:text-white/50 focus:border-brand-500/80 focus:bg-white/15 focus:shadow-[0_0_0_4px_rgba(255,169,30,0.1)]' 
-                        : 'border border-black/10 bg-white text-black placeholder:text-black/40'
-                    }`}
-                    placeholder={isHomepage ? "Can we help you?" : "What are you building, modernising, or reviewing?"}
-                  />
-                </motion.div>
-                {/* Honeypot field - hidden from users, visible to bots */}
-                <div style={{ position: 'absolute', left: '-9999px', opacity: 0, pointerEvents: 'none' }} aria-hidden="true">
-                  <label htmlFor={`website-${variant}`}>Website (leave blank)</label>
+                  <input id="hp-phone" name="phone" type="tel" required autoComplete="tel" className={inputLead} placeholder="" />
+                </div>
+                <div className={fieldShell}>
+                  <label htmlFor="hp-company" className={labelLead}>
+                    Company *
+                  </label>
                   <input
-                    type="text"
-                    id={`website-${variant}`}
-                    name="website"
-                    tabIndex={-1}
-                    autoComplete="off"
+                    id="hp-company"
+                    name="company"
+                    required
+                    autoComplete="organization"
+                    className={inputLead}
+                    placeholder=""
                   />
                 </div>
-                <motion.div className={`${isHomepage ? 'sm:col-span-2' : 'sm:col-span-2'} space-y-3`}>
-                  {submitStatus === 'success' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
-                        isHomepage
-                          ? 'bg-brand-500/20 text-brand-200 border border-brand-500/30'
-                          : 'bg-green-50 text-green-700 border border-green-200'
-                      }`}
-                    >
-                      <CheckCircle size={18} />
-                      <span>Message sent successfully! We&apos;ll get back to you soon.</span>
-                    </motion.div>
-                  )}
-                  {submitStatus === 'error' && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex items-center gap-2 rounded-xl px-4 py-3 text-sm ${
-                        isHomepage
-                          ? 'bg-red-500/20 text-red-200 border border-red-500/30'
-                          : 'bg-red-50 text-red-700 border border-red-200'
-                      }`}
-                    >
-                      <AlertCircle size={18} />
-                      <span>{errorMessage || 'Failed to send message. Please try again.'}</span>
-                    </motion.div>
-                  )}
-                  <motion.button
-                    type="submit"
-                    disabled={isSubmitting}
-                    whileHover={!isSubmitting ? { scale: 1.02, y: -2 } : {}}
-                    whileTap={!isSubmitting ? { scale: 0.98 } : {}}
-                    className={`group relative flex w-full items-center justify-center gap-3 overflow-hidden rounded-xl bg-brand-500 px-8 py-5 text-base font-semibold text-black transition-all duration-300 hover:bg-brand-400 min-h-[56px] touch-manipulation shadow-[0_16px_40px_-18px_rgba(255,169,30,0.65)] disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-brand-500`}
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <Loader2 size={20} className="animate-spin" />
-                        <span className="relative z-10">Sending...</span>
-                      </>
-                    ) : (
-                      <span className="relative z-10">Send Message</span>
-                    )}
-                  </motion.button>
-                </motion.div>
-              </form>
               </div>
-            </motion.div>
-
-            {!isHomepage && (
-              <motion.div variants={scrollReveal} className="space-y-6 sm:space-y-8">
-              <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 backdrop-blur ${
-                isHomepage 
-                  ? 'border border-white/10 bg-white/5 shadow-[0_24px_80px_-50px_rgba(255,169,30,0.15)]' 
-                  : 'border border-black/10 bg-white/90 shadow-[0_24px_80px_-50px_rgba(15,23,42,0.35)]'
-              }`}>
-                <h3 className={`text-lg sm:text-xl font-semibold ${isHomepage ? 'text-white' : 'text-black'}`}>Talk to us directly</h3>
-                <p className={`mt-2 sm:mt-3 text-sm ${isHomepage ? 'text-white/70' : 'text-black/65'}`}>
-                  Prefer a quick chat? Call or email and we&apos;ll line up a discovery session.
-                </p>
-                <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-5">
-                  {contactMethods.map((method, index) => {
-                    const Icon = method.icon
-                    return (
-                      <motion.a
-                        key={method.title}
-                        href={method.href}
-                        initial={{ opacity: 0, x: -12 }}
-                        whileInView={{ opacity: 1, x: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1 }}
-                        className={`flex items-start gap-3 sm:gap-4 rounded-xl px-4 sm:px-5 py-3 sm:py-4 transition duration-200 touch-manipulation min-h-[60px] ${
-                          isHomepage 
-                            ? 'border border-white/10 bg-white/5 text-white hover:border-brand-400/60 hover:bg-brand-500/20' 
-                            : 'border border-black/10 bg-white text-black hover:border-brand-400/60 hover:bg-brand-500/10'
-                        }`}
-                      >
-                        <span className="mt-0.5 sm:mt-1 flex h-10 w-10 sm:h-11 sm:w-11 flex-shrink-0 items-center justify-center rounded-xl bg-brand-500 text-black">
-                          <Icon size={18} className="sm:w-5 sm:h-5" />
-                        </span>
-                        <div className="flex-1 min-w-0">
-                          <p className={`text-sm font-semibold ${isHomepage ? 'text-white' : 'text-black'}`}>{method.title}</p>
-                          <p className={`text-xs sm:text-sm break-words ${isHomepage ? 'text-white/60' : 'text-black/60'}`}>{method.content}</p>
-                        </div>
-                      </motion.a>
-                    )
-                  })}
+              <div className={fieldShell}>
+                <label htmlFor="hp-message" className={labelLead}>
+                  Message *
+                </label>
+                <textarea
+                  id="hp-message"
+                  name="message"
+                  defaultValue={prefillMessage}
+                  rows={5}
+                  required
+                  className={`${inputLead} min-h-[7.5rem] resize-y`}
+                  placeholder=""
+                />
+              </div>
+            </>
+          ) : (
+            <>
+              <div className="grid gap-0 sm:grid-cols-2">
+                <div className={`${fieldShell} sm:border-r sm:border-white/[0.06] sm:pr-6`}>
+                  <label htmlFor="hp-name" className="mb-1 block text-sm font-medium text-white/70">
+                    Full name *
+                  </label>
+                  <input
+                    id="hp-name"
+                    name="name"
+                    required
+                    autoComplete="name"
+                    className="w-full bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none"
+                    placeholder=""
+                  />
+                </div>
+                <div className={`${fieldShell} sm:pl-6`}>
+                  <label htmlFor="hp-email" className="mb-1 block text-sm font-medium text-white/70">
+                    Email *
+                  </label>
+                  <input
+                    id="hp-email"
+                    name="email"
+                    type="email"
+                    required
+                    autoComplete="email"
+                    className="w-full bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none"
+                    placeholder=""
+                  />
                 </div>
               </div>
-
-              <div className={`rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 backdrop-blur ${
-                isHomepage 
-                  ? 'border border-white/10 bg-white/5 shadow-[0_24px_80px_-50px_rgba(255,169,30,0.15)]' 
-                  : 'border border-black/10 bg-white/90 shadow-[0_24px_80px_-50px_rgba(15,23,42,0.35)]'
-              }`}>
-                <h4 className={`text-base font-semibold ${isHomepage ? 'text-white' : 'text-black'}`}>Business Hours (EAT)</h4>
-                <div className={`mt-4 space-y-2 text-sm ${isHomepage ? 'text-white/60' : 'text-black/60'}`}>
-                  <div className="flex justify-between">
-                    <span>Mon – Fri</span>
-                    <span>8:00 AM – 5:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Saturday</span>
-                    <span>9:00 AM – 1:00 PM</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>Sunday</span>
-                    <span>Closed</span>
-                  </div>
+              <div className="grid gap-0 sm:grid-cols-2">
+                <div className={`${fieldShell} sm:border-r sm:border-white/[0.06] sm:pr-6`}>
+                  <label htmlFor="hp-phone" className="mb-1 block text-sm font-medium text-white/70">
+                    Phone number *
+                  </label>
+                  <input
+                    id="hp-phone"
+                    name="phone"
+                    type="tel"
+                    required
+                    autoComplete="tel"
+                    className="w-full bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none"
+                    placeholder=""
+                  />
                 </div>
-                <p className={`mt-3 text-xs ${isHomepage ? 'text-white/50' : 'text-black/50'}`}>We respond to enquiries within one business day.</p>
+                <div className={`${fieldShell} sm:pl-6`}>
+                  <label htmlFor="hp-company" className="mb-1 block text-sm font-medium text-white/70">
+                    Company *
+                  </label>
+                  <input
+                    id="hp-company"
+                    name="company"
+                    required
+                    autoComplete="organization"
+                    className="w-full bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none"
+                    placeholder=""
+                  />
+                </div>
               </div>
-            </motion.div>
-            )}
+              <div className={fieldShell}>
+                <label htmlFor="hp-message" className="mb-1 block text-sm font-medium text-white/70">
+                  Message *
+                </label>
+                <textarea
+                  id="hp-message"
+                  name="message"
+                  defaultValue={prefillMessage}
+                  rows={4}
+                  required
+                  className="w-full resize-none bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none"
+                  placeholder=""
+                />
+              </div>
+            </>
+          )}
+
+          <div
+            className="pointer-events-none absolute left-[-9999px] top-auto h-0 w-0 overflow-hidden opacity-0"
+            aria-hidden="true"
+          >
+            <label htmlFor="hp-website">Website (leave blank)</label>
+            <input type="text" id="hp-website" name="website" tabIndex={-1} autoComplete="off" />
           </div>
 
-          {!isHomepage && (
-            <motion.div
-              variants={scrollReveal}
-              className="overflow-hidden rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 shadow-[0_24px_80px_-50px_rgba(15,23,42,0.35)] backdrop-blur"
+          <div className={`space-y-4 ${embedded ? 'pt-6' : 'pt-8'}`}>
+            <p className={`text-sm leading-relaxed ${embedded ? 'text-white/38' : 'text-white/45'}`}>
+              We store your details to follow up on this request only. See our{' '}
+              <Link
+                href="/privacy"
+                className={
+                  embedded
+                    ? 'font-medium text-white/55 underline-offset-2 transition-colors hover:text-white/85 hover:underline'
+                    : 'font-medium text-[#FFA91F] underline-offset-2 hover:text-[#FFB83F] hover:underline'
+                }
+              >
+                privacy policy
+              </Link>
+              .
+            </p>
+
+            {submitStatus === 'success' && (
+              <motion.div
+                initial={reducedMotion ? false : { opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-start gap-2 rounded-card border border-[#FFA91F]/40 bg-[#FFA91F]/10 px-4 py-3 text-sm text-white"
+              >
+                <CheckCircle size={18} className="mt-0.5 shrink-0 text-[#FFA91F]" aria-hidden />
+                <span>Message sent. We&apos;ll respond within one business day.</span>
+              </motion.div>
+            )}
+            {submitStatus === 'error' && (
+              <motion.div
+                initial={reducedMotion ? false : { opacity: 0, y: -8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: reducedMotion ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="flex items-start gap-2 rounded-card border border-red-500/50 bg-red-500/10 px-4 py-3 text-sm text-red-100"
+              >
+                <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-400" aria-hidden />
+                <span>{errorMessage || 'Failed to send message. Please try again.'}</span>
+              </motion.div>
+            )}
+
+            <CTAButtonElement
+              type="submit"
+              disabled={isSubmitting}
+              variant="primary"
+              className={`w-full px-7 py-3.5 text-sm sm:w-auto ${embedded ? 'shadow-none' : ''}`}
             >
-              <iframe
-                title="Raven Tech Group location"
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8541252750797!2d36.79839147697934!3d-1.2596568987283558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1765fa05ef0d%3A0xafe61a1cd961a0a3!2sRaven%20Tech%20Group!5e0!3m2!1sen!2ske!4v1762836423781!5m2!1sen!2ske"
-                loading="lazy"
-                allowFullScreen
-                referrerPolicy="no-referrer-when-downgrade"
-                className="h-[280px] sm:h-[350px] md:h-[420px] w-full border-0"
-              />
-            </motion.div>
-          )}
+              {isSubmitting ? (
+                <>
+                  <Loader2 size={16} className="animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Send message'
+              )}
+            </CTAButtonElement>
+          </div>
+        </form>
+      </>
+    )
+
+    if (embedded) {
+      return (
+        <motion.div
+          initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: reducedMotion ? 0 : 0.6, ease: [0.22, 1, 0.36, 1] }}
+          className="relative h-full min-h-0"
+          aria-labelledby="homepage-contact-heading"
+        >
+          {homepageInner}
         </motion.div>
-      </div>
-    </section>
+      )
+    }
+
+    return (
+      <section
+        id="contact"
+        aria-labelledby="homepage-contact-heading"
+        className="bg-[#0A0A0A] pt-16 pb-8 sm:pt-20 sm:pb-10 lg:pt-24 lg:pb-12"
+      >
+        <div className="site-shell">
+          <div className="mx-auto w-full max-w-3xl">{homepageInner}</div>
+        </div>
+      </section>
+    )
+  }
+
+  /* ── Dedicated contact page: Problems-style dark surface, line grid (no cards) ─ */
+  const labelLine =
+    'mb-1 block text-[11px] font-medium uppercase tracking-[0.12em] text-white/45'
+  const inputLine =
+    'w-full border-0 bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-0'
+  const selectLine = `${inputLine} appearance-none pr-8 contact-form-select-chevron-dark`
+
+  return (
+    <>
+      <section
+        id="contact"
+        className="relative isolate bg-[#0A0A0A] pb-16 pt-28 text-white sm:pb-20 sm:pt-32 md:pb-24 md:pt-36 lg:pt-40"
+      >
+        <div className="relative mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12">
+          <motion.div
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: '-80px' }}
+            className="w-full"
+          >
+            <motion.div variants={fadeInUp}>
+              <SectionEyebrow>Contact</SectionEyebrow>
+              <h1 className="max-w-3xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-4xl lg:text-5xl">
+                Tell us what you are trying to fix
+              </h1>
+              <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/50 sm:text-lg">
+                We reply within one business day. Name the problem, the timeline, and what you need—enough for a substantive first response.
+              </p>
+            </motion.div>
+
+            <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1.55fr)_minmax(260px,1fr)] lg:items-start lg:gap-x-10 lg:gap-y-0 xl:gap-x-14">
+              <motion.div variants={scrollReveal}>
+                <form ref={formRef} onSubmit={handleSubmit} className="relative space-y-0">
+                  <div className="grid gap-0 sm:grid-cols-2">
+                    <div className="border-b border-white/[0.08] py-4 sm:border-r sm:border-white/[0.08] sm:pr-6">
+                      <label htmlFor="cp-name" className={labelLine}>
+                        Full name *
+                      </label>
+                      <input id="cp-name" name="name" required autoComplete="name" className={inputLine} placeholder="" />
+                    </div>
+                    <div className="border-b border-white/[0.08] py-4 sm:pl-6">
+                      <label htmlFor="cp-email" className={labelLine}>
+                        Email *
+                      </label>
+                      <input
+                        id="cp-email"
+                        name="email"
+                        type="email"
+                        required
+                        autoComplete="email"
+                        className={inputLine}
+                        placeholder=""
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-0 sm:grid-cols-2">
+                    <div className="border-b border-white/[0.08] py-4 sm:border-r sm:border-white/[0.08] sm:pr-6">
+                      <label htmlFor="cp-phone" className={labelLine}>
+                        Phone *
+                      </label>
+                      <input id="cp-phone" name="phone" type="tel" required autoComplete="tel" className={inputLine} placeholder="" />
+                    </div>
+                    <div className="border-b border-white/[0.08] py-4 sm:pl-6">
+                      <label htmlFor="cp-company" className={labelLine}>
+                        Company *
+                      </label>
+                      <input
+                        id="cp-company"
+                        name="company"
+                        required
+                        autoComplete="organization"
+                        className={inputLine}
+                        placeholder=""
+                      />
+                    </div>
+                  </div>
+                  <div className="grid gap-0 sm:grid-cols-2">
+                    <div className="border-b border-white/[0.08] py-4 sm:border-r sm:border-white/[0.08] sm:pr-6">
+                      <label htmlFor="cp-services" className={labelLine}>
+                        Service *
+                      </label>
+                      <select id="cp-services" name="services" required className={selectLine} defaultValue="">
+                        <option value="">Select a focus area</option>
+                        {services.map((s) => (
+                          <option key={s.slug} value={s.title}>
+                            {s.title}
+                          </option>
+                        ))}
+                        <option value="Not sure yet">Not sure yet</option>
+                      </select>
+                    </div>
+                    <div className="border-b border-white/[0.08] py-4 sm:pl-6">
+                      <label htmlFor="cp-timeline" className={labelLine}>
+                        Timeline
+                      </label>
+                      <select id="cp-timeline" name="timeline" className={selectLine} defaultValue="">
+                        <option value="">Optional</option>
+                        <option value="As soon as possible">As soon as possible</option>
+                        <option value="This quarter">This quarter</option>
+                        <option value="Next quarter">Next quarter</option>
+                        <option value="Exploring options">Exploring options</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div className="border-b border-white/[0.08] py-4">
+                    <label htmlFor="cp-message" className={labelLine}>
+                      Message *
+                    </label>
+                    <textarea
+                      id="cp-message"
+                      name="message"
+                      defaultValue={prefillMessage}
+                      rows={5}
+                      required
+                      className={`${inputLine} min-h-[7.5rem] resize-y`}
+                      placeholder=""
+                    />
+                  </div>
+                  <div className="border-b border-white/[0.08] py-4">
+                    <label htmlFor="cp-attachment" className={labelLine}>
+                      Attach a file
+                    </label>
+                    <input
+                      id="cp-attachment"
+                      name="attachment"
+                      type="file"
+                      className="mt-1 w-full cursor-pointer bg-transparent text-xs text-white/50 file:mr-3 file:cursor-pointer file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white file:transition-colors hover:file:bg-white/15"
+                    />
+                    <p className="mt-2 text-[11px] text-white/35">PDF, images, or Office files up to 10 MB.</p>
+                  </div>
+
+                  <div className="sr-only" aria-hidden="true">
+                    <label htmlFor="cp-website">Website (leave blank)</label>
+                    <input type="text" id="cp-website" name="website" tabIndex={-1} autoComplete="off" />
+                  </div>
+
+                  <div className="border-b border-white/[0.08] py-5">
+                    <label className="flex cursor-pointer items-start gap-3 text-sm text-white/60">
+                      <input
+                        type="checkbox"
+                        name="consentUpdates"
+                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-transparent text-[#FFA91F] focus:outline-none focus:ring-2 focus:ring-[#FFA91F]/40"
+                      />
+                      <span>Occasional updates from Raven (you can unsubscribe anytime).</span>
+                    </label>
+                  </div>
+
+                  <div className="space-y-4 pt-6">
+                    <p className="text-sm leading-relaxed text-white/45">
+                      We use your details to respond to this request. See our{' '}
+                      <Link
+                        href="/privacy"
+                        className="font-medium text-[#FFA91F] underline-offset-2 transition-colors hover:text-[#FFB83F] hover:underline"
+                      >
+                        privacy policy
+                      </Link>
+                      .
+                    </p>
+
+                    {submitStatus === 'success' && (
+                      <motion.div
+                        initial={reducedMotion ? false : { opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        className="flex items-start gap-2 border-l-2 border-[#FFA91F] pl-4 text-sm text-white/90"
+                      >
+                        <CheckCircle size={18} className="mt-0.5 shrink-0 text-[#FFA91F]" aria-hidden />
+                        <span>Message sent. We&apos;ll respond within one business day.</span>
+                      </motion.div>
+                    )}
+                    {submitStatus === 'error' && (
+                      <motion.div
+                        initial={reducedMotion ? false : { opacity: 0, y: -6 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: reducedMotion ? 0 : 0.3, ease: [0.22, 1, 0.36, 1] }}
+                        className="flex items-start gap-2 border-l-2 border-red-400/80 pl-4 text-sm text-red-200/95"
+                      >
+                        <AlertCircle size={18} className="mt-0.5 shrink-0 text-red-400" aria-hidden />
+                        <span>{errorMessage || 'Failed to send message. Please try again.'}</span>
+                      </motion.div>
+                    )}
+
+                    <CTAButtonElement
+                      type="submit"
+                      disabled={isSubmitting}
+                      variant="primary"
+                      className="w-full px-7 py-3.5 text-sm font-semibold sm:w-auto"
+                    >
+                      {isSubmitting ? (
+                        <>
+                          <Loader2 size={16} className="animate-spin" />
+                          Sending...
+                        </>
+                      ) : (
+                        'Send message'
+                      )}
+                    </CTAButtonElement>
+                  </div>
+                </form>
+              </motion.div>
+
+              <motion.div
+                variants={scrollReveal}
+                className="flex w-full max-w-lg flex-col divide-y divide-white/[0.08] lg:sticky lg:top-32 lg:max-w-none lg:self-start"
+              >
+                <div className="pb-8">
+                  <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-white/45">What clients say</p>
+                  <div className="mb-5 text-4xl font-sans leading-none text-white/[0.12]">&ldquo;</div>
+                  <p className="text-sm leading-relaxed text-white/70">{contactPageTestimonials[activeTestimonial].quote}</p>
+                  <div className="mt-6 flex items-center justify-between gap-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15">
+                        <Image
+                          src={contactPageTestimonials[activeTestimonial].image}
+                          alt={contactPageTestimonials[activeTestimonial].name}
+                          fill
+                          sizes="48px"
+                          className="object-cover"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-sm font-semibold text-white">{contactPageTestimonials[activeTestimonial].name}</p>
+                        <p className="text-xs text-white/45">{contactPageTestimonials[activeTestimonial].role}</p>
+                      </div>
+                    </div>
+                    <div className="flex shrink-0 items-center gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setActiveTestimonial(
+                            (i) => (i - 1 + contactPageTestimonials.length) % contactPageTestimonials.length,
+                          )
+                        }
+                        aria-label="Previous testimonial"
+                        className="flex h-9 w-9 items-center justify-center border border-white/[0.12] text-white/45 transition-colors hover:border-[#FFA91F]/45 hover:text-white"
+                      >
+                        <ChevronLeft size={16} />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setActiveTestimonial((i) => (i + 1) % contactPageTestimonials.length)}
+                        aria-label="Next testimonial"
+                        className="flex h-9 w-9 items-center justify-center border border-white/[0.12] text-white/45 transition-colors hover:border-[#FFA91F]/45 hover:text-white"
+                      >
+                        <ChevronRight size={16} />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+
+                {heroClientLogos.length > 0 && (
+                  <div className="pt-8">
+                    <TrustedByLogoMarquee
+                      staticEntrance
+                      eyebrow="Trusted by teams at"
+                      eyebrowAlign="center"
+                    />
+                    <div className="mt-8 border-t border-white/[0.08] pt-6 text-center">
+                      <p className="flex flex-col items-center gap-2 text-[11px] text-white/45 sm:flex-row sm:justify-center sm:gap-0">
+                        <a
+                          href="mailto:hello@raventechgroup.com"
+                          className="text-[#FFA91F] underline decoration-[#FFA91F]/40 underline-offset-2 transition-colors hover:text-[#FFB83F]"
+                        >
+                          hello@raventechgroup.com
+                        </a>
+                        <span className="hidden text-white/25 sm:inline sm:px-2" aria-hidden>
+                          ·
+                        </span>
+                        <a
+                          href="tel:+254796349079"
+                          className="text-white/65 underline decoration-white/20 underline-offset-2 transition-colors hover:text-white"
+                        >
+                          +254 796 349 079
+                        </a>
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <section className="border-t border-white/[0.06] bg-[#0A0A0A]" aria-label="Office location map">
+        <div className="relative h-[260px] w-full min-h-0 sm:h-[320px] md:h-[380px]">
+          <iframe
+            title="Raven Tech Group location — Western Heights, Karuna Road, Westlands, Nairobi"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3988.8541252750797!2d36.79839147697934!3d-1.2596568987283558!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x182f1765fa05ef0d%3A0xafe61a1cd961a0a3!2sRaven%20Tech%20Group!5e0!3m2!1sen!2ske!4v1762836423781!5m2!1sen!2ske"
+            loading="lazy"
+            allowFullScreen
+            referrerPolicy="no-referrer-when-downgrade"
+            className="absolute inset-0 h-full w-full border-0 grayscale contrast-[0.92]"
+          />
+          <div className="pointer-events-none absolute inset-0 bg-[#0A0A0A]/25" aria-hidden />
+        </div>
+      </section>
+    </>
   )
 }
-

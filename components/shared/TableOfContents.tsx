@@ -2,35 +2,49 @@
 
 import type { InsightTocItem } from '@/lib/data/insights'
 import { useEffect, useState } from 'react'
-import { useReducedMotion } from 'framer-motion'
 
 type TableOfContentsProps = {
   items: InsightTocItem[]
   className?: string
 }
 
+/** px below the viewport top where a heading counts as the "current" section (clears the fixed header). */
+const ACTIVE_OFFSET = 120
+
 export function TableOfContents({ items, className = '' }: TableOfContentsProps) {
-  const reduced = useReducedMotion()
   const [active, setActive] = useState<string | null>(items[0]?.id ?? null)
 
   useEffect(() => {
-    if (reduced || items.length === 0) return
-    const elements = items
-      .map((i) => document.getElementById(i.id))
-      .filter((el): el is HTMLElement => el != null)
-    if (elements.length === 0) return
+    if (items.length === 0) return
+    const ids = items.map((i) => i.id)
+    let frame = 0
 
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const visible = entries.filter((e) => e.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio)
-        if (visible[0]?.target.id) setActive(visible[0].target.id)
-      },
-      { rootMargin: '-45% 0px -45% 0px', threshold: [0, 0.1, 0.25, 0.5, 1] },
-    )
+    const update = () => {
+      frame = 0
+      let current = ids[0]
+      for (const id of ids) {
+        const el = document.getElementById(id)
+        if (!el) continue
+        if (el.getBoundingClientRect().top - ACTIVE_OFFSET <= 0) current = id
+        else break
+      }
+      setActive(current)
+    }
 
-    elements.forEach((el) => obs.observe(el))
-    return () => obs.disconnect()
-  }, [items, reduced])
+    const onScroll = () => {
+      if (frame) return
+      frame = window.requestAnimationFrame(update)
+    }
+
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (frame) window.cancelAnimationFrame(frame)
+    }
+  }, [items])
 
   return (
     <nav aria-label="On this page" className={`text-sm ${className}`}>

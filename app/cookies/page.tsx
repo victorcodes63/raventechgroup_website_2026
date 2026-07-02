@@ -8,9 +8,9 @@ export default function CookiesPage() {
   return (
     <div className="min-h-screen bg-black text-white">
       <section className="border-b border-white/10 bg-gradient-to-b from-black via-black to-zinc-950">
-        <div className="container mx-auto px-4 pb-24 pt-32 sm:px-6 lg:px-8">
+        <div className="site-shell pb-24 pt-32">
           <motion.div variants={staggerContainer} initial="hidden" animate="visible" className="mx-auto max-w-3xl space-y-6 text-center">
-            <motion.span variants={fadeInUp} className="inline-flex rounded-full border border-white/15 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
+            <motion.span variants={fadeInUp} className="inline-flex rounded-sm border border-white/15 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/60">
               Cookie Policy
             </motion.span>
             <motion.h1 variants={fadeInUp} className="text-4xl font-semibold tracking-tight text-white sm:text-5xl">
@@ -25,19 +25,19 @@ export default function CookiesPage() {
       </section>
 
       <section className="border-b border-white/10 bg-black">
-        <div className="container mx-auto px-4 py-20 sm:px-6 lg:px-8">
+        <div className="site-shell py-20">
           <div className="mx-auto max-w-4xl space-y-10">
             <div className="space-y-4">
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">Cookies we set</h2>
               <ul className="space-y-3 text-sm text-white/70">
-                <li className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                <li className="rounded-sm border border-white/10 bg-white/[0.03] p-5">
                   <span className="font-semibold text-white">Essential cookies</span>
                   <p className="mt-2 text-white/65">
                     Required for basic site functionality, security, and remembering your cookie preferences. These are always active and do not store
                     personally identifiable information.
                   </p>
                 </li>
-                <li className="rounded-3xl border border-white/10 bg-white/[0.03] p-5">
+                <li className="rounded-sm border border-white/10 bg-white/[0.03] p-5">
                   <span className="font-semibold text-white">Analytics cookies</span>
                   <p className="mt-2 text-white/65">
                     We use privacy-focused analytics to understand aggregated site usage. Data is anonymized and never shared with advertisers. You can opt out

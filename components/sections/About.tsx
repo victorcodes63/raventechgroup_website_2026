@@ -45,7 +45,7 @@ export function About() {
         <div className="absolute left-[-12%] top-24 h-72 w-72 rounded-full bg-black/7 blur-[120px]" />
         <div className="absolute right-[-18%] bottom-0 h-[380px] w-[480px] rounded-full bg-brand-500/20 blur-[160px]" />
       </div>
-      <div className="relative container mx-auto px-4 py-12 sm:py-16 md:py-20 sm:px-6 lg:px-8">
+      <div className="site-shell relative py-12 sm:py-16 md:py-20">
         <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-100px' }} className="mx-auto max-w-6xl space-y-12 sm:space-y-16">
           <motion.div
             variants={fadeInUp}
@@ -61,7 +61,7 @@ export function About() {
                 ship new digital products. We favour honest collaboration, clean architecture, and ongoing support over one-off launches.
               </p>
               <p className="text-sm text-black/70 sm:text-base leading-relaxed">
-                Whether you need a dedicated squad for a regulated fintech platform or software engineers to co-create a modernisation roadmap, our teams plug
+                Whether you need a dedicated delivery team for a regulated fintech platform or software engineers to co-create a modernisation roadmap, our teams plug
                 into your workflows and stay engaged until the results are measurable.
               </p>
               <ul className="mt-4 sm:mt-6 space-y-3 sm:space-y-4 text-sm text-black/65">
@@ -73,7 +73,7 @@ export function About() {
                 ))}
               </ul>
             </div>
-            <div className="relative h-full min-h-[280px] sm:min-h-[340px] max-h-[460px] overflow-hidden rounded-2xl sm:rounded-3xl border border-black/5 shadow-[0_34px_90px_-48px_rgba(15,23,42,0.35)]">
+            <div className="relative h-full min-h-[280px] sm:min-h-[340px] max-h-[460px] overflow-hidden rounded-sm border border-black/5 shadow-[0_34px_90px_-48px_rgba(15,23,42,0.35)]">
               <Image
                 src="/images/photos/rec3.jpg"
                 alt="Raven Tech Group studio reception area"
@@ -91,9 +91,9 @@ export function About() {
             {differentiators.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
-                className="group flex h-full flex-col gap-3 sm:gap-4 rounded-2xl sm:rounded-3xl border border-black/10 bg-white/90 p-4 sm:p-6 text-black transition duration-200 hover:border-brand-400/60 hover:bg-brand-400/10"
+                className="group flex h-full flex-col gap-3 sm:gap-4 rounded-sm border border-black/10 bg-white/90 p-4 sm:p-6 text-black transition duration-200 hover:border-brand-400/60 hover:bg-brand-400/10"
               >
-                <span className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-black/5 text-brand-400 transition duration-200 group-hover:bg-brand-400/20 group-hover:text-brand-100">
+                <span className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-sm bg-black/5 text-brand-400 transition duration-200 group-hover:bg-brand-400/20 group-hover:text-brand-100">
                   <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
                 </span>
                 <div>

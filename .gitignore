@@ -29,6 +29,11 @@ yarn-error.log*
 # Vercel
 .vercel
 
+# Local agent workspace data
+.claude/
+.cursor/worktrees.json
+HR_PLATFORM_BUILD_SUMMARY.md
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

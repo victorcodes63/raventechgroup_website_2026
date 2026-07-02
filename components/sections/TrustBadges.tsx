@@ -36,7 +36,7 @@ export function TrustBadges() {
       viewport={{ once: true, margin: '-100px' }}
       className="border-t border-white/10 bg-white py-12 sm:py-16 md:py-20"
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="site-shell">
         <motion.div variants={fadeInUp} className="mx-auto max-w-3xl text-center mb-12">
           <h2 className="mb-4 text-3xl font-semibold text-black sm:text-4xl">
             Why businesses trust us
@@ -54,9 +54,9 @@ export function TrustBadges() {
                 key={badge.title}
                 variants={fadeInUp}
                 whileHover={{ y: -4, scale: 1.02 }}
-                className="flex flex-col items-center rounded-xl border border-black/10 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+                className="flex flex-col items-center rounded-sm border border-black/10 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
               >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-brand-500/10">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-sm bg-brand-500/10">
                   <Icon className="h-6 w-6 text-brand-500" />
                 </div>
                 <h3 className="mb-2 text-sm font-semibold text-black sm:text-base">
