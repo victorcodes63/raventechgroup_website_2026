@@ -127,13 +127,13 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
             />
           ) : null}
         </div>
-        <div className="relative mx-auto flex min-h-[52vh] max-w-7xl flex-col justify-end px-5 pb-16 pt-32 md:px-8 md:pb-20 md:pt-40 lg:px-12">
+        <div className="relative mx-auto flex min-h-[52vh] max-w-7xl flex-col justify-end px-5 pb-12 pt-28 md:px-8 md:pb-20 md:pt-40 lg:px-12">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFA91F]">
             Case study · {study.industry}
           </p>
-          <h1 className="mt-4 max-w-4xl text-4xl font-bold tracking-[-0.03em] md:text-5xl lg:text-6xl">{study.client}</h1>
-          <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/80 md:text-xl">{study.tagline}</p>
-          <p className="mt-6 text-sm text-white/55">
+          <h1 className="mt-4 max-w-4xl text-[2.35rem] font-bold leading-[1.04] tracking-[-0.03em] md:text-5xl lg:text-6xl">{study.client}</h1>
+          <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/80 md:text-xl">{study.tagline}</p>
+          <p className="mt-5 text-sm leading-relaxed text-white/55">
             {study.location} <span aria-hidden>·</span> {study.engagementLength} <span aria-hidden>·</span> {study.year}
           </p>
         </div>
@@ -141,26 +141,26 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
 
       <CaseStudyStickyMetricsBar metrics={study.metrics} heroId="case-study-hero" />
 
-      <div className="mx-auto max-w-7xl px-5 py-16 md:px-8 lg:px-12 lg:py-24">
+      <div className="mx-auto max-w-7xl px-5 py-12 md:px-8 md:py-16 lg:px-12 lg:py-24">
         <ScrollReveal>
-          <section className="border-b border-white/[0.06] pb-16 lg:pb-20">
+          <section className="border-b border-white/[0.06] pb-12 lg:pb-20">
             <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">The challenge</h2>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white/70">{study.problem}</p>
+            <p className="mt-5 max-w-3xl text-base leading-relaxed text-white/70 md:text-lg">{study.problem}</p>
           </section>
         </ScrollReveal>
 
         <ScrollReveal>
-          <section className="border-b border-white/[0.06] py-16 lg:py-20">
+          <section className="border-b border-white/[0.06] py-12 lg:py-20">
             <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">What we built</h2>
-            <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white/70">{study.solution}</p>
+            <p className="mt-5 max-w-3xl text-base leading-relaxed text-white/70 md:text-lg">{study.solution}</p>
           </section>
         </ScrollReveal>
 
         {study.sections.map((sec) => (
           <ScrollReveal key={sec.heading}>
-            <section className="border-b border-white/[0.06] py-16 lg:py-20">
+            <section className="border-b border-white/[0.06] py-12 lg:py-20">
               <h3 className="text-xl font-bold tracking-tight text-white md:text-2xl">{sec.heading}</h3>
-              <p className="mt-6 max-w-3xl whitespace-pre-wrap text-base leading-relaxed text-white/70">{sec.body}</p>
+              <p className="mt-5 max-w-3xl whitespace-pre-wrap text-base leading-relaxed text-white/70">{sec.body}</p>
               {sec.image ? (
                 <div className="relative mt-10 aspect-video w-full max-w-4xl overflow-hidden rounded-card border border-white/[0.08] bg-[#111111]">
                   <SafeRasterImage

@@ -35,17 +35,17 @@ export default function BookPage() {
 
   return (
     <main className="min-h-screen bg-[#0A0A0A] pt-[72px]">
-      <div className="site-shell py-12 lg:py-24">
+      <div className="site-shell py-10 pb-24 lg:py-24">
         <div className="content-wrap">
           <Link
             href="/"
-            className={`mb-10 inline-flex items-center gap-2 text-sm text-white/50 transition-colors duration-150 hover:text-white ${focusRing} rounded-card`}
+            className={`mb-8 inline-flex items-center gap-2 text-sm text-white/50 transition-colors duration-150 hover:text-white sm:mb-10 ${focusRing} rounded-card`}
           >
             <ArrowLeft size={14} aria-hidden />
             Back to home
           </Link>
 
-          <div className="grid items-start gap-12 lg:grid-cols-2 lg:gap-16 xl:gap-20">
+          <div className="grid items-start gap-10 lg:grid-cols-2 lg:gap-16 xl:gap-20">
             <div className="lg:sticky lg:top-28">
               <motion.div
                 initial={reducedMotion ? false : { opacity: 0, y: 20 }}
@@ -58,7 +58,7 @@ export default function BookPage() {
                     Free · No commitment
                   </p>
                 </div>
-                <h1 className="text-4xl font-bold leading-[1.05] tracking-[-0.02em] text-white lg:text-5xl">
+                <h1 className="text-[2.35rem] font-bold leading-[1.04] tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl">
                   Let us talk about what you are building.
                 </h1>
                 <p className="mt-5 max-w-xl text-base leading-relaxed text-white/60 lg:text-lg">
@@ -71,7 +71,7 @@ export default function BookPage() {
                 initial={reducedMotion ? false : { opacity: 0, y: 16 }}
                 animate={instant ?? { opacity: 1, y: 0 }}
                 transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.15, ease: motionEase }}
-                className="mt-10 space-y-5"
+                className="mt-8 space-y-4 sm:mt-10 sm:space-y-5"
               >
                 {[
                   {
@@ -106,7 +106,7 @@ export default function BookPage() {
                 initial={reducedMotion ? false : { opacity: 0, y: 16 }}
                 animate={instant ?? { opacity: 1, y: 0 }}
                 transition={{ duration: reducedMotion ? 0 : 0.6, delay: reducedMotion ? 0 : 0.25, ease: motionEase }}
-                className="mt-10 rounded-card border border-white/[0.08] bg-[#111111] p-6 sm:p-8"
+                className="mt-8 rounded-card border border-white/[0.08] bg-[#111111] p-5 sm:mt-10 sm:p-8"
               >
                 <div className="mb-4 flex items-center gap-3">
                   <div className="h-px w-6 bg-[#FFA91F]" aria-hidden />
@@ -152,10 +152,10 @@ export default function BookPage() {
               transition={{ duration: reducedMotion ? 0 : 0.7, delay: reducedMotion ? 0 : 0.1, ease: motionEase }}
               className="lg:pl-2"
             >
-              <div className="rounded-card border border-white/[0.1] bg-[#0f0f0f] p-8 shadow-[0_32px_80px_-40px_rgba(0,0,0,0.85)] lg:p-10">
-                <div className="mb-8">
+              <div className="rounded-card border border-white/[0.1] bg-[#0f0f0f] p-4 shadow-[0_32px_80px_-40px_rgba(0,0,0,0.85)] sm:p-6 lg:p-10">
+                <div className="mb-6 sm:mb-8">
                   <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-white/40">Step 1 of 2</p>
-                  <h2 className="text-2xl font-bold tracking-tight text-white lg:text-3xl">
+                  <h2 className="text-[1.65rem] font-bold leading-tight tracking-tight text-white lg:text-3xl">
                     Choose the conversation that fits
                   </h2>
                   <p className="mt-3 text-sm leading-relaxed text-white/55">
@@ -174,20 +174,15 @@ export default function BookPage() {
                         type="button"
                         aria-pressed={isSelected}
                         onClick={() => setSelectedService(service.id)}
-                        className={`relative w-full rounded-card border p-5 text-left transition-all duration-200 ${focusRing} ${
+                        className={`relative w-full rounded-card border p-4 text-left transition-all duration-200 sm:p-5 ${focusRing} ${
                           isSelected
                             ? 'border-[#FFA91F]/50 bg-[#FFA91F]/[0.04]'
                             : 'border-white/[0.08] bg-[#0A0A0A] hover:border-white/[0.15] hover:bg-[#141414]'
                         }`}
                       >
-                        {service.recommended ? (
-                          <span className="absolute right-12 top-4 rounded-full border border-[#FFA91F]/20 bg-[#FFA91F]/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">
-                            Recommended
-                          </span>
-                        ) : null}
-                        <div className="flex items-start gap-4">
+                        <div className="flex items-start gap-3 sm:gap-4">
                           <div
-                            className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-card border transition-colors duration-200 ${
+                            className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-card border transition-colors duration-200 ${
                               isSelected
                                 ? 'border-[#FFA91F]/30 bg-[#FFA91F]/15'
                                 : 'border-white/[0.06] bg-white/[0.03]'
@@ -196,18 +191,25 @@ export default function BookPage() {
                             <Icon size={16} className={isSelected ? 'text-[#FFA91F]' : 'text-white/50'} aria-hidden />
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                            {service.recommended ? (
+                              <span className="mb-2 inline-flex rounded-full border border-[#FFA91F]/20 bg-[#FFA91F]/10 px-2 py-1 text-[9px] font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">
+                                Recommended
+                              </span>
+                            ) : null}
+                            <div className="flex flex-col gap-1 min-[420px]:flex-row min-[420px]:flex-wrap min-[420px]:items-center min-[420px]:gap-x-3">
                               <h3
-                                className={`text-base font-semibold transition-colors duration-200 ${
+                                className={`text-[15px] font-semibold leading-snug transition-colors duration-200 sm:text-base ${
                                   isSelected ? 'text-white' : 'text-white/85'
                                 }`}
                               >
                                 {service.title}
                               </h3>
-                              <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">
-                                {formatLabel}
+                              <span className="flex flex-wrap items-center gap-2">
+                                <span className="rounded-full border border-white/[0.12] bg-white/[0.04] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.12em] text-white/50">
+                                  {formatLabel}
+                                </span>
+                                <span className="text-xs font-medium text-white/40">{service.duration}</span>
                               </span>
-                              <span className="text-xs font-medium text-white/40">{service.duration}</span>
                             </div>
                             <p className="mt-1.5 text-sm leading-relaxed text-white/55">{service.description}</p>
                           </div>

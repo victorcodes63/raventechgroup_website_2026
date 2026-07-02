@@ -244,7 +244,7 @@ export function StrideProductContent() {
                   ) : null}
                 </div>
 
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid gap-4 sm:grid-cols-3">
                   {product.proofPoints.map((point) => (
                     <div
                       key={point.label}

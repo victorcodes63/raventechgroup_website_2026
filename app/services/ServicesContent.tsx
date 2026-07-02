@@ -139,7 +139,7 @@ function ServicesHero() {
                 The first section helps you choose a starting point. The service accordion shows the full catalogue.
                 The capability groups explain how those services combine in real work.
               </p>
-              <div className="mt-7 grid grid-cols-3 gap-4 border-t border-white/[0.08] pt-6">
+              <div className="mt-7 grid gap-4 border-t border-white/[0.08] pt-6 min-[420px]:grid-cols-3">
                 {heroStats.map((stat) => (
                   <div key={stat.label}>
                     <p className="text-2xl font-bold tracking-[-0.03em] text-white">{stat.value}</p>
