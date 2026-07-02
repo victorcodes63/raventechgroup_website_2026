@@ -4,7 +4,6 @@ import './globals.css'
 import { Header } from '@/components/layout/Header'
 import { GlobalContactLead } from '@/components/layout/GlobalContactLead'
 import { Footer } from '@/components/layout/Footer'
-import { CookieBanner } from '@/components/ui/CookieBanner'
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 
 const manrope = Manrope({
@@ -123,7 +122,6 @@ export default function RootLayout({
         </main>
         <GlobalContactLead />
         <Footer />
-        <CookieBanner />
       </body>
     </html>
   )
