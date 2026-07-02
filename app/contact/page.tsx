@@ -129,9 +129,9 @@ export default function ContactPage() {
       </ScrollReveal>
 
       <ScrollReveal delay={s(1)}>
-        <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-24 text-white lg:py-32">
+        <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-16 text-white sm:py-20 lg:py-32">
           <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12">
-            <div className="grid w-full gap-12 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-14">
+            <div className="grid w-full gap-8 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-14">
               <motion.div
                 variants={fadeInUp}
                 initial="hidden"
@@ -143,7 +143,7 @@ export default function ContactPage() {
                   <div className="h-px w-8 shrink-0 bg-[#FFA91F] md:w-10" aria-hidden />
                   <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">Before you write</span>
                 </div>
-                <h2 className="text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-4xl lg:text-5xl">
+                <h2 className="text-[2rem] font-bold leading-[1.08] tracking-[-0.02em] text-white md:text-4xl lg:text-5xl">
                   Quick answers for busy owners
                 </h2>
                 <p className="max-w-md text-base leading-relaxed text-white/50 sm:text-lg">

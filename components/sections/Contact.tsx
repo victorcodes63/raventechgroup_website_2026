@@ -396,14 +396,18 @@ export function Contact({
   const labelLine =
     'mb-1 block text-[11px] font-medium uppercase tracking-[0.12em] text-white/45'
   const inputLine =
-    'w-full border-0 bg-transparent py-1 text-sm text-white placeholder:text-white/30 focus:outline-none focus:ring-0'
+    'w-full border-0 bg-transparent p-0 text-base text-white placeholder:text-white/30 focus:outline-none focus:ring-0 sm:text-sm'
   const selectLine = `${inputLine} appearance-none pr-8 contact-form-select-chevron-dark`
+  const fieldShell =
+    'rounded-card border border-white/[0.08] bg-white/[0.035] px-4 py-3.5 transition-colors focus-within:border-[#FFA91F]/45 sm:rounded-none sm:border-x-0 sm:border-t-0 sm:bg-transparent sm:px-0 sm:py-4 sm:focus-within:border-white/[0.08]'
+  const leftFieldShell = `${fieldShell} sm:border-r sm:pr-6`
+  const rightFieldShell = `${fieldShell} sm:pl-6`
 
   return (
     <>
       <section
         id="contact"
-        className="relative isolate bg-[#0A0A0A] pb-16 pt-28 text-white sm:pb-20 sm:pt-32 md:pb-24 md:pt-36 lg:pt-40"
+        className="relative isolate bg-[#0A0A0A] pb-14 pt-24 text-white sm:pb-20 sm:pt-32 md:pb-24 md:pt-36 lg:pt-40"
       >
         <div className="relative mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12">
           <motion.div
@@ -415,7 +419,7 @@ export function Contact({
           >
             <motion.div variants={fadeInUp}>
               <SectionEyebrow>Contact</SectionEyebrow>
-              <h1 className="max-w-3xl text-3xl font-bold leading-[1.1] tracking-[-0.02em] text-white md:text-4xl lg:text-5xl">
+              <h1 className="max-w-3xl text-[2.35rem] font-bold leading-[1.04] tracking-[-0.03em] text-white md:text-4xl lg:text-5xl">
                 Tell us what you are trying to fix
               </h1>
               <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/50 sm:text-lg">
@@ -423,17 +427,17 @@ export function Contact({
               </p>
             </motion.div>
 
-            <div className="mt-12 grid gap-12 lg:mt-16 lg:grid-cols-[minmax(0,1.55fr)_minmax(260px,1fr)] lg:items-start lg:gap-x-10 lg:gap-y-0 xl:gap-x-14">
+            <div className="mt-9 grid gap-8 sm:mt-12 lg:mt-16 lg:grid-cols-[minmax(0,1.55fr)_minmax(260px,1fr)] lg:items-start lg:gap-x-10 lg:gap-y-0 xl:gap-x-14">
               <motion.div variants={scrollReveal}>
-                <form ref={formRef} onSubmit={handleSubmit} className="relative space-y-0">
-                  <div className="grid gap-0 sm:grid-cols-2">
-                    <div className="border-b border-white/[0.08] py-4 sm:border-r sm:border-white/[0.08] sm:pr-6">
+                <form ref={formRef} onSubmit={handleSubmit} className="relative space-y-3 sm:space-y-0">
+                  <div className="grid gap-3 sm:grid-cols-2 sm:gap-0">
+                    <div className={leftFieldShell}>
                       <label htmlFor="cp-name" className={labelLine}>
                         Full name *
                       </label>
                       <input id="cp-name" name="name" required autoComplete="name" className={inputLine} placeholder="" />
                     </div>
-                    <div className="border-b border-white/[0.08] py-4 sm:pl-6">
+                    <div className={rightFieldShell}>
                       <label htmlFor="cp-email" className={labelLine}>
                         Email *
                       </label>
@@ -448,14 +452,14 @@ export function Contact({
                       />
                     </div>
                   </div>
-                  <div className="grid gap-0 sm:grid-cols-2">
-                    <div className="border-b border-white/[0.08] py-4 sm:border-r sm:border-white/[0.08] sm:pr-6">
+                  <div className="grid gap-3 sm:grid-cols-2 sm:gap-0">
+                    <div className={leftFieldShell}>
                       <label htmlFor="cp-phone" className={labelLine}>
                         Phone *
                       </label>
                       <input id="cp-phone" name="phone" type="tel" required autoComplete="tel" className={inputLine} placeholder="" />
                     </div>
-                    <div className="border-b border-white/[0.08] py-4 sm:pl-6">
+                    <div className={rightFieldShell}>
                       <label htmlFor="cp-company" className={labelLine}>
                         Company *
                       </label>
@@ -469,8 +473,8 @@ export function Contact({
                       />
                     </div>
                   </div>
-                  <div className="grid gap-0 sm:grid-cols-2">
-                    <div className="border-b border-white/[0.08] py-4 sm:border-r sm:border-white/[0.08] sm:pr-6">
+                  <div className="grid gap-3 sm:grid-cols-2 sm:gap-0">
+                    <div className={leftFieldShell}>
                       <label htmlFor="cp-services" className={labelLine}>
                         Service *
                       </label>
@@ -484,7 +488,7 @@ export function Contact({
                         <option value="Not sure yet">Not sure yet</option>
                       </select>
                     </div>
-                    <div className="border-b border-white/[0.08] py-4 sm:pl-6">
+                    <div className={rightFieldShell}>
                       <label htmlFor="cp-timeline" className={labelLine}>
                         Timeline
                       </label>
@@ -497,7 +501,7 @@ export function Contact({
                       </select>
                     </div>
                   </div>
-                  <div className="border-b border-white/[0.08] py-4">
+                  <div className={fieldShell}>
                     <label htmlFor="cp-message" className={labelLine}>
                       Message *
                     </label>
@@ -507,11 +511,11 @@ export function Contact({
                       defaultValue={prefillMessage}
                       rows={5}
                       required
-                      className={`${inputLine} min-h-[7.5rem] resize-y`}
+                      className={`${inputLine} min-h-[8rem] resize-y`}
                       placeholder=""
                     />
                   </div>
-                  <div className="border-b border-white/[0.08] py-4">
+                  <div className={fieldShell}>
                     <label htmlFor="cp-attachment" className={labelLine}>
                       Attach a file
                     </label>
@@ -519,7 +523,7 @@ export function Contact({
                       id="cp-attachment"
                       name="attachment"
                       type="file"
-                      className="mt-1 w-full cursor-pointer bg-transparent text-xs text-white/50 file:mr-3 file:cursor-pointer file:border-0 file:bg-white/10 file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white file:transition-colors hover:file:bg-white/15"
+                      className="mt-1 w-full cursor-pointer bg-transparent text-xs text-white/50 file:mr-3 file:cursor-pointer file:rounded-card file:border-0 file:bg-white/10 file:px-3 file:py-2.5 file:text-xs file:font-semibold file:text-white file:transition-colors hover:file:bg-white/15"
                     />
                     <p className="mt-2 text-[11px] text-white/35">PDF, images, or Office files up to 10 MB.</p>
                   </div>
@@ -529,12 +533,12 @@ export function Contact({
                     <input type="text" id="cp-website" name="website" tabIndex={-1} autoComplete="off" />
                   </div>
 
-                  <div className="border-b border-white/[0.08] py-5">
+                  <div className="rounded-card border border-white/[0.08] bg-white/[0.025] px-4 py-4 sm:rounded-none sm:border-x-0 sm:border-t-0 sm:bg-transparent sm:px-0 sm:py-5">
                     <label className="flex cursor-pointer items-start gap-3 text-sm text-white/60">
                       <input
                         type="checkbox"
                         name="consentUpdates"
-                        className="mt-0.5 h-4 w-4 shrink-0 rounded border-white/20 bg-transparent text-[#FFA91F] focus:outline-none focus:ring-2 focus:ring-[#FFA91F]/40"
+                        className="mt-0.5 h-5 w-5 shrink-0 rounded border-white/20 bg-transparent text-[#FFA91F] focus:outline-none focus:ring-2 focus:ring-[#FFA91F]/40 sm:h-4 sm:w-4"
                       />
                       <span>Occasional updates from Raven (you can unsubscribe anytime).</span>
                     </label>
@@ -596,13 +600,13 @@ export function Contact({
 
               <motion.div
                 variants={scrollReveal}
-                className="flex w-full max-w-lg flex-col divide-y divide-white/[0.08] lg:sticky lg:top-32 lg:max-w-none lg:self-start"
+                className="flex w-full flex-col divide-y divide-white/[0.08] rounded-card border border-white/[0.08] bg-white/[0.025] p-5 sm:max-w-lg sm:border-0 sm:bg-transparent sm:p-0 lg:sticky lg:top-32 lg:max-w-none lg:self-start"
               >
-                <div className="pb-8">
+                <div className="pb-6 sm:pb-8">
                   <p className="mb-4 text-xs font-semibold uppercase tracking-[0.15em] text-white/45">What clients say</p>
-                  <div className="mb-5 text-4xl font-sans leading-none text-white/[0.12]">&ldquo;</div>
+                  <div className="mb-3 text-4xl font-sans leading-none text-white/[0.12] sm:mb-5">&ldquo;</div>
                   <p className="text-sm leading-relaxed text-white/70">{contactPageTestimonials[activeTestimonial].quote}</p>
-                  <div className="mt-6 flex items-center justify-between gap-4">
+                  <div className="mt-6 flex flex-col gap-4 min-[390px]:flex-row min-[390px]:items-center min-[390px]:justify-between">
                     <div className="flex min-w-0 items-center gap-3">
                       <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-white/15">
                         <Image
@@ -618,7 +622,7 @@ export function Contact({
                         <p className="text-xs text-white/45">{contactPageTestimonials[activeTestimonial].role}</p>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-1.5">
+                    <div className="flex shrink-0 items-center gap-1.5 self-end min-[390px]:self-auto">
                       <button
                         type="button"
                         onClick={() =>
@@ -644,7 +648,7 @@ export function Contact({
                 </div>
 
                 {heroClientLogos.length > 0 && (
-                  <div className="pt-8">
+                  <div className="hidden pt-8 sm:block">
                     <TrustedByLogoMarquee
                       staticEntrance
                       eyebrow="Trusted by teams at"
