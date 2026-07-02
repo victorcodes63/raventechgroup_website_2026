@@ -131,10 +131,10 @@ export function Testimonials({ variant = 'default' }: TestimonialsProps) {
         </p>
 
         {/* Main: rails + quote */}
-        <div className="flex flex-1 items-center gap-8 sm:gap-12 lg:gap-16">
+        <div className="flex flex-1 items-center gap-0 sm:gap-12 lg:gap-16">
 
-          {/* Vertical navigation rails */}
-          <div className="flex shrink-0 flex-col gap-2.5" role="tablist" aria-label="Choose testimonial">
+          {/* Vertical navigation rails — desktop/tablet only; mobile advances automatically. */}
+          <div className="hidden shrink-0 flex-col gap-2.5 sm:flex" role="tablist" aria-label="Choose testimonial">
             {homeTestimonials.map((item, i) => (
               <button
                 key={item.id}
