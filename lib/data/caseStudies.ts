@@ -95,6 +95,7 @@ export const caseStudies: CaseStudy[] = [
     year: '2024 — ongoing',
     heroImage: '/images/photos/eaglehrscreen.png',
     heroImageAlt: 'Eagle HR Consultants platform dashboard on a laptop',
+    cardImage: '/images/case-studies/eagle-hr-preview.jpg',
     services: ['Software Development', 'Web Development', 'Digital Transformation'],
     stack: ['Next.js 14', 'TypeScript', 'PostgreSQL', 'Tailwind CSS', 'Vercel', 'Resend'],
     tagline: 'A full business operating system — not just a website.',
