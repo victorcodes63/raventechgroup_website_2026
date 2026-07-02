@@ -30,7 +30,7 @@ export function OrganizationSchema() {
     },
     sameAs: [
       'https://www.linkedin.com/company/raven-tech-group',
-      'https://twitter.com/ravetechgroup',
+      'https://x.com/raventechgroup',
       'https://getstride.co.ke',
     ],
   }

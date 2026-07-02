@@ -155,7 +155,7 @@ export function Footer() {
                     <Linkedin size={20} />
                   </a>
                   <a
-                    href="https://twitter.com/ravetechgroup"
+                    href="https://x.com/raventechgroup"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group relative flex h-11 w-11 items-center justify-center rounded-card border border-white/[0.1] text-white/50 transition-all duration-200 hover:border-[#FFA91F]/40 hover:bg-[#FFA91F]/[0.03] hover:text-[#FFA91F] touch-manipulation"
