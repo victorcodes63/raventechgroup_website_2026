@@ -36,6 +36,7 @@ import {
 import { MetricsBand } from '@/components/services/MetricsBand'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import {
   serviceBenefitWatermarkVariants,
   serviceCapabilityStaggerChildVariants,
@@ -51,7 +52,7 @@ import {
 import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { caseStudies, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
 import { getServiceMetricsBand } from '@/lib/data/serviceMetricsBand'
-import type { ServiceDetail } from './service-page-types'
+import type { Capability, ServiceDetail } from './service-page-types'
 
 const SECTION_VIEWPORT = { once: true, margin: '-80px' as const }
 
@@ -142,10 +143,35 @@ function pickIndustryIcon(slug: string | undefined, name: string): LucideIcon {
 /** Equal-weight grid — avoids uneven “bento” spans that read as arbitrary */
 function capabilityGridClass(count: number): string {
   if (count <= 1) return 'grid-cols-1 w-full max-w-2xl mx-auto'
-  if (count === 2) return 'grid-cols-1 md:grid-cols-2'
-  if (count === 3) return 'grid-cols-1 md:grid-cols-3'
-  if (count === 4) return 'grid-cols-1 sm:grid-cols-2'
-  return 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3'
+  if (count === 2) return 'md:grid-cols-2'
+  if (count === 3) return 'md:grid-cols-3'
+  if (count === 4) return 'sm:grid-cols-2'
+  return 'md:grid-cols-2 lg:grid-cols-3'
+}
+
+function CapabilityCard({ cap, index }: { cap: Capability; index: number }) {
+  const Icon = CAPABILITY_ICONS[index % CAPABILITY_ICONS.length]!
+  return (
+    <article className="group/cap flex h-full flex-col rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-all duration-300 hover:scale-[1.01] hover:border-brand-500/40 hover:bg-[#161616] lg:p-9">
+      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-white/[0.08]">
+        <Icon className="h-5 w-5 text-brand-500" strokeWidth={1.5} aria-hidden />
+      </div>
+      <h3 className="mt-6 text-xl font-semibold tracking-tight text-white">{cap.title}</h3>
+      <p className="mt-3 flex-1 text-[15px] leading-relaxed text-white/60">{cap.description}</p>
+      {cap.points && cap.points.length > 0 ? (
+        <ul className="mt-6 space-y-2.5 border-t border-white/[0.06] pt-6">
+          {cap.points.map((pt) => (
+            <li key={pt} className="flex gap-2.5 text-sm leading-relaxed text-white/65">
+              <span className="text-brand-500/50" aria-hidden>
+                +
+              </span>
+              <span>{pt}</span>
+            </li>
+          ))}
+        </ul>
+      ) : null}
+    </article>
+  )
 }
 
 function stepSubtitle(description: string): string {
@@ -366,9 +392,29 @@ function DeliveryTimelinePhases({
   const n = steps.length
   const gridClass = n >= 4 ? 'md:grid-cols-4' : n === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'
 
+  const renderStep = (step: (typeof steps)[number], i: number, centered: boolean) => (
+    <div className={centered ? 'flex flex-col items-center text-center' : 'flex flex-col items-center md:items-start'}>
+      <motion.div
+        className="relative z-10 h-3 w-3 rounded-full bg-brand-500"
+        initial={reducedMotion ? false : 'hidden'}
+        whileInView={reducedMotion ? undefined : 'visible'}
+        viewport={SECTION_VIEWPORT}
+        variants={serviceTimelineDotVariants}
+        transition={{ delay: reducedMotion ? 0 : 0.08 + i * 0.1 }}
+      />
+      <div className="hidden h-8 w-px bg-white/[0.15] md:block" aria-hidden />
+      <div className={`mt-6 w-full ${centered ? 'text-center' : 'text-center md:mt-0 md:text-left'}`}>
+        <p className="text-sm font-semibold uppercase tracking-[0.15em] text-brand-500">{step.title}</p>
+        <p className="mt-1 text-xs text-white/40">{stepSubtitle(step.description)}</p>
+        <p className={`mt-4 text-sm leading-relaxed text-white/70 ${centered ? 'mx-auto max-w-[260px]' : 'max-w-[240px] md:max-w-none'}`}>
+          {step.description}
+        </p>
+      </div>
+    </div>
+  )
+
   return (
     <div className="relative mt-16">
-      {/* Horizontal connector: muted track + brand amber pulse (L→R); dots sit above via z-index */}
       <div
         className="pointer-events-none absolute left-[5%] right-[5%] top-[6px] z-0 hidden h-[3px] overflow-hidden md:block"
         aria-hidden
@@ -382,32 +428,20 @@ function DeliveryTimelinePhases({
         />
       </div>
 
-      <div
-        className={`flex snap-x snap-mandatory gap-10 overflow-x-auto pb-2 md:grid md:gap-8 md:overflow-visible md:pb-0 ${gridClass}`}
-      >
+      <MobileSwipeRail hint="Swipe phases" className="md:hidden" bleed={false} aria-label="Delivery phases">
         {steps.map((step, i) => (
-          <div
-            key={step.title}
-            className="min-w-[min(100%,280px)] flex-shrink-0 snap-center md:min-w-0"
-          >
-            <div className="flex flex-col items-center md:items-start">
-              <motion.div
-                className="relative z-10 h-3 w-3 rounded-full bg-brand-500"
-                initial={reducedMotion ? false : 'hidden'}
-                whileInView={reducedMotion ? undefined : 'visible'}
-                viewport={SECTION_VIEWPORT}
-                variants={serviceTimelineDotVariants}
-                transition={{ delay: reducedMotion ? 0 : 0.08 + i * 0.1 }}
-              />
-              <div className="hidden h-8 w-px bg-white/[0.15] md:block" aria-hidden />
-              <div className="mt-6 w-full text-center md:mt-0 md:text-left">
-                <p className="text-sm font-semibold uppercase tracking-[0.15em] text-brand-500">{step.title}</p>
-                <p className="mt-1 text-xs text-white/40">{stepSubtitle(step.description)}</p>
-                <p className="mt-4 max-w-[240px] text-sm leading-relaxed text-white/70 md:max-w-none">
-                  {step.description}
-                </p>
-              </div>
+          <MobileSwipeCard key={step.title} widthClassName="w-[min(82vw,300px)]">
+            <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-6">
+              {renderStep(step, i, true)}
             </div>
+          </MobileSwipeCard>
+        ))}
+      </MobileSwipeRail>
+
+      <div className={`hidden gap-8 md:grid md:gap-8 ${gridClass}`}>
+        {steps.map((step, i) => (
+          <div key={step.title} className="min-w-0">
+            {renderStep(step, i, false)}
           </div>
         ))}
       </div>
@@ -455,7 +489,18 @@ function SampleTimelineVisual({
           variants={serviceTimelineLineVariants}
         />
       </motion.svg>
-      <div className={`mt-6 grid grid-cols-1 gap-4 ${gridCols}`}>
+      <MobileSwipeRail hint="Swipe timeline" className="mt-6 md:hidden" bleed={false} aria-label="Sample timeline">
+        {phases.map((p) => (
+          <MobileSwipeCard key={p.phase} widthClassName="w-[min(72vw,240px)]">
+            <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-4">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500/85">{p.phase}</p>
+              <h4 className="mt-2 text-sm font-bold text-white">{p.duration}</h4>
+              <p className="mt-1 text-xs leading-relaxed text-white/45">{p.focus}</p>
+            </div>
+          </MobileSwipeCard>
+        ))}
+      </MobileSwipeRail>
+      <div className={`mt-6 hidden grid-cols-1 gap-4 md:grid ${gridCols}`}>
         {phases.map((p) => (
           <div key={p.phase} className="rounded-card border border-white/[0.08] bg-[#111111] p-4">
             <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500/85">{p.phase}</p>
@@ -507,7 +552,38 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                   </ArrowSwapRow>
                 </Link>
               </div>
-              <div className="divide-y divide-white/[0.06]">
+              <MobileSwipeRail
+                hint="Swipe highlights"
+                className="lg:hidden"
+                bleed={false}
+                aria-label="What you get"
+              >
+                {whatBlocks.map((cap, i) => (
+                  <MobileSwipeCard key={cap.title} widthClassName="w-[min(88vw,340px)]">
+                    <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-8">
+                      <p className="text-5xl font-bold leading-none text-white/[0.08]">
+                        {String(i + 1).padStart(2, '0')}
+                      </p>
+                      <h3 className="mt-4 text-xl font-semibold text-white">{cap.title}</h3>
+                      <p className="mt-3 text-[15px] leading-relaxed text-white/60">{cap.description}</p>
+                      {cap.points && cap.points.length > 0 ? (
+                        <ul className="mt-5 space-y-2">
+                          {cap.points.map((pt) => (
+                            <li key={pt} className="flex gap-2 text-[15px] leading-relaxed text-white/60">
+                              <span className="text-brand-500/50" aria-hidden>
+                                +
+                              </span>
+                              <span>{pt}</span>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </div>
+                  </MobileSwipeCard>
+                ))}
+              </MobileSwipeRail>
+
+              <div className="hidden divide-y divide-white/[0.06] lg:block">
                 {whatBlocks.map((cap, i) => (
                   <motion.div
                     key={cap.title}
@@ -578,41 +654,30 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                 </motion.p>
               </motion.div>
 
+              <MobileSwipeRail
+                hint="Swipe capabilities"
+                className="md:hidden"
+                aria-label="Service capabilities"
+              >
+                {caps.map((cap, index) => (
+                  <MobileSwipeCard key={cap.title} widthClassName="w-[min(88vw,360px)]">
+                    <CapabilityCard cap={cap} index={index} />
+                  </MobileSwipeCard>
+                ))}
+              </MobileSwipeRail>
+
               <motion.div
-                className={`grid gap-6 lg:gap-8 ${capabilityGridClass(caps.length)}`}
+                className={`hidden gap-6 md:grid lg:gap-8 ${capabilityGridClass(caps.length)}`}
                 initial={reducedMotion ? false : 'hidden'}
                 whileInView={reducedMotion ? undefined : 'visible'}
                 viewport={SECTION_VIEWPORT}
                 variants={serviceCapabilityStaggerParentVariants}
               >
-                {caps.map((cap, index) => {
-                  const Icon = CAPABILITY_ICONS[index % CAPABILITY_ICONS.length]!
-                  return (
-                    <motion.article
-                      key={cap.title}
-                      variants={serviceCapabilityStaggerChildVariants}
-                      className="group/cap flex h-full flex-col rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-all duration-300 hover:scale-[1.01] hover:border-brand-500/40 hover:bg-[#161616] lg:p-9"
-                    >
-                      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-white/[0.08]">
-                        <Icon className="h-5 w-5 text-brand-500" strokeWidth={1.5} aria-hidden />
-                      </div>
-                      <h3 className="mt-6 text-xl font-semibold tracking-tight text-white">{cap.title}</h3>
-                      <p className="mt-3 flex-1 text-[15px] leading-relaxed text-white/60">{cap.description}</p>
-                      {cap.points && cap.points.length > 0 ? (
-                        <ul className="mt-6 space-y-2.5 border-t border-white/[0.06] pt-6">
-                          {cap.points.map((pt) => (
-                            <li key={pt} className="flex gap-2.5 text-sm leading-relaxed text-white/65">
-                              <span className="text-brand-500/50" aria-hidden>
-                                +
-                              </span>
-                              <span>{pt}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      ) : null}
-                    </motion.article>
-                  )
-                })}
+                {caps.map((cap, index) => (
+                  <motion.div key={cap.title} variants={serviceCapabilityStaggerChildVariants}>
+                    <CapabilityCard cap={cap} index={index} />
+                  </motion.div>
+                ))}
               </motion.div>
             </div>
           </div>
@@ -650,7 +715,26 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 gap-x-12 gap-y-16 lg:grid-cols-2">
+              <MobileSwipeRail
+                hint="Swipe benefits"
+                className="lg:hidden"
+                bleed={false}
+                aria-label="Service benefits"
+              >
+                {detail.numberedBenefits.map((row) => (
+                  <MobileSwipeCard key={row.number} widthClassName="w-[min(84vw,340px)]">
+                    <article className="relative h-full rounded-card border border-white/[0.08] bg-[#111111] p-8">
+                      <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">Benefit</p>
+                      <p className="mt-3 text-5xl font-bold leading-none text-white/[0.08]">{row.number}</p>
+                      <h3 className="mt-4 text-xl font-bold tracking-tight text-white">{row.title}</h3>
+                      <p className="mt-4 text-[15px] leading-relaxed text-white/60">{row.description}</p>
+                      <div className="mt-8 h-px w-12 bg-brand-500" aria-hidden />
+                    </article>
+                  </MobileSwipeCard>
+                ))}
+              </MobileSwipeRail>
+
+              <div className="hidden grid-cols-1 gap-x-12 gap-y-16 lg:grid lg:grid-cols-2">
                 {detail.numberedBenefits.map((row, i) => (
                   <motion.article
                     key={row.number}
@@ -797,10 +881,58 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
               </Link>
 
               {otherCases.length > 0 ? (
-                <div className="grid gap-6 lg:grid-cols-2">
-                  {otherCases.map((cs) => {
-                    const rowStudy = caseStudies.find((c) => c.slug === cs.slug)
-                    return (
+                <>
+                  <MobileSwipeRail
+                    hint="Swipe case studies"
+                    className="lg:hidden"
+                    bleed={false}
+                    aria-label="Related case studies"
+                  >
+                    {otherCases.map((cs) => {
+                      const rowStudy = caseStudies.find((c) => c.slug === cs.slug)
+                      return (
+                        <MobileSwipeCard key={cs.slug} widthClassName="w-[min(88vw,360px)]">
+                          <Link
+                            href={`/case-studies/${cs.slug}`}
+                            className="group/case flex h-full min-h-0 flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111]"
+                          >
+                            {rowStudy ? (
+                              <div className="relative aspect-[16/10] w-full shrink-0 overflow-hidden">
+                                <RealProjectsCaseStudyImage
+                                  study={rowStudy}
+                                  alt={`${cs.client}: ${rowStudy.tagline}`}
+                                  objectPosition="top"
+                                  className="object-cover brightness-[0.82] saturate-[0.85] transition duration-700 group-hover/case:saturate-100"
+                                  sizes="88vw"
+                                />
+                              </div>
+                            ) : null}
+                            <div className="flex flex-1 flex-col p-6">
+                              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500/90">
+                                Case study
+                              </p>
+                              <h3 className="mt-2 text-xl font-bold text-white">{cs.client}</h3>
+                              <p className="mt-3 flex-1 text-sm leading-relaxed text-white/65">{cs.outcome}</p>
+                              {caseStudyMetrics(cs.slug).length > 0 ? (
+                                <p className="mt-4 text-xs font-medium text-white/75">
+                                  {caseStudyMetrics(cs.slug).join(' · ')}
+                                </p>
+                              ) : null}
+                              <span className="mt-6 inline-flex items-center gap-2 text-sm font-semibold text-brand-500">
+                                Read full case study
+                                <ArrowRight size={14} aria-hidden />
+                              </span>
+                            </div>
+                          </Link>
+                        </MobileSwipeCard>
+                      )
+                    })}
+                  </MobileSwipeRail>
+
+                  <div className="hidden gap-6 lg:grid lg:grid-cols-2">
+                    {otherCases.map((cs) => {
+                      const rowStudy = caseStudies.find((c) => c.slug === cs.slug)
+                      return (
                     <Link
                       key={cs.slug}
                       href={`/case-studies/${cs.slug}`}
@@ -836,7 +968,8 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                     </Link>
                     )
                   })}
-                </div>
+                  </div>
+                </>
               ) : null}
             </div>
           </div>
@@ -866,8 +999,27 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
               <h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight text-white lg:text-4xl">
                 Sectors we operate in
               </h2>
+              <MobileSwipeRail
+                hint="Swipe sectors"
+                className="mt-10 md:hidden"
+                bleed={false}
+                aria-label="Industries"
+              >
+                {detail.industries.map((ind) => {
+                  const Icon = pickIndustryIcon(ind.slug, ind.name)
+                  return (
+                    <MobileSwipeCard key={ind.name} widthClassName="w-[min(78vw,260px)]">
+                      <div className="h-full rounded-card border border-white/[0.06] bg-[#0f0f0f] p-5">
+                        <Icon className="h-5 w-5 text-brand-500" strokeWidth={1.5} aria-hidden />
+                        <p className="mt-4 text-sm font-semibold text-white">{ind.name}</p>
+                      </div>
+                    </MobileSwipeCard>
+                  )
+                })}
+              </MobileSwipeRail>
+
               <motion.div
-                className="mt-10 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4"
+                className="mt-10 hidden grid-cols-2 gap-3 md:grid md:grid-cols-3 lg:grid-cols-4"
                 initial={reducedMotion ? false : 'hidden'}
                 whileInView={reducedMotion ? undefined : 'visible'}
                 viewport={SECTION_VIEWPORT}
@@ -951,8 +1103,48 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
               description="Case studies and field notes for operators and technical leaders."
               reducedMotion={reducedMotion}
             />
+            <MobileSwipeRail
+              hint="Swipe articles"
+              className="lg:hidden"
+              bleed={false}
+              aria-label="Related insights"
+            >
+              {detail.relatedInsights.map((post) => (
+                <MobileSwipeCard key={post.slug} widthClassName="w-[min(88vw,340px)]">
+                  <article className="group flex h-full flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#0A0A0A]">
+                    <Link href={post.href ?? `/insights/${post.slug}`} className="flex flex-1 flex-col">
+                      {post.image ? (
+                        <div className="relative aspect-[16/10] w-full overflow-hidden">
+                          <Image
+                            src={post.image}
+                            alt={`${post.title} — Raven Tech Group`}
+                            fill
+                            className="object-cover transition duration-700 group-hover:scale-[1.02]"
+                            sizes="88vw"
+                          />
+                        </div>
+                      ) : null}
+                      <div className="flex flex-1 flex-col p-6">
+                        <p className="text-xs font-semibold uppercase tracking-[0.15em] text-brand-500">
+                          {post.readTime ?? 'Article'}
+                        </p>
+                        <h3 className="mt-3 text-lg font-bold text-white transition-colors group-hover:text-brand-500">
+                          {post.title}
+                        </h3>
+                        <p className="mt-2 flex-1 text-sm leading-relaxed text-white/55">{post.excerpt}</p>
+                        <span className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-brand-500">
+                          Read article
+                          <ArrowRight size={14} aria-hidden />
+                        </span>
+                      </div>
+                    </Link>
+                  </article>
+                </MobileSwipeCard>
+              ))}
+            </MobileSwipeRail>
+
             <motion.div
-              className="grid gap-6 lg:grid-cols-3"
+              className="hidden gap-6 lg:grid lg:grid-cols-3"
               initial={reducedMotion ? false : 'hidden'}
               whileInView={reducedMotion ? undefined : 'visible'}
               viewport={SECTION_VIEWPORT}

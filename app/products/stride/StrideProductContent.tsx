@@ -7,6 +7,7 @@ import { ArrowUpRight, CheckCircle2 } from 'lucide-react'
 
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import { strideProduct as product } from '@/lib/data/products'
@@ -160,7 +161,7 @@ export function StrideProductContent() {
                 initial="hidden"
                 whileInView="visible"
                 viewport={{ once: true, margin: '-80px' }}
-                className="mt-16 grid gap-6 md:grid-cols-2"
+                className="mt-16 hidden gap-6 md:grid md:grid-cols-2"
               >
                 {product.modules.map((mod) => (
                   <motion.li
@@ -173,6 +174,17 @@ export function StrideProductContent() {
                   </motion.li>
                 ))}
               </motion.ul>
+
+              <MobileSwipeRail hint="Swipe modules" className="mt-16 md:hidden" aria-label="Stride modules">
+                {product.modules.map((mod) => (
+                  <MobileSwipeCard key={mod.title} widthClassName="w-[min(84vw,360px)]">
+                    <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-8">
+                      <h3 className="text-xl font-semibold tracking-tight text-white">{mod.title}</h3>
+                      <p className="mt-3 text-base leading-relaxed text-white/60">{mod.description}</p>
+                    </div>
+                  </MobileSwipeCard>
+                ))}
+              </MobileSwipeRail>
             </div>
           </div>
         </section>
@@ -188,7 +200,21 @@ export function StrideProductContent() {
                 Vertical packs on the same core
               </h2>
 
-              <ul className="mt-16 grid gap-6 md:grid-cols-2">
+              <MobileSwipeRail hint="Swipe industries" className="mt-16 md:hidden" aria-label="Stride industries">
+                {product.industries.map((industry) => (
+                  <MobileSwipeCard key={industry.title} widthClassName="w-[min(84vw,360px)]">
+                    <div className="flex h-full gap-4 rounded-card border border-white/[0.08] bg-[#111111] p-6">
+                      <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-500" aria-hidden />
+                      <div>
+                        <h3 className="text-lg font-semibold text-white">{industry.title}</h3>
+                        <p className="mt-2 text-sm leading-relaxed text-white/60">{industry.description}</p>
+                      </div>
+                    </div>
+                  </MobileSwipeCard>
+                ))}
+              </MobileSwipeRail>
+
+              <ul className="mt-16 hidden gap-6 md:grid md:grid-cols-2">
                 {product.industries.map((industry) => (
                   <li
                     key={industry.title}

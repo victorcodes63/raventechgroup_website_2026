@@ -9,6 +9,7 @@ import { ScrollReveal } from '@/components/motion/ScrollReveal'
 import { ServiceIntakeWizard } from '@/components/sections/ServiceIntakeWizard'
 import { Services as ServicesShowcase } from '@/components/sections/Services'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { fadeInUp, staggerContainer } from '@/lib/animations'
 import {
@@ -273,12 +274,34 @@ function EngagementModel() {
             </p>
           </div>
 
+          <MobileSwipeRail hint="Swipe steps" className="md:hidden" aria-label="Engagement model">
+            {engagementSteps.map((step, index) => (
+              <MobileSwipeCard key={step.label} widthClassName="w-[min(82vw,320px)]">
+                <article className="relative min-h-[220px] overflow-hidden border-t border-white/[0.06] px-0 pb-10 pt-10">
+                  <span
+                    className="absolute right-0 top-6 z-0 select-none text-[150px] font-bold leading-none tracking-[-0.04em] text-white/[0.05]"
+                    aria-hidden
+                  >
+                    {String(index + 1).padStart(2, '0')}
+                  </span>
+                  <div className="relative z-10">
+                    <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500/80">
+                      {String(index + 1).padStart(2, '0')} · {step.label}
+                    </p>
+                    <h3 className="text-xl font-bold leading-tight tracking-tight text-white">{step.title}</h3>
+                    <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-white/55">{step.description}</p>
+                  </div>
+                </article>
+              </MobileSwipeCard>
+            ))}
+          </MobileSwipeRail>
+
           <motion.div
             variants={staggerContainer}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: '-60px' }}
-            className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16"
+            className="hidden w-full grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16"
           >
             {engagementSteps.map((step, index) => (
               <motion.article

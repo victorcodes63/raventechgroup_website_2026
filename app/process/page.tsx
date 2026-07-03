@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { howWeWorkSteps } from '@/lib/data/howWeWork'
 
 const canonical = 'https://www.raventechgroup.com/process'
@@ -70,7 +71,30 @@ export default function ProcessPage() {
             Four phases — same team end to end. No hand-offs to anonymous builders.
           </p>
 
-          <ol className="mt-16 grid list-none grid-cols-1 gap-8 border-t border-white/[0.06] pt-12 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16">
+          <MobileSwipeRail hint="Swipe steps" className="mt-16 md:hidden" aria-label="Engagement steps">
+            {howWeWorkSteps.map(({ title, description }, index) => {
+              const stepNo = String(index + 1).padStart(2, '0')
+              return (
+                <MobileSwipeCard key={title} widthClassName="w-[min(82vw,320px)]">
+                  <div className="relative min-h-[220px] border-t border-white/[0.06] px-0 pb-14 pt-10">
+                    <span
+                      className="absolute right-0 top-6 z-0 select-none text-[180px] font-bold leading-none tracking-[-0.04em] text-white/[0.06]"
+                      aria-hidden
+                    >
+                      {stepNo}
+                    </span>
+                    <div className="relative z-10">
+                      <p className="mb-5 text-[10px] font-semibold uppercase tracking-[0.2em] text-[#FFA91F]/80">{stepNo}</p>
+                      <h2 className="text-xl font-bold leading-tight tracking-tight text-white">{title}</h2>
+                      <p className="mt-3 max-w-[280px] text-sm leading-relaxed text-white/55">{description}</p>
+                    </div>
+                  </div>
+                </MobileSwipeCard>
+              )
+            })}
+          </MobileSwipeRail>
+
+          <ol className="mt-16 hidden list-none grid-cols-1 gap-8 border-t border-white/[0.06] pt-12 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16">
             {howWeWorkSteps.map(({ title, description }, index) => {
               const stepNo = String(index + 1).padStart(2, '0')
               return (

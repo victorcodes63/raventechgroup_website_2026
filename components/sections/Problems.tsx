@@ -12,6 +12,7 @@ import {
   useSectionScrollProgress,
 } from '@/components/motion/ScrollDrivenTypography'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SITE_EASE } from '@/lib/siteScrollMotion'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 
@@ -343,57 +344,105 @@ export function Problems() {
           />
         </div>
 
-        <div className="mt-20 w-full">
+        <div className="mx-auto mt-20 w-full max-w-6xl">
           <motion.div
             style={{ opacity: bannerOpacity, scale: bannerScale, y: bannerY }}
-            className="group relative overflow-hidden rounded-card border border-white/[0.08] bg-gradient-to-br from-[#141414] to-[#0E0E0E] shadow-[0_28px_90px_-52px_rgba(0,0,0,0.85)] transition-[border-color,box-shadow] duration-300 hover:border-[#FFA91F]/25 hover:shadow-[0_36px_110px_-52px_rgba(255,169,31,0.2)]"
+            className="relative"
           >
-            {/* Amber corner glow — quiet resolution to the story */}
             <div
-              className="pointer-events-none absolute -right-16 -top-20 h-56 w-56 rounded-full bg-[#FFA91F]/[0.12] blur-[70px] transition-colors duration-500 group-hover:bg-[#FFA91F]/[0.18]"
+              className="pointer-events-none absolute -left-24 top-4 h-64 w-64 rounded-full bg-[#FFA91F]/[0.06] blur-[90px]"
               aria-hidden
             />
             <div
-              className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FFA91F]/50 to-transparent"
+              className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#FFA91F]/[0.08] blur-[100px]"
               aria-hidden
             />
-            <div className="relative flex flex-col gap-10 border-l-2 border-[#FFA91F] p-8 sm:p-10 lg:flex-row lg:items-center lg:justify-between lg:gap-12 lg:p-12">
-              <div className="min-w-0 text-left">
-                <ScrollRevealWords
-                  scrollYProgress={scrollYProgress}
-                  range={[0.72, 0.76]}
-                  reduced={isReduced}
-                  text="Sound familiar?"
-                  className="text-3xl font-bold tracking-[-0.02em] text-white sm:text-4xl"
-                />
-                <ScrollRevealWords
-                  scrollYProgress={scrollYProgress}
-                  range={[0.74, 0.79]}
-                  reduced={isReduced}
-                  text="Usually more than one."
-                  className="mt-2.5 text-sm font-medium leading-relaxed text-white/55 sm:text-base"
-                />
-                <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-white/45">
-                  <span className="inline-flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-[#FFA91F]" aria-hidden />
-                    30 minutes
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-[#FFA91F]" aria-hidden />
-                    No deck
-                  </span>
-                  <span className="inline-flex items-center gap-2">
-                    <span className="h-1 w-1 rounded-full bg-[#FFA91F]" aria-hidden />
-                    Straight talk on fit
-                  </span>
+
+            <div className="relative grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start lg:gap-12">
+              <div>
+                <div className="mb-6 flex items-center gap-3">
+                  <div className="h-px w-8 bg-[#FFA91F]" aria-hidden />
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#FFA91F]">Fit check</p>
+                </div>
+
+                <div className="max-w-2xl">
+                  <ScrollRevealWords
+                    scrollYProgress={scrollYProgress}
+                    range={[0.72, 0.76]}
+                    reduced={isReduced}
+                    text="Sound familiar?"
+                    className="text-3xl font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl"
+                  />
+                  <ScrollRevealWords
+                    scrollYProgress={scrollYProgress}
+                    range={[0.74, 0.79]}
+                    reduced={isReduced}
+                    text="Usually more than one."
+                    className="mt-4 max-w-xl text-base font-medium leading-relaxed text-white/55 sm:text-lg"
+                  />
+                  <p className="mt-6 max-w-xl text-sm leading-relaxed text-white/42 sm:text-base">
+                    Bring the messy context. We will separate what needs a system, what needs a process change, and
+                    what does not need a build at all.
+                  </p>
+                </div>
+
+                <MobileSwipeRail hint="Swipe points" className="mt-9 sm:hidden" bleed={false} aria-label="Fit check points">
+                  {[
+                    ['01', 'No pitch deck'],
+                    ['02', 'No generic audit'],
+                    ['03', 'Clear next step'],
+                  ].map(([number, label]) => (
+                    <MobileSwipeCard key={label} widthClassName="w-[min(72vw,240px)]">
+                      <div className="h-full rounded-card border border-white/[0.07] bg-white/[0.025] p-4">
+                        <p className="text-[10px] font-bold tracking-[0.16em] text-[#FFA91F]/80">{number}</p>
+                        <p className="mt-2 text-sm font-semibold text-white/75">{label}</p>
+                      </div>
+                    </MobileSwipeCard>
+                  ))}
+                </MobileSwipeRail>
+
+                <div className="mt-9 hidden gap-3 sm:grid sm:grid-cols-3">
+                  {[
+                    ['01', 'No pitch deck'],
+                    ['02', 'No generic audit'],
+                    ['03', 'Clear next step'],
+                  ].map(([number, label]) => (
+                    <div key={label} className="rounded-card border border-white/[0.07] bg-white/[0.025] p-4">
+                      <p className="text-[10px] font-bold tracking-[0.16em] text-[#FFA91F]/80">{number}</p>
+                      <p className="mt-2 text-sm font-semibold text-white/75">{label}</p>
+                    </div>
+                  ))}
                 </div>
               </div>
-              <div className="flex w-full shrink-0 flex-col items-stretch gap-3 sm:w-auto sm:items-end">
-                <CTAButton href="/book" variant="primary" className="w-full justify-center px-8 py-4 text-base sm:w-auto">
+
+              <div className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111]/80 p-6 shadow-[0_28px_80px_-56px_rgba(255,169,31,0.28)] sm:p-8">
+                <div
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FFA91F]/45 to-transparent"
+                  aria-hidden
+                />
+                <div
+                  className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#FFA91F]/[0.1] blur-[70px]"
+                  aria-hidden
+                />
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">
+                  30-minute conversation
+                </p>
+                <p className="relative mt-4 text-2xl font-bold leading-tight tracking-[-0.02em] text-white">
+                  Know if Raven is the right team.
+                </p>
+                <ul className="relative mt-6 space-y-3 text-sm leading-relaxed text-white/55">
+                  {['What is breaking', 'What should be built', 'What should wait'].map((item) => (
+                    <li key={item} className="flex items-center gap-3">
+                      <span className="h-1.5 w-1.5 rounded-full bg-[#FFA91F]" aria-hidden />
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+                <CTAButton href="/book" variant="primary" className="relative mt-8 w-full justify-center px-7 py-4 text-sm">
                   Book 30 minutes
                 </CTAButton>
-                <p className="text-center text-xs leading-snug text-white/40 sm:max-w-[15rem] sm:text-right">
-                  We reply within one business day with a calendar link — or a short note if it&apos;s not a match.
+                <p className="relative mt-4 text-xs leading-relaxed text-white/38">
+                  We reply within one business day with a calendar link, or a direct note if it is not a fit.
                 </p>
               </div>
             </div>

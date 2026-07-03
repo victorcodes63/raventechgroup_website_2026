@@ -1,11 +1,13 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { motion, useReducedMotion } from 'framer-motion'
 import { caseStudiesOrdered, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
 import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
@@ -27,9 +29,31 @@ function CaseStudyMedia({
   isSupport: boolean
   applyMonochromeOverlay: boolean
 }) {
+  const [currentSrc, setCurrentSrc] = useState(imgSrc)
+  const [imageFailed, setImageFailed] = useState(false)
+
+  useEffect(() => {
+    setCurrentSrc(imgSrc)
+    setImageFailed(false)
+  }, [imgSrc])
+
+  const handleImageError = () => {
+    if (currentSrc !== study.heroImage) {
+      setCurrentSrc(study.heroImage)
+      return
+    }
+    setImageFailed(true)
+  }
+
+  const gradientClass = isFeatured
+    ? applyMonochromeOverlay
+      ? 'bg-gradient-to-t from-black/76 via-black/32 to-transparent lg:bg-gradient-to-r lg:from-black/55 lg:via-black/20 lg:to-transparent'
+      : 'bg-gradient-to-t from-black/50 via-black/10 to-transparent lg:bg-gradient-to-r lg:from-black/35 lg:via-transparent lg:to-transparent'
+    : 'bg-gradient-to-t from-black/82 via-black/45 to-transparent'
+
   return (
     <div
-      className={`relative w-full shrink-0 overflow-hidden ${
+      className={`relative w-full shrink-0 overflow-hidden bg-[#111111] ${
         isFeatured
           ? 'aspect-[16/10] lg:aspect-auto lg:h-full lg:min-h-[420px] lg:w-[52%]'
           : isSupport
@@ -37,31 +61,31 @@ function CaseStudyMedia({
             : 'aspect-[16/10]'
       }`}
     >
-      <Image
-        src={imgSrc}
-        alt={`${study.client}: ${study.tagline}`}
-        fill
-        className={`object-cover scale-[1.02] ${isFeatured ? 'object-center' : 'object-top origin-top'} ${
-          applyMonochromeOverlay ? 'saturate-[0.3] contrast-[1.05] brightness-[0.95]' : ''
-        } ${isSupport ? 'brightness-[0.82] saturate-[0.85]' : ''}`}
-        sizes={
-          isFeatured
-            ? '(min-width: 1024px) 52vw, 100vw'
-            : '(min-width: 1024px) 40vw, (min-width: 768px) 50vw, 100vw'
-        }
-        priority={priority}
-        unoptimized={unoptimized}
-        onError={(e) => {
-          ;(e.target as HTMLImageElement).src = study.heroImage
-        }}
-      />
-      <div
-        className={`absolute inset-0 z-[1] ${
-          isFeatured
-            ? 'bg-gradient-to-t from-black/76 via-black/32 to-transparent lg:bg-gradient-to-r lg:from-black/55 lg:via-black/20 lg:to-transparent'
-            : 'bg-gradient-to-t from-black/82 via-black/45 to-transparent'
-        }`}
-      />
+      {!imageFailed ? (
+        <Image
+          src={currentSrc}
+          alt={`${study.client}: ${study.tagline}`}
+          fill
+          className={`object-cover scale-[1.02] ${isFeatured ? 'object-top lg:object-center' : 'object-top origin-top'} ${
+            applyMonochromeOverlay ? 'saturate-[0.3] contrast-[1.05] brightness-[0.95]' : ''
+          } ${isSupport ? 'brightness-[0.82] saturate-[0.85]' : ''}`}
+          sizes={
+            isFeatured
+              ? '(min-width: 1024px) 52vw, 88vw'
+              : '(min-width: 1024px) 40vw, (min-width: 768px) 50vw, 88vw'
+          }
+          priority={priority}
+          unoptimized={unoptimized || currentSrc !== imgSrc}
+          onError={handleImageError}
+        />
+      ) : (
+        <div
+          className="absolute inset-0 bg-gradient-to-br from-[#161616] via-[#111111] to-[#0A0A0A]"
+          role="img"
+          aria-label={`${study.client}: ${study.tagline}`}
+        />
+      )}
+      <div className={`absolute inset-0 z-[1] ${gradientClass}`} />
       {study.clientLogo ? (
         <CaseStudyClientLogoBadge
           clientLogo={study.clientLogo}
@@ -214,10 +238,8 @@ function CaseStudyCard({
   const { src: imgSrc, unoptimized } = getCaseStudyImageSrc(study)
   const isFeatured = variant === 'featured'
   const isSupport = variant === 'support'
-  const hasClientSite = study.siteUrl !== null && study.siteUrl !== undefined
   const isEagle = isFeatured && study.slug === 'eagle-hr-consultants'
-  const isR4 = study.slug === 'r4-automotive'
-  const applyMonochromeOverlay = hasClientSite || isEagle || isR4
+  const applyMonochromeOverlay = imgSrc.startsWith('/api/screenshot')
   const eagleParts = isEagle ? study.tagline.split(' — ') : []
 
   if (isFeatured) {
@@ -318,7 +340,23 @@ export function CaseStudiesPreview() {
       </ScrollReveal>
 
       <div className={`${CASE_STUDIES_SHELL} pb-16 lg:pb-20`}>
-        <div className="flex flex-col gap-5 lg:gap-6">
+        <MobileSwipeRail
+          hint="Swipe projects"
+          className="lg:hidden"
+          aria-label="Case studies"
+        >
+          <MobileSwipeCard widthClassName="w-[min(88vw,400px)]">
+            <CaseStudyCard study={featured} priority reduced={reduced} variant="featured" />
+          </MobileSwipeCard>
+          <MobileSwipeCard widthClassName="w-[min(88vw,340px)]">
+            <CaseStudyCard study={firstSupport} reduced={reduced} variant="support" />
+          </MobileSwipeCard>
+          <MobileSwipeCard widthClassName="w-[min(88vw,340px)]">
+            <CaseStudyCard study={secondSupport} reduced={reduced} variant="support" />
+          </MobileSwipeCard>
+        </MobileSwipeRail>
+
+        <div className="hidden flex-col gap-5 lg:flex lg:gap-6">
           <CaseStudyCard study={featured} priority reduced={reduced} variant="featured" />
           <div className="grid gap-5 sm:grid-cols-2 lg:gap-6">
             <CaseStudyCard study={firstSupport} reduced={reduced} variant="support" />

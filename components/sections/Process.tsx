@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { howWeWorkSteps } from '@/lib/data/howWeWork'
 
@@ -110,7 +111,24 @@ export function Process() {
           </div>
 
           <div className="relative w-full">
-            <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16">
+            <MobileSwipeRail
+              hint="Swipe steps"
+              className="md:hidden"
+              aria-label="How we work steps"
+            >
+              {howWeWorkSteps.map(({ title, description }, index) => (
+                <MobileSwipeCard key={title} widthClassName="w-[min(82vw,320px)]">
+                  <ProcessStepCard
+                    index={index}
+                    title={title}
+                    description={description}
+                    prefersReducedMotion={!!reduced}
+                  />
+                </MobileSwipeCard>
+              ))}
+            </MobileSwipeRail>
+
+            <div className="hidden w-full grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16">
               {howWeWorkSteps.map(({ title, description }, index) => (
                 <ProcessStepCard
                   key={title}

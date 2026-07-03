@@ -12,6 +12,8 @@ import {
   Building2,
 } from 'lucide-react'
 
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
+
 const industries = [
   {
     icon: ShoppingBag,
@@ -71,7 +73,31 @@ export function Industries() {
           </div>
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4">
+        <MobileSwipeRail
+          hint="Swipe sectors"
+          className="md:hidden"
+          aria-label="Industries we serve"
+        >
+          {industries.map(({ icon: Icon, name, description }, i) => (
+            <MobileSwipeCard key={name} widthClassName="w-[min(78vw,300px)]">
+              <motion.div
+                initial={{ opacity: 0, y: 18 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true, margin: '-50px' }}
+                transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1], delay: i * 0.055 }}
+                className="group h-full rounded-card border border-white/[0.06] bg-[#111111] p-5 transition duration-300 hover:border-brand-500/25 hover:bg-[#161616]"
+              >
+                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-card bg-white/[0.05] text-brand-400 transition group-hover:bg-brand-500/20 group-hover:text-brand-300">
+                  <Icon size={18} />
+                </span>
+                <h3 className="text-[13px] font-bold leading-snug text-white sm:text-sm">{name}</h3>
+                <p className="mt-2 text-[12px] leading-relaxed text-white/45 sm:text-[13px]">{description}</p>
+              </motion.div>
+            </MobileSwipeCard>
+          ))}
+        </MobileSwipeRail>
+
+        <div className="hidden grid-cols-2 gap-3 sm:gap-4 md:grid md:grid-cols-3 lg:grid-cols-4">
           {industries.map(({ icon: Icon, name, description }, i) => (
             <motion.div
               key={name}

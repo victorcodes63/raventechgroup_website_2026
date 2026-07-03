@@ -7,6 +7,7 @@ import { Plus, Minus } from 'lucide-react'
 
 import { useSectionScrollProgress } from '@/components/motion/ScrollDrivenTypography'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { services as allServices } from '@/lib/data/services'
 
@@ -222,16 +223,14 @@ export function Services() {
         </motion.div>
 
         {/* ── Mobile: horizontal swipe cards ─────────────────────────── */}
-        <div className="lg:hidden">
-          <p className="-mt-2 mb-3 text-[11px] text-white/35">Swipe services</p>
-          <div className="-mx-5 flex snap-x snap-mandatory gap-3 overflow-x-auto px-5 pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+        <MobileSwipeRail hint="Swipe services" className="-mt-2 lg:hidden" aria-label="Services">
           {services.map((service) => {
             const Icon = service.Icon
             const hasThumb = Boolean(service.imagePath) && !imgErrors.has(service.slug)
             return (
+              <MobileSwipeCard key={service.slug}>
               <article
-                key={service.slug}
-                className="w-[min(88vw,420px)] shrink-0 snap-start overflow-hidden rounded-card border border-white/[0.06] bg-[#111111]"
+                className="h-full overflow-hidden rounded-card border border-white/[0.06] bg-[#111111]"
               >
                 <div className="relative h-36 w-full overflow-hidden border-b border-white/[0.06] bg-[#0A0A0A]">
                   {hasThumb ? (
@@ -288,10 +287,10 @@ export function Services() {
                 </CTAButton>
                 </div>
               </article>
+              </MobileSwipeCard>
             )
           })}
-          </div>
-        </div>
+        </MobileSwipeRail>
 
       </motion.div>
     </section>

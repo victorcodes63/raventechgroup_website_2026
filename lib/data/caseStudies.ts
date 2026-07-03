@@ -73,7 +73,7 @@ export function getCaseStudyImageSrc(study: CaseStudy): { src: string; unoptimiz
     return { src: '/images/photos/r4-auto-screen.png', unoptimized: false }
   }
   if (study.cardImage) {
-    return { src: study.cardImage, unoptimized: false }
+    return { src: study.cardImage, unoptimized: true }
   }
   if (study.siteUrl) {
     return {
