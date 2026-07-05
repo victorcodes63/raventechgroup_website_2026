@@ -412,7 +412,7 @@ export function Header() {
                                       <Link
                                         key={service.title}
                                         href={service.href}
-                                        className="block min-h-[44px] rounded-card bg-white/[0.04] px-4 py-3 text-sm text-white/75 transition-colors duration-200 hover:bg-brand-500/15 hover:text-brand-300 touch-manipulation"
+                                        className="block min-h-[44px] rounded-card bg-white/[0.04] px-4 py-3 text-sm text-white/75 transition-colors duration-200 hover:bg-brand-500/15 hover:text-brand-400 touch-manipulation"
                                         onClick={() => {
                                           setIsMobileMenuOpen(false)
                                           setMobileSubmenu(null)
@@ -467,7 +467,7 @@ export function Header() {
                                       <Link
                                         key={item.href}
                                         href={item.href}
-                                        className="block min-h-[44px] rounded-card bg-white/[0.04] px-4 py-3 text-sm text-white/75 transition-colors duration-200 hover:bg-brand-500/15 hover:text-brand-300 touch-manipulation"
+                                        className="block min-h-[44px] rounded-card bg-white/[0.04] px-4 py-3 text-sm text-white/75 transition-colors duration-200 hover:bg-brand-500/15 hover:text-brand-400 touch-manipulation"
                                         onClick={() => {
                                           setIsMobileMenuOpen(false)
                                           setMobileSubmenu(null)

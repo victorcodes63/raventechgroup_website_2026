@@ -53,7 +53,7 @@ export const PUBLISHED_INSIGHT_SLUGS: ReadonlySet<string> = new Set(Object.keys(
 const INSIGHT_HERO_BY_SLUG: Record<string, string> = {
   'mpesa-daraja-nextjs-production-integration': '/images/photos/collage-2.jpg',
   'sacco-digital-transformation-mistakes-kenya': '/images/photos/collage-3.jpg',
-  'cost-of-fintech-infrastructure-kenya-2026': '/images/photos/collage-1.jpg',
+  'cost-of-fintech-infrastructure-kenya-2026': '/images/photos/fintech-cost-review.jpg',
 }
 
 const VICTOR: InsightAuthor = {

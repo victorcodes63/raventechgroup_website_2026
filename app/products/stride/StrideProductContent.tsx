@@ -149,7 +149,7 @@ export function StrideProductContent() {
                   href={product.marketingUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-brand-400 underline-offset-4 hover:underline"
+                  className="text-brand-500 underline-offset-4 hover:underline"
                 >
                   getstride.co.ke
                 </a>
@@ -262,7 +262,7 @@ export function StrideProductContent() {
                   {product.caseStudySlug ? (
                     <Link
                       href={`/case-studies/${product.caseStudySlug}`}
-                      className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-400 transition-all hover:gap-3"
+                      className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-500 transition-all hover:gap-3"
                     >
                       Read the case study
                       <ArrowUpRight size={15} aria-hidden />

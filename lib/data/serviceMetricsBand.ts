@@ -12,9 +12,9 @@ export type ServiceMetricBandItem =
 /** Client-referenced or delivery-target metrics — no unverifiable averages */
 export const SERVICE_METRICS_BAND: Record<string, ServiceMetricBandItem[]> = {
   'software-development': [
-    { kind: 'text', value: '12', label: 'Weeks — Eagle HR to production' },
-    { kind: 'text', value: '6', label: 'Modules on Eagle HR platform' },
-    { kind: 'text', value: '2–3', label: 'Leads/week — Eagle HR site' },
+    { kind: 'text', value: '8–12', label: 'Weeks to production' },
+    { kind: 'text', value: '6+', label: 'Platforms shipped' },
+    { kind: 'text', value: '2', label: 'Week release cadence' },
     { kind: 'text', value: '24/7', label: 'Support on active builds' },
   ],
   'cloud-solutions': [
@@ -37,7 +37,7 @@ export const SERVICE_METRICS_BAND: Record<string, ServiceMetricBandItem[]> = {
   ],
   'digital-transformation': [
     { kind: 'text', value: '12', label: 'Week pilot cycles' },
-    { kind: 'text', value: 'Eagle HR', label: 'Reference operating system' },
+    { kind: 'text', value: '3', label: 'Pilot waves typical' },
     { kind: 'text', value: '1', label: 'Source of truth goal' },
     { kind: 'text', value: '48h', label: 'Written readout SLA' },
   ],

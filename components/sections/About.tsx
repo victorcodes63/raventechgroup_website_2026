@@ -62,7 +62,7 @@ export function About() {
               <ul className="mt-4 sm:mt-6 space-y-3 sm:space-y-4 text-sm text-black/65">
                 {bulletPoints.map((item) => (
                   <li key={item} className="flex gap-3 leading-relaxed">
-                    <span className="relative top-2 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-400" />
+                    <span className="relative top-2 block h-1.5 w-1.5 flex-shrink-0 rounded-full bg-brand-500" />
                     <span>{item}</span>
                   </li>
                 ))}
@@ -86,9 +86,9 @@ export function About() {
             {differentiators.map(({ icon: Icon, title, description }) => (
               <div
                 key={title}
-                className="group flex h-full flex-col gap-3 sm:gap-4 rounded-sm border border-black/10 bg-white/90 p-4 sm:p-6 text-black transition duration-200 hover:border-brand-400/60 hover:bg-brand-400/10"
+                className="group flex h-full flex-col gap-3 sm:gap-4 rounded-sm border border-black/10 bg-white/90 p-4 sm:p-6 text-black transition duration-200 hover:border-brand-500/60 hover:bg-brand-500/10"
               >
-                <span className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-sm bg-black/5 text-brand-400 transition duration-200 group-hover:bg-brand-400/20 group-hover:text-brand-100">
+                <span className="inline-flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-sm bg-black/5 text-brand-500 transition duration-200 group-hover:bg-brand-500/20">
                   <Icon size={20} className="sm:w-[22px] sm:h-[22px]" />
                 </span>
                 <div>

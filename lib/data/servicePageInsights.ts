@@ -1,5 +1,7 @@
 import type { ServiceDetail } from '@/app/services/[slug]/service-page-types'
 
+import { EAGLE_HR_WEBSITE_IMAGE } from '@/lib/data/caseStudies'
+
 /** Related reading cards on service pages — insights and case studies with live routes. */
 export const SERVICE_PAGE_RELATED_INSIGHTS: NonNullable<ServiceDetail['relatedInsights']> = [
   {
@@ -8,7 +10,7 @@ export const SERVICE_PAGE_RELATED_INSIGHTS: NonNullable<ServiceDetail['relatedIn
     slug: 'eagle-hr-consultants',
     href: '/case-studies/eagle-hr-consultants',
     readTime: 'Case study',
-    image: '/images/photos/eaglehrscreen.png',
+    image: EAGLE_HR_WEBSITE_IMAGE,
   },
   {
     title: 'M-Pesa integration in Next.js — a production walkthrough',

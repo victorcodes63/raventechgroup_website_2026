@@ -65,10 +65,16 @@ export function caseStudyPrimaryMetric(study: CaseStudy): string | undefined {
   return m ? `${m.value} ${m.label}` : undefined
 }
 
+/** Canonical Eagle HR marketing site capture — cards, heroes, and related previews */
+export const EAGLE_HR_WEBSITE_IMAGE = '/images/case-studies/eagle-hr-website.png'
+
 /**
  * Case-study card media: `cardImage` when Microlink breaks logos; else live screenshot when `siteUrl` is set; else `heroImage`.
  */
 export function getCaseStudyImageSrc(study: CaseStudy): { src: string; unoptimized: boolean } {
+  if (study.slug === 'eagle-hr-consultants') {
+    return { src: EAGLE_HR_WEBSITE_IMAGE, unoptimized: true }
+  }
   if (study.slug === 'r4-automotive') {
     return { src: '/images/photos/r4-auto-screen.png', unoptimized: false }
   }
@@ -84,18 +90,29 @@ export function getCaseStudyImageSrc(study: CaseStudy): { src: string; unoptimiz
   return { src: study.heroImage, unoptimized: false }
 }
 
+/**
+ * Detail-page hero backdrop. Stride's card uses the light marketing capture, but the
+ * hero needs the dark dashboard crop so the H1 stays legible over the gradient.
+ */
+export function getCaseStudyHeroSrc(study: CaseStudy): { src: string; unoptimized: boolean } {
+  if (study.slug === 'stride') {
+    return { src: study.heroImage, unoptimized: false }
+  }
+  return getCaseStudyImageSrc(study)
+}
+
 export const caseStudies: CaseStudy[] = [
   {
     slug: 'eagle-hr-consultants',
     client: 'Eagle HR Consultants',
     industry: 'Human Resources',
     industrySlug: 'hr',
-    location: 'Nairobi, Kenya',
+    location: '',
     engagementLength: '6 months ongoing',
     year: '2024 — ongoing',
-    heroImage: '/images/photos/eaglehrscreen.png',
-    heroImageAlt: 'Eagle HR Consultants platform dashboard on a laptop',
-    cardImage: '/images/case-studies/eagle-hr-preview.jpg',
+    heroImage: EAGLE_HR_WEBSITE_IMAGE,
+    heroImageAlt: 'Eagle HR Consultants public website homepage',
+    cardImage: EAGLE_HR_WEBSITE_IMAGE,
     services: ['Software Development', 'Web Development', 'Digital Transformation'],
     stack: ['Next.js 14', 'TypeScript', 'PostgreSQL', 'Tailwind CSS', 'Vercel', 'Resend'],
     tagline: 'A full business operating system — not just a website.',
@@ -135,8 +152,8 @@ export const caseStudies: CaseStudy[] = [
         heading: 'Platform modules, shipped as one system',
         body:
           'The platform we built for Eagle HR consists of six tightly integrated modules — all sharing one user directory, one audit log, one permissions model. Recruitment ATS handles job posting, applications, candidate screening, and interview scheduling. Finance & Payroll handles contracts, invoices, payroll calculations with KRA iTax and P9 formula compliance, and payment records. Outsourcing & Employees tracks placed staff, their reviews, and client satisfaction. Vendor Management handles supplier onboarding and invoice processing. The Client Portal gives clients a single login to view their outsourced staff, placement pipeline, and invoicing. The public website is the seventh piece — a marketing surface that captures leads directly into the ATS.',
-        image: '/images/eagle-dashboard.png',
-        imageAlt: 'Eagle HR platform dashboard showing integrated modules',
+        image: EAGLE_HR_WEBSITE_IMAGE,
+        imageAlt: 'Eagle HR Consultants public website homepage',
       },
       {
         heading: 'Why KRA compliance mattered',
@@ -153,6 +170,71 @@ export const caseStudies: CaseStudy[] = [
           attribution: 'Eagle HR Leadership',
           role: 'Consultancy Leadership Team',
         },
+      },
+    ],
+  },
+  {
+    slug: 'stride',
+    client: 'Stride',
+    industry: 'Raven product · Business management',
+    industrySlug: 'hr',
+    location: 'Nairobi, Kenya · East Africa',
+    engagementLength: 'Built and operated by Raven',
+    year: '2025 — ongoing',
+    heroImage: '/images/case-studies/stride-dashboard.jpg',
+    heroImageAlt: 'Stride business management platform — people, payroll, and finance dashboard',
+    cardImage: '/images/products/stride-preview.jpg',
+    services: ['Software Development', 'System Integration', 'Digital Transformation'],
+    stack: ['Next.js', 'TypeScript', 'PostgreSQL', 'M-Pesa Daraja API', 'Vercel'],
+    tagline: 'Our own product — the platform pattern we proved in client work, productised.',
+    problem:
+      'Every operating system we built for clients — Eagle HR, logistics operators, clinics — kept solving the same problems: employee records in spreadsheets, payroll in Excel with statutory rules approximated, finance disconnected from the people it pays. Global ERPs were designed elsewhere and adapted for Kenya, with M-Pesa added late and support queued in another timezone. The pattern deserved a product, not another one-off build.',
+    solution:
+      'Raven built Stride — a business management platform with people, time and leave, payroll, and finance on one data layer. Kenyan statutory compliance is built in, not bolted on: PAYE, NSSF, SHIF, and Housing Levy calculated correctly, with P9 and iTax-ready exports every pay run. M-Pesa disbursements run from the same finance module that carries the ledger. Vertical packs extend the core for logistics, SACCOs, healthcare, and HR consultancies.',
+    outcomeHeadline: 'Six core modules on one platform — compliance built in, onboarding in days.',
+    outcomeSummary:
+      'Stride is live at getstride.co.ke and running real payrolls. Businesses onboard in days with guided setup, run statutory-compliant pay cycles, and disburse via M-Pesa without leaving the platform. Multi-entity compliance covers Kenya and Uganda, and the vertical packs carry the patterns we proved in client engagements.',
+    metrics: [
+      { value: '6', label: 'Core modules on one platform' },
+      { value: 'Days', label: 'Typical guided onboarding' },
+      { value: 'KE+UG', label: 'Multi-entity compliance' },
+    ],
+    featured: false,
+    status: 'live',
+    siteUrl: 'https://getstride.co.ke',
+    publishedAt: '2026-06-01',
+    tags: ['Raven Product', 'Payroll & HR', 'M-Pesa Integration'],
+    platformModules: [
+      'People & workforce',
+      'Time & leave',
+      'Payroll (Kenya)',
+      'Finance & disbursements',
+      'Vertical industry packs',
+      'Multi-entity compliance',
+    ],
+    cta: 'Read the Stride story',
+    sections: [
+      {
+        heading: 'From client pattern to product',
+        body:
+          'The Eagle HR engagement proved the shape: one user directory, one audit log, payroll with KRA compliance, finance on the same records as the people it pays. When the third client needed the same core, the decision was clear — build it once, properly, and operate it as a product. Stride is that build.',
+        image: '/images/products/stride-preview.jpg',
+        imageAlt: 'Stride platform dashboard showing workforce and payroll modules',
+      },
+      {
+        heading: 'Compliance is the product, not a feature',
+        body:
+          'Kenyan payroll is not a template you localise. PAYE bands, NSSF tiers, SHIF, and the Housing Levy each carry their own rules and change on their own schedules. Stride calculates them natively and produces P9 and iTax-ready exports every pay run — so a KRA review is a download, not a scramble. Uganda support extends the same engine for multi-entity groups.',
+      },
+      {
+        heading: 'M-Pesa disbursements on the same ledger',
+        body:
+          'Salary disbursement is where most platforms hand you a bank file and wish you luck. Stride runs M-Pesa disbursements from the finance module directly — the same records that carry approvals and the ledger. Payments reconcile because they never leave the system.',
+      },
+      {
+        heading: 'What operating our own product changes',
+        body:
+          'Running Stride makes Raven a better consultancy. We carry pager duty for our own uptime, onboard real businesses in days, and feel every rough edge a client would. The vertical packs — logistics, SACCOs, healthcare, HR consultancies — encode what we learned shipping client systems, and client engagements now start from a proven core instead of a blank repo.',
       },
     ],
   },

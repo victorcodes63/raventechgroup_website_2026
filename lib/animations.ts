@@ -226,35 +226,39 @@ export const pageHeroButtonVariants = {
  */
 const heroAccordionEase: [number, number, number, number] = [0.16, 1, 0.32, 1]
 
-/** Container: staggers the rise-variant sub-elements (logos, accent line, footer band). */
+/**
+ * Container: staggers ALL panel content top→bottom.
+ * delayChildren waits for the accordion flex expansion (1.1s, decelerating ease)
+ * to be ~95% settled so copy never re-wraps visibly while the panel is still growing.
+ */
 export const heroAccordionStaggerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
-      delayChildren: 0.6,
-      staggerChildren: 0.1,
+      delayChildren: 0.8,
+      staggerChildren: 0.09,
     },
   },
 }
 
 /** Body copy + chrome inside the active panel (blur entrance). */
 export const heroAccordionRiseVariants: Variants = {
-  hidden: { opacity: 0, y: 10, filter: 'blur(3px)' },
+  hidden: { opacity: 0, y: 12, filter: 'blur(3px)' },
   visible: {
     opacity: 1,
     y: 0,
     filter: 'blur(0px)',
-    transition: { duration: 1.1, ease: heroAccordionEase },
+    transition: { duration: 0.85, ease: heroAccordionEase },
   },
 }
 
 /** Active panel H1 only — no filter blur so the headline stays sharp (no glow at rest). */
 export const heroAccordionTitleVariants: Variants = {
-  hidden: { opacity: 0, y: 10 },
+  hidden: { opacity: 0, y: 14 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 1.1, ease: heroAccordionEase },
+    transition: { duration: 0.9, ease: heroAccordionEase },
   },
 }
 

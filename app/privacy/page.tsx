@@ -88,11 +88,11 @@ export default function PrivacyPage() {
             <h2 className="text-2xl font-semibold text-white">Questions or requests?</h2>
             <p className="mt-4 text-sm text-white/65 sm:text-base">
               Reach our data protection lead at{' '}
-              <Link href="mailto:privacy@raventechgroup.com" className="text-brand-300 transition hover:text-brand-200">
+              <Link href="mailto:privacy@raventechgroup.com" className="text-brand-500 transition hover:text-brand-400">
                 privacy@raventechgroup.com
               </Link>{' '}
               or{' '}
-              <Link href="/contact" className="text-brand-300 transition hover:text-brand-200">
+              <Link href="/contact" className="text-brand-500 transition hover:text-brand-400">
                 contact us
               </Link>{' '}
               directly. We respond within one business day.

@@ -11,6 +11,7 @@ import {
   type MotionValue,
 } from 'framer-motion'
 import { SubtleParallaxBackground } from '@/components/motion/SubtleParallaxBackground'
+import { LetterFillReveal } from '@/components/motion/LetterFillReveal'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
@@ -237,6 +238,30 @@ const stagger = heroAccordionStaggerVariants
 const rise = heroAccordionRiseVariants
 const titleRise = heroAccordionTitleVariants
 
+/** Amber category chip — mobile/tablet context (collapsed strips carry it on desktop). */
+function HeroCategoryChip({ category }: { category: string }) {
+  return (
+    <span className="inline-flex items-center rounded-full border border-brand-500/25 bg-brand-500/[0.08] px-3 py-1 text-[9px] font-bold uppercase tracking-[0.26em] text-brand-500">
+      {category}
+    </span>
+  )
+}
+
+/** Hero headline — LetterFillReveal entrance on the overview panel only (H1 treatment per rules). */
+function HeroHeadline({ panel, isOverview }: { panel: HeroPanel; isOverview: boolean }) {
+  if (!isOverview) return <>{panel.headline}</>
+  return (
+    <LetterFillReveal
+      as="span"
+      mode="entrance"
+      text={panel.headline}
+      entranceDuration={1.5}
+      entranceDelay={0.9}
+      dimColor="rgba(255,255,255,0.16)"
+    />
+  )
+}
+
 /** Secondary CTA: stays in the text column — no overlap with copy (replaces floating card). */
 function HeroConsultationRow({ staticEntrance = false }: { staticEntrance?: boolean }) {
   const inner = (
@@ -299,7 +324,7 @@ function HeroSocialBand({ panel, layout }: { panel: HeroPanel; layout: 'desktop'
 
   const accentInner = (
     <>
-      <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-400">At a glance</p>
+      <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-500">At a glance</p>
       <p className={`${HERO_ACCORDION_COPY_MEASURE} text-[12px] leading-relaxed text-white/55 sm:text-[13px]`}>
         {panel.accentLine}
       </p>
@@ -510,7 +535,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                 <motion.div
                   key={panel.id}
                   animate={{ flex: isActive ? accordionFlex.active : accordionFlex.idle }}
-                  transition={reduced ? { duration: 0 } : { duration: 1.38, ease: [0.25, 0.08, 0.25, 1] }}
+                  transition={reduced ? { duration: 0 } : { duration: 1.1, ease: [0.22, 1, 0.36, 1] }}
                   onClick={() => !isActive && setActive(i)}
                   className={`relative h-full min-h-0 overflow-hidden rounded-card border border-white/[0.07] ${
                     isActive
@@ -566,7 +591,15 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                     </span>
                   </motion.div>
 
-                  {/* ── Expanded: text anchored to bottom ────────── */}
+                  {/* ── Active panel: amber edge indicator ───────── */}
+                  <motion.div
+                    aria-hidden
+                    className="pointer-events-none absolute inset-y-0 left-0 z-30 w-0.5 bg-brand-500"
+                    animate={{ opacity: isActive ? 1 : 0 }}
+                    transition={reduced ? { duration: 0 } : { duration: 0.6, delay: isActive ? 0.5 : 0 }}
+                  />
+
+                  {/* ── Expanded: copy column + full-width footer band ── */}
                   <AnimatePresence>
                     {isActive && (
                       <motion.div
@@ -575,45 +608,60 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                         initial="hidden"
                         animate="visible"
                         exit={{ opacity: 0, transition: reduced ? { duration: 0 } : { duration: 0.08 } }}
-                        className="relative z-10 flex h-full min-h-0 flex-col justify-end overflow-x-hidden overflow-y-auto p-6 pt-8 lg:p-8 lg:pt-10 min-[1920px]:p-10 min-[1920px]:pt-12 [scrollbar-width:thin]"
+                        className="relative z-10 flex h-full min-h-0 flex-col"
                       >
-                        <motion.h1
-                          variants={titleRise}
-                          className={`w-full ${HERO_ACCORDION_COPY_MEASURE} text-[clamp(1.9rem,3vw,3.4rem)] font-bold leading-[1.08] tracking-[-0.03em] text-white antialiased min-[1600px]:text-[clamp(2rem,2.75vw,3.65rem)] min-[1920px]:text-[clamp(2.05rem,2.45vw,3.95rem)] [text-shadow:none]`}
-                        >
-                          {panel.headline}
-                        </motion.h1>
+                        {/* Copy column — anchored to bottom, scrolls if short viewports */}
+                        <div className="flex min-h-0 flex-1 flex-col justify-end overflow-x-hidden overflow-y-auto p-6 pt-8 pb-5 lg:p-8 lg:pt-10 lg:pb-6 min-[1920px]:p-10 min-[1920px]:pt-12 min-[1920px]:pb-7 [scrollbar-width:thin]">
+                          {i === 0 ? (
+                            <motion.h1
+                              variants={titleRise}
+                              className={`w-full ${HERO_ACCORDION_COPY_MEASURE} text-[clamp(1.9rem,3vw,3.4rem)] font-bold leading-[1.08] tracking-[-0.03em] text-white antialiased min-[1600px]:text-[clamp(2rem,2.75vw,3.65rem)] min-[1920px]:text-[clamp(2.05rem,2.45vw,3.95rem)] [text-shadow:none]`}
+                            >
+                              <HeroHeadline panel={panel} isOverview />
+                            </motion.h1>
+                          ) : (
+                            <motion.h2
+                              variants={titleRise}
+                              className={`w-full ${HERO_ACCORDION_COPY_MEASURE} text-[clamp(1.9rem,3vw,3.4rem)] font-bold leading-[1.08] tracking-[-0.03em] text-white antialiased min-[1600px]:text-[clamp(2rem,2.75vw,3.65rem)] min-[1920px]:text-[clamp(2.05rem,2.45vw,3.95rem)] [text-shadow:none]`}
+                            >
+                              {panel.headline}
+                            </motion.h2>
+                          )}
 
-                        <p
-                          className={`mt-5 w-full ${HERO_ACCORDION_COPY_MEASURE} text-[13px] leading-[1.75] text-white/60 sm:text-sm min-[1920px]:text-[0.9375rem] xl:mt-6`}
-                        >
-                          {panel.description}
-                        </p>
-
-                        <div className={`mt-5 w-full ${HERO_ACCORDION_COPY_MEASURE} xl:mt-6`}>
-                          <CTAButton
-                            href={panel.cta.href}
-                            variant={i === 0 ? 'primary' : 'outline'}
-                            className="px-5 py-2.5 text-sm shadow-none"
+                          <motion.p
+                            variants={rise}
+                            className={`mt-5 w-full ${HERO_ACCORDION_COPY_MEASURE} text-[13px] leading-[1.75] text-white/60 sm:text-sm min-[1920px]:text-[0.9375rem] xl:mt-6`}
                           >
-                            {panel.cta.label}
-                          </CTAButton>
+                            {panel.description}
+                          </motion.p>
+
+                          <motion.div variants={rise} className={`mt-5 w-full ${HERO_ACCORDION_COPY_MEASURE} xl:mt-6`}>
+                            <CTAButton
+                              href={panel.cta.href}
+                              variant={i === 0 ? 'primary' : 'outline'}
+                              className="px-5 py-2.5 text-sm shadow-none"
+                            >
+                              {panel.cta.label}
+                            </CTAButton>
+                          </motion.div>
+
+                          <div className={`w-full ${HERO_ACCORDION_COPY_MEASURE}`}>
+                            <HeroConsultationRow />
+                          </div>
+
+                          <div className={`w-full ${HERO_ACCORDION_COPY_MEASURE}`}>
+                            <HeroSocialBand panel={panel} layout="desktop" />
+                          </div>
                         </div>
 
-                        <div className={`w-full ${HERO_ACCORDION_COPY_MEASURE}`}>
-                          <HeroConsultationRow />
-                        </div>
-
-                        <div className={`w-full ${HERO_ACCORDION_COPY_MEASURE}`}>
-                          <HeroSocialBand panel={panel} layout="desktop" />
-                        </div>
-
-                        {/* Footer: tags + arrows + progress */}
-                        <div className={`mt-8 w-full ${HERO_ACCORDION_COPY_MEASURE} space-y-5 xl:mt-10`}>
-                          <div className="h-px w-16 bg-white/[0.12]" />
+                        {/* Footer band — full panel width; carousel chrome lives here, not in copy */}
+                        <motion.div
+                          variants={rise}
+                          className="shrink-0 border-t border-white/[0.08] px-6 py-4 lg:px-8 lg:py-5 min-[1920px]:px-10"
+                        >
                           <div className="flex items-end justify-between gap-6">
                             <div className="min-w-0">
-                              <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-400">
+                              <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-500">
                                 What we do
                               </p>
                               <div className="flex flex-wrap gap-x-5 gap-y-1.5">
@@ -647,13 +695,13 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                           </div>
 
                           {/* Progress bar */}
-                          <div className="flex gap-1">
+                          <div className="mt-4 flex gap-1">
                             {panels.map((p, idx) => (
                               <button
                                 type="button"
                                 key={p.id}
                                 onClick={(e) => { e.stopPropagation(); setActive(idx) }}
-                                className="hero-progress-track relative flex flex-1 items-center border-0 bg-transparent p-0 max-sm:min-h-[44px]"
+                                className="hero-progress-track relative flex flex-1 items-center border-0 bg-transparent p-0"
                                 aria-label={`Go to ${p.category}`}
                               >
                                 <span className="relative h-0.5 w-full overflow-hidden rounded-full bg-white/20">
@@ -673,7 +721,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                               </button>
                             ))}
                           </div>
-                        </div>
+                        </motion.div>
                       </motion.div>
                     )}
                   </AnimatePresence>
@@ -683,9 +731,129 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
           </div>
         </motion.div>
 
-        {/* ════════ Mobile carousel ════════════════════════════ */}
+        {/* ════════ Tablet (md–lg): pill tabs + single expanded card ════════ */}
         <motion.div
-          className="flex min-h-0 w-full min-w-0 flex-1 flex-col lg:hidden"
+          className="hidden min-h-0 w-full min-w-0 flex-1 flex-col md:flex lg:hidden"
+          initial={reduced ? false : { opacity: 0, y: 28 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={reduced ? { duration: 0 } : { duration: 1.05, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+          onMouseEnter={() => setPaused(true)}
+          onMouseLeave={() => setPaused(false)}
+        >
+          <div className="mb-4 flex flex-wrap gap-2" role="tablist" aria-label="Hero highlights">
+            {panels.map((p, idx) => (
+              <button
+                type="button"
+                key={p.id}
+                role="tab"
+                aria-selected={idx === active}
+                onClick={() => setActive(idx)}
+                className={`rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.18em] transition-all duration-300 ${
+                  idx === active
+                    ? 'border-brand-500/60 bg-brand-500/[0.12] text-brand-500'
+                    : 'border-white/[0.12] bg-white/[0.03] text-white/45 hover:border-white/25 hover:text-white/75'
+                }`}
+              >
+                {p.category}
+              </button>
+            ))}
+          </div>
+
+          <div className="relative min-h-0 flex-1">
+            <AnimatePresence mode="wait">
+              {panels.map((panel, i) =>
+                i === active ? (
+                  <motion.article
+                    key={panel.id}
+                    initial={reduced ? false : { opacity: 0, y: 14 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={reduced ? undefined : { opacity: 0, transition: { duration: 0.15 } }}
+                    transition={reduced ? { duration: 0 } : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                    className="relative isolate flex h-full min-h-0 flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-8 pb-6"
+                  >
+                    <div className="pointer-events-none absolute inset-0 -z-10">
+                      <PanelBackdrop g={panel.geometry} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                    </div>
+                    <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-0.5 bg-brand-500" />
+
+                    <div className="relative max-w-xl space-y-4">
+                      {i === 0 ? (
+                        <h1 className="whitespace-pre-line text-[clamp(2.1rem,4.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white antialiased [text-shadow:none]">
+                          <HeroHeadline panel={panel} isOverview />
+                        </h1>
+                      ) : (
+                        <h2 className="whitespace-pre-line text-[clamp(2.1rem,4.6vw,3rem)] font-bold leading-[1.05] tracking-[-0.03em] text-white antialiased [text-shadow:none]">
+                          {panel.headline}
+                        </h2>
+                      )}
+                      <p className="max-w-md text-sm leading-[1.75] text-white/60">{panel.description}</p>
+                      <div>
+                        <CTAButton
+                          href={panel.cta.href}
+                          variant={i === 0 ? 'primary' : 'outline'}
+                          className="px-5 py-2.5 text-sm shadow-none"
+                        >
+                          {panel.cta.label}
+                        </CTAButton>
+                      </div>
+                      <HeroConsultationRow staticEntrance />
+                      <div className="min-w-0">
+                        <HeroSocialBand panel={panel} layout="mobile" />
+                      </div>
+                    </div>
+
+                    <div className="relative mt-6 border-t border-white/[0.08] pt-4">
+                      <p className="mb-2 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-500">
+                        What we do
+                      </p>
+                      <div className="flex min-w-0 flex-wrap gap-x-5 gap-y-1.5">
+                        {panel.tags.map((tag) => (
+                          <Link
+                            key={tag.label}
+                            href={tag.href}
+                            className="text-[12px] font-medium text-white/45 transition-colors hover:text-white"
+                          >
+                            {tag.label}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  </motion.article>
+                ) : null,
+              )}
+            </AnimatePresence>
+          </div>
+
+          <div className="mt-4 flex w-full gap-1">
+            {panels.map((p, idx) => (
+              <button
+                type="button"
+                key={p.id}
+                onClick={() => setActive(idx)}
+                className="hero-progress-track relative flex flex-1 items-center border-0 bg-transparent p-0"
+                aria-label={`Go to ${p.category}`}
+              >
+                <span className="relative h-0.5 w-full overflow-hidden rounded-full bg-white/20">
+                  {idx === active && (
+                    <motion.div
+                      className="absolute inset-y-0 left-0 rounded-full bg-brand-500"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: paused ? 99999 : AUTOPLAY_MS / 1000, ease: 'linear' }}
+                      key={`tprog-${active}-${paused}`}
+                    />
+                  )}
+                  {idx < active && <div className="absolute inset-0 rounded-full bg-white/50" />}
+                </span>
+              </button>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* ════════ Mobile carousel (below md) ════════════════════ */}
+        <motion.div
+          className="flex min-h-0 w-full min-w-0 flex-1 flex-col md:hidden"
           initial={reduced ? false : { opacity: 0, y: 28 }}
           animate={{ opacity: 1, y: 0 }}
           transition={reduced ? { duration: 0 } : { duration: 1.05, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
@@ -699,50 +867,68 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
             onTouchStart={() => setPaused(true)}
             onTouchEnd={() => setPaused(false)}
           >
-            {panels.map((panel, i) => (
-              <article
-                key={panel.id}
-                ref={(el) => {
-                  mobileSlideRefs.current[i] = el
-                }}
-                aria-label={`${i + 1} of ${panels.length}: ${panel.category}`}
-                className="relative isolate flex min-h-[calc(100svh_-_140px)] w-[min(32rem,calc(100vw-2.75rem))] shrink-0 snap-start snap-always flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-5 pb-8 sm:p-8 sm:pb-10"
-              >
-                <div className="pointer-events-none absolute inset-0 -z-10">
-                  <PanelBackdrop g={panel.geometry} />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
-                </div>
-                <div className="relative space-y-4">
-                  <h1 className="whitespace-pre-line text-[clamp(1.85rem,8vw,2.85rem)] font-bold leading-[1.0] tracking-[-0.03em] text-white antialiased [text-shadow:none]">
-                    {panel.headline}
-                  </h1>
-                  <p className="max-w-sm text-[13px] leading-relaxed text-white/60">{panel.description}</p>
-                  <div>
-                    <CTAButton
-                      href={panel.cta.href}
-                      variant={i === 0 ? 'primary' : 'outline'}
-                      className="px-5 py-2.5 text-sm shadow-none"
-                    >
-                      {panel.cta.label}
-                    </CTAButton>
+            {panels.map((panel, i) => {
+              const headlineClass =
+                'whitespace-pre-line text-[clamp(1.85rem,8vw,2.85rem)] font-bold leading-[1.0] tracking-[-0.03em] text-white antialiased [text-shadow:none]'
+              return (
+                <article
+                  key={panel.id}
+                  ref={(el) => {
+                    mobileSlideRefs.current[i] = el
+                  }}
+                  aria-label={`${i + 1} of ${panels.length}: ${panel.category}`}
+                  className="relative isolate flex min-h-[calc(100svh_-_140px)] w-[min(32rem,calc(100vw-2.75rem))] shrink-0 snap-start snap-always flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-5 pb-8 sm:p-8 sm:pb-10"
+                >
+                  <div className="pointer-events-none absolute inset-0 -z-10">
+                    <PanelBackdrop g={panel.geometry} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
                   </div>
-                  <HeroConsultationRow staticEntrance />
-                  <div className="min-w-0">
-                    <HeroSocialBand panel={panel} layout="mobile" />
+                  <div className="relative space-y-4">
+                    <div>
+                      <HeroCategoryChip category={panel.category} />
+                    </div>
+                    {i === 0 ? (
+                      <h1 className={headlineClass}>
+                        <HeroHeadline panel={panel} isOverview />
+                      </h1>
+                    ) : (
+                      <h2 className={headlineClass}>{panel.headline}</h2>
+                    )}
+                    <p className="max-w-sm text-[13px] leading-relaxed text-white/60">{panel.description}</p>
+                    <div>
+                      <CTAButton
+                        href={panel.cta.href}
+                        variant={i === 0 ? 'primary' : 'outline'}
+                        className="px-5 py-2.5 text-sm shadow-none"
+                      >
+                        {panel.cta.label}
+                      </CTAButton>
+                    </div>
+                    <HeroConsultationRow staticEntrance />
+                    <div className="min-w-0">
+                      <HeroSocialBand panel={panel} layout="mobile" />
+                    </div>
                   </div>
-                </div>
-                <div className="relative mt-6 flex min-w-0 flex-wrap gap-x-3.5 gap-y-1">
-                  {panel.tags.slice(0, 3).map((tag) => (
-                    <span key={tag.label} className="text-[11px] font-medium text-white/45">
-                      {tag.label}
-                    </span>
-                  ))}
-                </div>
-              </article>
-            ))}
+                  <div className="relative mt-6 flex min-w-0 flex-wrap gap-x-4 gap-y-1.5">
+                    {panel.tags.map((tag) => (
+                      <Link
+                        key={tag.label}
+                        href={tag.href}
+                        className="text-[11px] font-medium text-white/45 transition-colors hover:text-white"
+                      >
+                        {tag.label}
+                      </Link>
+                    ))}
+                  </div>
+                </article>
+              )
+            })}
           </div>
 
           <div className="mt-4 w-full px-5">
+            <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.2em] text-white/30">
+              Swipe to explore
+            </p>
             <div className="flex gap-1" role="tablist" aria-label="Slides">
               {panels.map((p, idx) => (
                 <button

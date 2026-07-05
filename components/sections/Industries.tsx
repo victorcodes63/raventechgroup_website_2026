@@ -87,7 +87,7 @@ export function Industries() {
                 transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1], delay: i * 0.055 }}
                 className="group h-full rounded-card border border-white/[0.06] bg-[#111111] p-5 transition duration-300 hover:border-brand-500/25 hover:bg-[#161616]"
               >
-                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-card bg-white/[0.05] text-brand-400 transition group-hover:bg-brand-500/20 group-hover:text-brand-300">
+                <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-card bg-white/[0.05] text-brand-500 transition group-hover:bg-brand-500/20 group-hover:text-brand-500">
                   <Icon size={18} />
                 </span>
                 <h3 className="text-[13px] font-bold leading-snug text-white sm:text-sm">{name}</h3>
@@ -107,7 +107,7 @@ export function Industries() {
               transition={{ duration: 0.48, ease: [0.22, 1, 0.36, 1], delay: i * 0.055 }}
               className="group rounded-card border border-white/[0.06] bg-[#111111] p-5 transition duration-300 hover:border-brand-500/25 hover:bg-[#161616]"
             >
-              <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-card bg-white/[0.05] text-brand-400 transition group-hover:bg-brand-500/20 group-hover:text-brand-300">
+              <span className="mb-4 inline-flex h-10 w-10 items-center justify-center rounded-card bg-white/[0.05] text-brand-500 transition group-hover:bg-brand-500/20 group-hover:text-brand-500">
                 <Icon size={18} />
               </span>
               <h3 className="text-[13px] font-bold leading-snug text-white sm:text-sm">{name}</h3>

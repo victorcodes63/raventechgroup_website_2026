@@ -1,19 +1,12 @@
 import type { ServiceDetail } from '@/app/services/[slug]/service-page-types'
 
+import { EAGLE_HR_SERVICE_TESTIMONIALS } from '@/lib/data/clientTestimonials'
 import { SERVICE_PAGE_RELATED_INSIGHTS } from '@/lib/data/servicePageInsights'
 
 export { SERVICE_PAGE_RELATED_INSIGHTS }
 
-export const SOFTWARE_DEVELOPMENT_CUSTOMER_FEEDBACK: NonNullable<ServiceDetail['customerFeedback']> = [
-  {
-    quote:
-      'Raven did not just build us a website. They built the system our business runs on. Recruitment, payroll, interviews, vendor management — all in one dashboard our team uses every day.',
-    author: 'Eagle HR Leadership Team',
-    role: 'Leadership',
-    company: 'Eagle HR Consultants',
-    projectContext: 'Full business operating system build (ATS + Finance + HRMS)',
-  },
-]
+export const SOFTWARE_DEVELOPMENT_CUSTOMER_FEEDBACK: NonNullable<ServiceDetail['customerFeedback']> =
+  EAGLE_HR_SERVICE_TESTIMONIALS
 
 export const SERVICE_NUMBERED_BENEFITS: Record<string, NonNullable<ServiceDetail['numberedBenefits']>> = {
   'software-development': [

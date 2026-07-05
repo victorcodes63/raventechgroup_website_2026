@@ -1,8 +1,10 @@
 'use client'
 
-import { useMemo, type RefObject } from 'react'
+import { useEffect, useMemo, type RefObject } from 'react'
 import {
+  animate,
   motion,
+  useMotionValue,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -14,7 +16,15 @@ type LetterFillRevealProps = {
   text: string
   className?: string
   as?: 'h2' | 'h3' | 'p' | 'span'
-  scrollTrackRef: RefObject<HTMLElement | null>
+  /**
+   * 'scroll' (default): fill driven by scrollTrackRef progress.
+   * 'entrance': fill plays once on mount — for hero H1s visible at scroll 0.
+   */
+  mode?: 'scroll' | 'entrance'
+  /** Entrance mode only */
+  entranceDuration?: number
+  entranceDelay?: number
+  scrollTrackRef?: RefObject<HTMLElement | null>
   scrollOffset?: UseScrollOptions['offset']
   /** Maps a slice of the track’s scroll progress to this line’s reveal */
   progressRange?: readonly [number, number]
@@ -86,6 +96,9 @@ export function LetterFillReveal({
   text,
   className,
   as = 'span',
+  mode = 'scroll',
+  entranceDuration = 1.4,
+  entranceDelay = 0.15,
   scrollTrackRef,
   scrollOffset = ['start end', 'end start'],
   progressRange = [0, 1] as const,
@@ -105,8 +118,20 @@ export function LetterFillReveal({
     offset: scrollOffset,
   })
 
+  const entranceProgress = useMotionValue(0)
+  useEffect(() => {
+    if (mode !== 'entrance' || reduced) return
+    const controls = animate(entranceProgress, 1, {
+      duration: entranceDuration,
+      delay: entranceDelay,
+      ease: [0.22, 1, 0.36, 1],
+    })
+    return () => controls.stop()
+  }, [mode, reduced, entranceProgress, entranceDuration, entranceDelay])
+
   const [spanStart, spanEnd] = progressRange
-  const driveProgress = useTransform(scrollYProgress, (v) => {
+  const sourceProgress = mode === 'entrance' ? entranceProgress : scrollYProgress
+  const driveProgress = useTransform(sourceProgress, (v) => {
     const d = Math.max(spanEnd - spanStart, 0.0001)
     return Math.min(1, Math.max(0, (v - spanStart) / d))
   })

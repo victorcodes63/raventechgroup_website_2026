@@ -123,12 +123,16 @@ function CaseStudyBody({
   return (
     <div className={`flex min-w-0 flex-1 flex-col p-6 lg:p-8 ${isFeatured ? 'lg:py-7' : ''}`}>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">
-          {study.location}
-        </span>
-        <span className="select-none text-white/30" aria-hidden>
-          ·
-        </span>
+        {study.location ? (
+          <>
+            <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">
+              {study.location}
+            </span>
+            <span className="select-none text-white/30" aria-hidden>
+              ·
+            </span>
+          </>
+        ) : null}
         <span className="text-xs font-semibold uppercase tracking-[0.15em] text-white/50">
           {study.industry}
         </span>
@@ -328,8 +332,7 @@ export function CaseStudiesPreview() {
               Real projects. Delivered.
             </h2>
             <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white/60">
-              Projects shipped for teams in Nairobi and across Kenya, with measurable outcomes
-              and delivery discipline you can verify.
+              Projects shipped with measurable outcomes and delivery discipline you can verify.
             </p>
             <div className="mt-6 inline-flex items-center gap-2 rounded-card border border-white/[0.06] bg-[#111111] px-3 py-1.5 text-xs font-semibold text-white/70">
               <span className="h-1.5 w-1.5 rounded-full bg-[#FFA91F]" aria-hidden />

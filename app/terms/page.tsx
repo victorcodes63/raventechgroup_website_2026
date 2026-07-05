@@ -84,7 +84,7 @@ export default function TermsPage() {
             <h2 className="text-2xl font-semibold text-white">Questions about our terms?</h2>
             <p className="mt-4 text-sm text-white/65 sm:text-base">
               Email{' '}
-              <a href="mailto:legal@raventechgroup.com" className="text-brand-300 transition hover:text-brand-200">
+              <a href="mailto:legal@raventechgroup.com" className="text-brand-500 transition hover:text-brand-400">
                 legal@raventechgroup.com
               </a>{' '}
               and our legal team will respond within one business day.

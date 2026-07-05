@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useCallback, useRef, type RefObject } from 'react'
+import { useState, useCallback, useRef, useEffect, type RefObject } from 'react'
 import Image from 'next/image'
 import { motion, AnimatePresence, useReducedMotion, useSpring, useTransform } from 'framer-motion'
 import { Plus, Minus } from 'lucide-react'
@@ -29,12 +29,22 @@ const services = ACCORDION_SLUGS
 export function Services() {
   const reduced = useReducedMotion()
   const sectionRef = useRef<HTMLElement | null>(null)
+  const [isLgUp, setIsLgUp] = useState(false)
   const { scrollYProgress, isReduced } = useSectionScrollProgress(sectionRef as RefObject<HTMLElement | null>)
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)')
+    const update = () => setIsLgUp(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   const panelSnapYRaw = useTransform(scrollYProgress, [0.12, 0.3], isReduced ? [0, 0] : [76, 0], { clamp: true })
   const panelSnapScaleRaw = useTransform(scrollYProgress, [0.12, 0.3], isReduced ? [1, 1] : [0.965, 1], { clamp: true })
   const panelSnapY = useSpring(panelSnapYRaw, { stiffness: 330, damping: 24, mass: 0.76 })
   const panelSnapScale = useSpring(panelSnapScaleRaw, { stiffness: 330, damping: 24, mass: 0.76 })
+  const panelMotionStyle = isLgUp ? { y: panelSnapY, scale: panelSnapScale } : undefined
 
   const contentOpacity = useTransform(scrollYProgress, [0.32, 0.5], isReduced ? [1, 1] : [0, 1], { clamp: true })
   const contentYRaw = useTransform(scrollYProgress, [0.32, 0.5], isReduced ? [0, 0] : [20, 0], { clamp: true })
@@ -65,9 +75,12 @@ export function Services() {
     <section
       ref={sectionRef}
       id="services"
-      className="bg-[#0A0A0A] py-24 lg:flex lg:min-h-svh lg:items-center lg:py-0"
+      className="min-w-0 overflow-x-clip bg-[#0A0A0A] py-16 sm:py-20 lg:flex lg:min-h-svh lg:items-center lg:py-0"
     >
-      <motion.div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12 lg:py-16" style={{ y: panelSnapY, scale: panelSnapScale }}>
+      <motion.div
+        className="mx-auto w-full min-w-0 max-w-7xl px-5 md:px-8 lg:px-12 lg:py-16"
+        style={panelMotionStyle}
+      >
 
         {/* ── Section header ──────────────────────────────────────────── */}
         <div className="mb-16 lg:mb-20">
@@ -223,7 +236,7 @@ export function Services() {
         </motion.div>
 
         {/* ── Mobile: horizontal swipe cards ─────────────────────────── */}
-        <MobileSwipeRail hint="Swipe services" className="-mt-2 lg:hidden" aria-label="Services">
+        <MobileSwipeRail hint="Swipe services" className="-mt-2 min-w-0 lg:hidden" aria-label="Services">
           {services.map((service) => {
             const Icon = service.Icon
             const hasThumb = Boolean(service.imagePath) && !imgErrors.has(service.slug)

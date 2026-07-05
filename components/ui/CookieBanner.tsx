@@ -49,7 +49,7 @@ export function CookieBanner() {
               <div className="flex-1 sm:pr-8">
                 <p className="text-sm text-white/80 leading-relaxed">
                   We use cookies to enhance your experience and analyze site usage.{' '}
-                  <Link href="/cookies" className="text-brand-400 hover:text-brand-300 underline underline-offset-2 transition-colors">
+                  <Link href="/cookies" className="text-brand-500 hover:text-brand-400 underline underline-offset-2 transition-colors">
                     Learn more
                   </Link>
                 </p>

@@ -67,7 +67,7 @@ export function TrustedByLogoMarquee({
     <>
       <p
         className={twMerge(
-          'mb-3 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-400',
+          'mb-3 text-[9px] font-bold uppercase tracking-[0.3em] text-brand-500',
           eyebrowAlign === 'center' && 'text-center',
         )}
       >

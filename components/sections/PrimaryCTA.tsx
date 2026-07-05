@@ -16,7 +16,7 @@ export function PrimaryCTA() {
           transition={{ duration: reduced ? 0 : 0.6, ease: [0.22, 1, 0.36, 1] }}
           className="relative overflow-hidden rounded-card border border-white/[0.06] bg-[#111111] p-10 text-center sm:p-16"
         >
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,169,30,0.08),_transparent_65%)]" />
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top,_rgba(255,169,31,0.08),_transparent_65%)]" />
           <div className="relative mx-auto flex max-w-3xl flex-col items-center gap-5 text-center">
             <p className="text-[11px] font-bold uppercase tracking-[0.28em] text-brand-500">Let&apos;s build together</p>
             <h2 className="text-2xl font-bold leading-[1.1] tracking-tight text-white sm:text-3xl md:text-4xl">

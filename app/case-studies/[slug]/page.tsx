@@ -7,7 +7,7 @@ import { CaseStudyStickyMetricsBar } from '@/components/case-studies/CaseStudySt
 import { RelatedContent } from '@/components/shared/RelatedContent'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
 import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
-import { caseStudies, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
+import { caseStudies, getCaseStudyHeroSrc, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
 import type { CaseStudy } from '@/lib/data/caseStudies'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.raventechgroup.com'
@@ -90,7 +90,7 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
   const study = caseStudies.find((item) => item.slug === slug)
   if (!study) notFound()
 
-  const { src, unoptimized } = getCaseStudyImageSrc(study)
+  const { src, unoptimized } = getCaseStudyHeroSrc(study)
   const canonical = `${siteUrl}/case-studies/${study.slug}`
   const related = relatedFor(study.slug)
   const relatedCards = related.map((r) => ({
@@ -127,14 +127,14 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
             />
           ) : null}
         </div>
-        <div className="relative mx-auto flex min-h-[52vh] max-w-7xl flex-col justify-end px-5 pb-12 pt-28 md:px-8 md:pb-20 md:pt-40 lg:px-12">
+        <div className="relative z-[2] mx-auto flex min-h-[52vh] max-w-7xl flex-col justify-end px-5 pb-12 pt-28 md:px-8 md:pb-20 md:pt-40 lg:px-12">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFA91F]">
             Case study · {study.industry}
           </p>
           <h1 className="mt-4 max-w-4xl text-[2.35rem] font-bold leading-[1.04] tracking-[-0.03em] md:text-5xl lg:text-6xl">{study.client}</h1>
           <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/80 md:text-xl">{study.tagline}</p>
           <p className="mt-5 text-sm leading-relaxed text-white/55">
-            {study.location} <span aria-hidden>·</span> {study.engagementLength} <span aria-hidden>·</span> {study.year}
+            {[study.location, study.engagementLength, study.year].filter(Boolean).join(' · ')}
           </p>
         </div>
       </section>

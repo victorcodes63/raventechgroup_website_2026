@@ -4,7 +4,7 @@ import { ArrowUpRight } from 'lucide-react'
 import { twMerge } from 'tailwind-merge'
 
 /** Parent must set matching `group/${name}`, e.g. `group/card` on the card `Link`. */
-export type ArrowSwapGroupName = 'card' | 'consult' | 'img' | 'feat' | 'case' | 'footer'
+export type ArrowSwapGroupName = 'card' | 'consult' | 'img' | 'feat' | 'case' | 'footer' | 'stride'
 
 const orderLabel: Record<ArrowSwapGroupName, string> = {
   card: 'order-1 group-hover/card:order-2',
@@ -13,6 +13,7 @@ const orderLabel: Record<ArrowSwapGroupName, string> = {
   feat: 'order-1 group-hover/feat:order-2',
   case: 'order-1 group-hover/case:order-2',
   footer: 'order-1 group-hover/footer:order-2',
+  stride: 'order-1 group-hover/stride:order-2',
 }
 
 const orderIcon: Record<ArrowSwapGroupName, string> = {
@@ -22,6 +23,7 @@ const orderIcon: Record<ArrowSwapGroupName, string> = {
   feat: 'order-2 group-hover/feat:order-1',
   case: 'order-2 group-hover/case:order-1',
   footer: 'order-2 group-hover/footer:order-1',
+  stride: 'order-2 group-hover/stride:order-1',
 }
 
 type ArrowSwapRowProps = {

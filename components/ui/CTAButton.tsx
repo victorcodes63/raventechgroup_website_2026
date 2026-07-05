@@ -19,7 +19,7 @@ const base =
 
 const variants: Record<Variant, string> = {
   primary:
-    'bg-brand-500 text-black hover:bg-brand-400 px-6 py-2.5 text-sm shadow-[0_16px_40px_-18px_rgba(255,169,30,0.55)]',
+    'bg-brand-500 text-black hover:bg-brand-400 px-6 py-2.5 text-sm shadow-[0_16px_40px_-18px_rgba(255,169,31,0.55)]',
   outline:
     'border border-brand-500 bg-transparent text-brand-500 hover:bg-brand-500 hover:border-brand-500 hover:text-[#0A0A0A] disabled:hover:bg-transparent disabled:hover:text-brand-500 disabled:hover:border-brand-500 px-6 py-2.5 text-sm',
   'outline-dark':

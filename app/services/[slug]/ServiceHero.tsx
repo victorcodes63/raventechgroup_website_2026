@@ -98,12 +98,12 @@ export function ServiceHero({
         </svg>
       </div>
 
-      <div className="relative z-10 flex min-h-[min(88vh,52rem)] flex-col justify-center pt-[88px] lg:min-h-[min(92vh,56rem)] lg:pt-[72px]">
-        <div className="site-shell pb-16 pt-8 lg:pb-24 lg:pt-12">
-          <div className="content-wrap">
-            <div className="grid items-end gap-12 lg:grid-cols-12 lg:gap-10 xl:gap-14">
+      <div className="relative z-10 flex min-h-[min(88vh,52rem)] min-w-0 flex-col justify-center pt-[88px] lg:min-h-[min(92vh,56rem)] lg:pt-[72px]">
+        <div className="site-shell min-w-0 pb-12 pt-6 sm:pb-16 sm:pt-8 lg:pb-24 lg:pt-12">
+          <div className="content-wrap min-w-0">
+            <div className="grid min-w-0 items-end gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-10 xl:gap-14">
               {/* Left: category, title, lead, single CTA — ELEKS-style alignment */}
-              <div className="lg:col-span-7 xl:col-span-6">
+              <div className="min-w-0 lg:col-span-7 xl:col-span-6">
                 <motion.div
                   initial={reducedMotion ? false : { opacity: 0, y: 14 }}
                   animate={instant ?? { opacity: 1, y: 0 }}
@@ -166,7 +166,7 @@ export function ServiceHero({
                 initial={reducedMotion ? false : { opacity: 0, y: 16 }}
                 animate={instant ?? { opacity: 1, y: 0 }}
                 transition={{ duration: 0.55, delay: reducedMotion ? 0 : 0.28, ease }}
-                className="flex flex-col gap-5 border-t border-white/[0.08] pt-10 lg:col-span-5 lg:border-t-0 lg:pt-0 xl:col-span-6"
+                className="flex min-w-0 flex-col gap-5 border-t border-white/[0.08] pt-8 sm:pt-10 lg:col-span-5 lg:border-t-0 lg:pt-0 xl:col-span-6"
               >
                 {awardBadges && awardBadges.length > 0 ? (
                   <div className="flex flex-wrap items-center justify-start gap-6 lg:ml-auto lg:justify-end">

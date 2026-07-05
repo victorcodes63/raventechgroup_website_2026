@@ -59,7 +59,7 @@ export default function CookiesPage() {
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">Contact</h2>
               <p className="text-sm text-white/70">
                 Have questions about how we use cookies? Email{' '}
-                <Link href="mailto:privacy@raventechgroup.com" className="text-brand-300 transition hover:text-brand-200">
+                <Link href="mailto:privacy@raventechgroup.com" className="text-brand-500 transition hover:text-brand-400">
                   privacy@raventechgroup.com
                 </Link>{' '}
                 and our team will help.

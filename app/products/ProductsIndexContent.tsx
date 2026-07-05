@@ -51,12 +51,12 @@ export function ProductsIndexContent() {
                         </div>
                         <ArrowUpRight
                           size={20}
-                          className="shrink-0 text-white/30 transition-all group-hover:text-brand-400"
+                          className="shrink-0 text-white/30 transition-all group-hover:text-brand-500"
                           aria-hidden
                         />
                       </div>
                       <p className="mt-4 flex-1 text-base leading-relaxed text-white/60">{product.description}</p>
-                      <p className="mt-6 text-sm font-semibold text-brand-400">{product.tagline}</p>
+                      <p className="mt-6 text-sm font-semibold text-brand-500">{product.tagline}</p>
                     </Link>
                   </li>
                 ))}

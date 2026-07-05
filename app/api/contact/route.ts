@@ -149,7 +149,7 @@ export async function POST(request: NextRequest) {
             <style>
               body { font-family: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; line-height: 1.6; color: #333; }
               .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-              .header { background: #000; color: #FFA91E; padding: 20px; border-radius: 8px 8px 0 0; }
+              .header { background: #000; color: #FFA91F; padding: 20px; border-radius: 8px 8px 0 0; }
               .content { background: #f9f9f9; padding: 30px; border-radius: 0 0 8px 8px; }
               .field { margin-bottom: 15px; }
               .field strong { color: #000; }
@@ -158,7 +158,7 @@ export async function POST(request: NextRequest) {
           <body>
             <div class="container">
               <div class="header">
-                <h1 style="margin: 0; color: #FFA91E;">Raven Tech Group</h1>
+                <h1 style="margin: 0; color: #FFA91F;">Raven Tech Group</h1>
                 <p style="margin: 5px 0 0 0; color: #fff; font-size: 14px;">New Contact Form Submission</p>
               </div>
               <div class="content">

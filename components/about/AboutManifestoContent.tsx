@@ -21,9 +21,9 @@ import {
   caseStudyPrimaryMetric,
   type CaseStudy,
 } from '@/lib/data/caseStudies'
+import { strideProduct } from '@/lib/data/products'
 
 const VIEWPORT = { once: true, margin: '-80px' as const }
-const PORTRAIT_SRC = '/images/website-potrait.png'
 const ABOUT_CASE_SLUGS = [
   'eagle-hr-consultants',
   'youthplus-festival-2026',
@@ -58,40 +58,29 @@ const PRINCIPLES: { title: string; description: string }[] = [
   },
 ]
 
-const STORY_PARAS: string[] = [
-  'I founded Raven because too many organisations had to pick between large consultancies that move slowly and ad-hoc contractors who disappear after launch. Neither was serving them. I wanted to build a firm where the person selling the work is the person shipping the work — where accountability is a phone number, not a process diagram.',
+const STORY_LEAD_PARAS: string[] = [
+  'I founded Raven because too many organisations had to pick between large consultancies that move slowly and ad-hoc contractors who disappear after launch. Neither was serving them. I wanted to build a firm where the person selling the work is the person shipping the work.',
   'Our job is to make sure the systems you rely on keep running. Discovery that surfaces the real constraints before anyone writes code. Delivery in two-week releases so you see progress, not surprises. Operations after launch — because something always breaks on a Saturday night, and you need someone who picks up.',
-  'Accountability is the through-line. You will always know who owns the work, how it is progressing, and what happens next.',
-  'I stay on the engagement. From the first discovery call to post-launch support — same operator, same phone number.',
-  'We document as we build. Whatever we ship, your team can keep running six months after we step back.',
-  'We leave you better off, not dependent. No vendor lock-in. Your repos, your infrastructure, your decisions.',
 ]
 
-function StoryPortraitFigure() {
-  const [failed, setFailed] = useState(false)
-
-  return (
-    <div className="relative mx-auto w-full max-w-[320px] lg:mx-0">
-      {failed ? (
-        <div
-          className="aspect-[4/5] w-full rounded-card border border-white/[0.08] bg-gradient-to-br from-[#161616] via-[#111111] to-[#0A0A0A]"
-          aria-hidden
-        />
-      ) : (
-        <div className="relative aspect-[4/5] w-full overflow-hidden rounded-card border border-white/[0.08]">
-          <Image
-            src={PORTRAIT_SRC}
-            alt="Victor Chumo, Managing Director — Raven Tech Group"
-            fill
-            sizes="(min-width: 1024px) 320px, 280px"
-            className="object-cover object-[center_22%] grayscale"
-            onError={() => setFailed(true)}
-          />
-        </div>
-      )}
-    </div>
-  )
-}
+const STORY_COMMITMENTS: { lead: string; rest: string }[] = [
+  {
+    lead: 'Accountability is the through-line.',
+    rest: 'You will always know who owns the work, how it is progressing, and what happens next.',
+  },
+  {
+    lead: 'I stay on the engagement.',
+    rest: 'From the first discovery call to post-launch support — same operator, same phone number.',
+  },
+  {
+    lead: 'We document as we build.',
+    rest: 'Whatever we ship, your team can keep running six months after we step back.',
+  },
+  {
+    lead: 'We leave you better off, not dependent.',
+    rest: 'No vendor lock-in. Your repos, your infrastructure, your decisions.',
+  },
+]
 
 function CaseStudyPreviewCard({ study }: { study: CaseStudy }) {
   const { src, unoptimized } = getCaseStudyImageSrc(study)
@@ -265,53 +254,100 @@ export function AboutManifestoContent() {
         </div>
       </section>
 
-      <section className="bg-[#050505] py-24 lg:py-32">
-        <div className="site-shell">
+      <section className="relative bg-[#050505] py-24 lg:py-32">
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_700px_500px_at_85%_15%,rgba(255,169,31,0.03)_0%,transparent_60%)]"
+        />
+        <div className="site-shell relative">
           <div className="content-wrap">
-            <motion.div
-              className="mb-12 lg:mb-14"
-              initial={reducedMotion ? false : 'hidden'}
-              whileInView={reducedMotion ? undefined : 'visible'}
-              viewport={VIEWPORT}
-              variants={serviceSectionHeaderGroupVariants}
-            >
-              <motion.p
-                variants={serviceSectionHeaderChildVariants}
-                className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500"
-              >
-                01 / The Story
-              </motion.p>
-              <motion.h2
-                variants={serviceSectionHeaderChildVariants}
-                className="mt-4 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl"
-              >
-                <span className="text-white">Why Raven</span> <span className="text-white/40">exists.</span>
-              </motion.h2>
-            </motion.div>
-
-            <div className="grid gap-10 lg:grid-cols-[4fr_8fr] lg:items-start lg:gap-16">
+            <div className="grid gap-14 lg:grid-cols-[5fr_7fr] lg:gap-16 xl:gap-24">
+              {/* Left — sticky header + pull quote */}
               <motion.div
+                className="lg:sticky lg:top-28 lg:self-start"
+                initial={reducedMotion ? false : 'hidden'}
+                whileInView={reducedMotion ? undefined : 'visible'}
+                viewport={VIEWPORT}
+                variants={serviceSectionHeaderGroupVariants}
+              >
+                <motion.div variants={serviceSectionHeaderChildVariants} className="flex items-center gap-3">
+                  <div className="h-px w-8 shrink-0 bg-brand-500" aria-hidden />
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">01 / The Story</p>
+                </motion.div>
+                <motion.h2
+                  variants={serviceSectionHeaderChildVariants}
+                  className="mt-5 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl"
+                >
+                  <span className="text-white">Why Raven</span> <span className="text-white/40">exists.</span>
+                </motion.h2>
+
+                <motion.blockquote
+                  variants={serviceSectionHeaderChildVariants}
+                  className="mt-10 border-l-2 border-brand-500 pl-6 lg:mt-14"
+                >
+                  <p className="text-xl font-semibold leading-snug tracking-[-0.01em] text-white sm:text-2xl lg:text-[1.7rem] lg:leading-[1.3]">
+                    Accountability is a{' '}
+                    <span className="text-brand-500">phone number</span>, not a process diagram.
+                  </p>
+                </motion.blockquote>
+
+                <motion.div variants={serviceSectionHeaderChildVariants} className="mt-10 lg:mt-14">
+                  <div className="h-px w-24 bg-gradient-to-r from-[#FFA91F] to-[#FFA91F]/10" aria-hidden />
+                  <p className="mt-5 text-base font-semibold text-white">Victor Chumo</p>
+                  <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
+                    Founder &amp; Managing Director
+                  </p>
+                </motion.div>
+              </motion.div>
+
+              {/* Right — narrative + commitments register */}
+              <motion.div
+                className="min-w-0"
                 initial={reducedMotion ? false : { opacity: 0, y: 20 }}
                 whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={VIEWPORT}
-                transition={{ duration: reducedMotion ? 0 : 0.45, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: reducedMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
               >
-                <StoryPortraitFigure />
-              </motion.div>
-              <div className="ml-auto w-full max-w-3xl space-y-6 text-base leading-relaxed text-white/72 md:text-lg">
-                {STORY_PARAS.map((p, i) => (
-                  <p key={i} className="text-left text-justify">
-                    {p}
-                  </p>
-                ))}
-                <div className="h-px w-24 bg-gradient-to-r from-[#FFA91F] to-[#FFA91F]/10" aria-hidden />
-                <div className="space-y-1">
-                  <p className="text-base font-semibold text-white">Victor Chumo</p>
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/45">
-                    Founder &amp; Managing Director
-                  </p>
+                <div className="space-y-7">
+                  {STORY_LEAD_PARAS.map((p, i) => (
+                    <p
+                      key={i}
+                      className={
+                        i === 0
+                          ? 'text-lg leading-[1.7] text-white/85 sm:text-xl sm:leading-[1.75]'
+                          : 'text-base leading-[1.8] text-white/60 sm:text-lg'
+                      }
+                    >
+                      {p}
+                    </p>
+                  ))}
                 </div>
-              </div>
+
+                <div className="mt-14 border-t border-white/[0.08]">
+                  {STORY_COMMITMENTS.map((c, i) => (
+                    <motion.div
+                      key={c.lead}
+                      className="group grid gap-2 border-b border-white/[0.08] py-7 sm:grid-cols-[3rem_1fr] sm:gap-6"
+                      initial={reducedMotion ? false : { opacity: 0, y: 14 }}
+                      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: '-60px' }}
+                      transition={{
+                        duration: reducedMotion ? 0 : 0.5,
+                        delay: reducedMotion ? 0 : i * 0.07,
+                        ease: [0.22, 1, 0.36, 1],
+                      }}
+                    >
+                      <span className="font-mono text-xs font-semibold tabular-nums text-brand-500/70 sm:pt-1.5">
+                        {String(i + 1).padStart(2, '0')}
+                      </span>
+                      <p className="text-base leading-[1.75] sm:text-lg">
+                        <span className="font-semibold text-white">{c.lead}</span>{' '}
+                        <span className="text-white/55">{c.rest}</span>
+                      </p>
+                    </motion.div>
+                  ))}
+                </div>
+              </motion.div>
             </div>
           </div>
         </div>
@@ -404,6 +440,65 @@ export function AboutManifestoContent() {
                 <span className="text-white">What we&apos;ve</span> <span className="text-white/40">shipped.</span>
               </motion.h2>
             </motion.div>
+
+            {/* Featured — Stride, the software product we build and operate */}
+            <motion.article
+              className="group/stride mb-6 overflow-hidden rounded-card border border-brand-500/25 bg-[#111111] transition-all duration-300 hover:border-brand-500/45 hover:bg-[#141414] lg:mb-8"
+              initial={reducedMotion ? false : { opacity: 0, y: 20 }}
+              whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
+              viewport={VIEWPORT}
+              transition={{ duration: reducedMotion ? 0 : 0.55, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <Link href={strideProduct.bridgeHref} className="grid lg:grid-cols-[1fr_1.05fr]">
+                <div className="flex flex-col justify-center p-7 sm:p-9 lg:p-12">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-brand-500/30 bg-brand-500/10 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-500">
+                      <span className="h-1.5 w-1.5 rounded-full bg-brand-500" aria-hidden />
+                      Raven product
+                    </span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/40">
+                      Software we build and operate
+                    </span>
+                  </div>
+                  <h3 className="mt-6 text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                    {strideProduct.name}
+                    <span className="text-white/40"> — {strideProduct.tagline}</span>
+                  </h3>
+                  <p className="mt-4 max-w-xl text-sm leading-relaxed text-white/60 sm:text-base">
+                    {strideProduct.description}
+                  </p>
+                  <div className="mt-7 grid grid-cols-3 gap-4 border-t border-white/[0.08] pt-6">
+                    {strideProduct.proofPoints.map((point) => (
+                      <div key={point.label} className="min-w-0">
+                        <p className="text-xl font-bold tabular-nums tracking-tight text-white sm:text-2xl">
+                          {point.value}
+                        </p>
+                        <p className="mt-1 text-[11px] leading-snug text-white/45">{point.label}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <span className="mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-500">
+                    <ArrowSwapRow groupName="stride" iconSize={14} strokeWidth={2.2}>
+                      Explore Stride
+                    </ArrowSwapRow>
+                  </span>
+                </div>
+                <div className="relative min-h-[240px] overflow-hidden bg-[#0A0A0A] sm:min-h-[300px] lg:min-h-0">
+                  <Image
+                    src="/images/products/stride-preview.jpg"
+                    alt="Stride business management platform dashboard"
+                    fill
+                    sizes="(min-width: 1024px) 50vw, 100vw"
+                    className="object-cover object-left-top grayscale transition-all duration-500 group-hover/stride:grayscale-0"
+                  />
+                  <div
+                    className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#111111]/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-[#111111] lg:via-transparent lg:to-transparent"
+                    aria-hidden
+                  />
+                </div>
+              </Link>
+            </motion.article>
+
             <motion.div
               className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 lg:gap-8"
               initial={reducedMotion ? false : 'hidden'}

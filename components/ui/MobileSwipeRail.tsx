@@ -1,4 +1,6 @@
-import type { ReactNode } from 'react'
+'use client'
+
+import { Children, createContext, useContext, type ReactNode } from 'react'
 
 type MobileSwipeRailProps = {
   children: ReactNode
@@ -18,7 +20,10 @@ type MobileSwipeCardProps = {
 }
 
 const SCROLL_TRACK =
-  'flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+  'flex w-full min-w-0 max-w-full snap-x snap-mandatory gap-3 overflow-x-auto overscroll-x-contain pb-2 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'
+
+/** True when the rail has a single item — cards render full-width, no swipe affordance. */
+const SwipeRailStaticContext = createContext(false)
 
 export function MobileSwipeRail({
   children,
@@ -28,10 +33,24 @@ export function MobileSwipeRail({
   bleed = true,
   'aria-label': ariaLabel,
 }: MobileSwipeRailProps) {
-  const bleedClasses = bleed ? '-mx-5 px-5' : ''
+  const isStatic = Children.count(children) <= 1
+
+  if (isStatic) {
+    return (
+      <SwipeRailStaticContext.Provider value={true}>
+        <div className={`min-w-0 max-w-full ${className}`.trim()} aria-label={ariaLabel}>
+          {children}
+        </div>
+      </SwipeRailStaticContext.Provider>
+    )
+  }
+
+  // scroll-pl keeps the first snap point aligned with the bleed padding — without it
+  // the browser snaps the first card to the scrollport edge and clips it.
+  const bleedClasses = bleed ? '-mx-5 px-5 scroll-pl-5' : ''
 
   return (
-    <div className={className}>
+    <div className={`min-w-0 max-w-full overflow-hidden ${className}`.trim()}>
       {hint ? (
         <p className={`mb-3 text-[11px] ${hintClassName}`}>{hint}</p>
       ) : null}
@@ -47,5 +66,7 @@ export function MobileSwipeCard({
   className = '',
   widthClassName = 'w-[min(88vw,420px)]',
 }: MobileSwipeCardProps) {
-  return <div className={`shrink-0 snap-start ${widthClassName} ${className}`.trim()}>{children}</div>
+  const isStatic = useContext(SwipeRailStaticContext)
+  const width = isStatic ? 'w-full' : `shrink-0 snap-start ${widthClassName}`
+  return <div className={`${width} ${className}`.trim()}>{children}</div>
 }

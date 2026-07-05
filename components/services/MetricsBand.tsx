@@ -58,31 +58,30 @@ export function MetricsBand({ metrics }: MetricsBandProps) {
 
   return (
     <section
-      className="relative bg-gradient-to-br from-[#FFA91F] via-[#FFA91F] to-[#FFB83F] py-12 text-[#0A0A0A] sm:py-14 lg:py-16"
+      className="relative bg-[#FFA91F] py-10 text-[#0A0A0A] sm:py-12 lg:py-14"
       aria-label="Delivery outcomes"
     >
-      <div className="site-shell">
-        <div className="content-wrap">
-          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-x-6 gap-y-10 sm:max-w-none sm:gap-x-8 lg:grid-cols-4 lg:gap-y-12">
-            {metrics.map((m) => (
+      <div className="site-shell min-w-0">
+        <div className="content-wrap min-w-0">
+          <div className="grid min-w-0 grid-cols-2 divide-x divide-y divide-[#0A0A0A]/10 overflow-hidden rounded-card border border-[#0A0A0A]/10 bg-[#0A0A0A]/[0.06] lg:grid-cols-4 lg:divide-y-0">
+            {metrics.map((m, i) => (
               <motion.div
                 key={m.label}
-                className="flex flex-col gap-2 text-left"
-                initial={reducedMotion ? false : { opacity: 0, y: 16 }}
+                className="flex min-w-0 flex-col justify-between gap-3 p-5 sm:gap-4 sm:p-6 lg:p-8"
+                initial={reducedMotion ? false : { opacity: 0, y: 12 }}
                 whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: '-60px' }}
-                transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                transition={{ duration: 0.5, delay: reducedMotion ? 0 : i * 0.06, ease: [0.22, 1, 0.36, 1] }}
               >
-                <p className="text-5xl font-bold tracking-[-0.04em] lg:text-7xl">
+                <p className="text-[clamp(2.25rem,6vw,3.5rem)] font-bold leading-none tracking-[-0.04em] lg:text-[clamp(2.75rem,4vw,4.25rem)]">
                   <MetricFigure item={m} reducedMotion={reducedMotion} />
                 </p>
-                <p className="text-sm font-medium uppercase tracking-[0.15em] text-[#0A0A0A]/70">
+                <p className="max-w-[11rem] text-[11px] font-semibold leading-snug tracking-[0.06em] text-[#0A0A0A]/72 sm:text-xs sm:tracking-[0.08em]">
                   {m.label}
                 </p>
               </motion.div>
             ))}
           </div>
-          <div className="mt-8 border-t border-[#0A0A0A]/10 lg:mt-10" aria-hidden />
         </div>
       </div>
     </section>

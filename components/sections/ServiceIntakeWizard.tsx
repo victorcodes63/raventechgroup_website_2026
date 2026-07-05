@@ -413,7 +413,7 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
                                 <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-white/35">1 · Stage</p>
                                 <p className="mt-1 text-[15px] font-bold leading-snug text-white sm:text-base">How far along?</p>
                               </div>
-                              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-brand-500/40 bg-brand-500/20 text-brand-400" aria-hidden>
+                              <span className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border border-brand-500/40 bg-brand-500/20 text-brand-500" aria-hidden>
                                 <Minus size={16} strokeWidth={2.2} />
                               </span>
                             </button>
@@ -428,7 +428,7 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
                                       onClick={() => selectStage(opt.id)}
                                       className={`rounded-sm border px-4 py-2 text-[13px] font-semibold transition ${
                                         active
-                                          ? 'border-brand-500/50 bg-brand-500/15 text-brand-400'
+                                          ? 'border-brand-500/50 bg-brand-500/15 text-brand-500'
                                           : 'border-white/[0.08] bg-white/[0.04] text-white/60 hover:border-white/20 hover:bg-white/[0.07]'
                                       }`}
                                       aria-pressed={active}
@@ -473,7 +473,7 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
                               </div>
                               <span
                                 className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border ${
-                                  openSection === 2 ? 'border-brand-500/40 bg-brand-500/20 text-brand-400' : 'border-white/[0.1] bg-white/[0.04] text-white/40'
+                                  openSection === 2 ? 'border-brand-500/40 bg-brand-500/20 text-brand-500' : 'border-white/[0.1] bg-white/[0.04] text-white/40'
                                 }`}
                                 aria-hidden
                               >
@@ -500,13 +500,13 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
                                             onClick={() => selectNeed(opt.id)}
                                             className={`w-full rounded-card border p-3 text-left transition sm:p-4 ${
                                               active
-                                                ? 'border-brand-500/50 bg-brand-500/15 text-brand-400'
+                                                ? 'border-brand-500/50 bg-brand-500/15 text-brand-500'
                                                 : 'border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
                                             }`}
                                             aria-pressed={active}
                                           >
                                             <div className="text-[13px] font-bold leading-snug sm:text-sm">{opt.title}</div>
-                                            <div className={`mt-1 text-[11px] leading-snug sm:mt-2 sm:text-xs sm:leading-relaxed ${active ? 'text-brand-300/80' : 'text-white/45'}`}>
+                                            <div className={`mt-1 text-[11px] leading-snug sm:mt-2 sm:text-xs sm:leading-relaxed ${active ? 'text-brand-500/80' : 'text-white/45'}`}>
                                               {opt.description}
                                             </div>
                                           </button>
@@ -540,7 +540,7 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
                         </div>
                         <span
                           className={`mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center rounded-sm border ${
-                            openSection === 3 ? 'border-brand-500/40 bg-brand-500/20 text-brand-400' : 'border-white/[0.1] bg-white/[0.04] text-white/40'
+                            openSection === 3 ? 'border-brand-500/40 bg-brand-500/20 text-brand-500' : 'border-white/[0.1] bg-white/[0.04] text-white/40'
                           }`}
                           aria-hidden
                         >
@@ -572,13 +572,13 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
                                       }}
                                       className={`rounded-card w-full border p-3 text-left transition sm:p-4 ${
                                         active
-                                          ? 'border-brand-500/50 bg-brand-500/15 text-brand-400'
+                                          ? 'border-brand-500/50 bg-brand-500/15 text-brand-500'
                                           : 'border-white/[0.08] bg-white/[0.03] text-white/60 hover:border-white/20 hover:bg-white/[0.06]'
                                       }`}
                                       aria-pressed={active}
                                     >
                                       <div className="text-[13px] font-bold leading-snug sm:text-sm">{opt.label}</div>
-                                      <div className={`mt-1 text-[11px] leading-snug sm:mt-2 sm:text-xs sm:leading-relaxed ${active ? 'text-brand-300/80' : 'text-white/45'}`}>
+                                      <div className={`mt-1 text-[11px] leading-snug sm:mt-2 sm:text-xs sm:leading-relaxed ${active ? 'text-brand-500/80' : 'text-white/45'}`}>
                                         {opt.hint}
                                       </div>
                                     </button>

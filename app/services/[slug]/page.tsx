@@ -1141,7 +1141,7 @@ export default async function ServicePage({ params }: ServicePageProps) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
         />
       ))}
-      <div className="min-h-screen bg-[#0A0A0A] text-white">
+      <div className="min-h-screen min-w-0 overflow-x-clip bg-[#0A0A0A] text-white">
         <ServiceHero
           slug={service.slug}
           serviceTitle={service.title}

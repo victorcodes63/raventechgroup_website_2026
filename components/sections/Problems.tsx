@@ -12,7 +12,6 @@ import {
   useSectionScrollProgress,
 } from '@/components/motion/ScrollDrivenTypography'
 import { CTAButton } from '@/components/ui/CTAButton'
-import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SITE_EASE } from '@/lib/siteScrollMotion'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 
@@ -200,9 +199,9 @@ export function Problems() {
     <section
       ref={sectionRef}
       id="problems"
-      className="relative isolate -mt-px bg-[#0A0A0A] pt-16 pb-24 text-white sm:pt-20 md:pt-24 lg:flex lg:min-h-svh lg:items-center lg:py-0"
+      className="relative isolate -mt-px min-w-0 overflow-x-clip bg-[#0A0A0A] pt-16 pb-12 text-white sm:pb-16 sm:pt-20 md:pt-24 lg:flex lg:min-h-svh lg:items-center lg:py-0 lg:pb-24"
     >
-      <div className="relative z-10 mx-auto max-w-7xl px-5 md:px-8 lg:px-12 w-full lg:py-16">
+      <div className="relative z-10 mx-auto w-full min-w-0 max-w-7xl px-5 md:px-8 lg:px-12 lg:py-16">
 
         <motion.div
           className="mx-auto max-w-3xl text-center"
@@ -344,22 +343,13 @@ export function Problems() {
           />
         </div>
 
-        <div className="mx-auto mt-20 w-full max-w-6xl">
+        <div className="mx-auto mt-12 w-full min-w-0 max-w-6xl sm:mt-16 lg:mt-20">
           <motion.div
             style={{ opacity: bannerOpacity, scale: bannerScale, y: bannerY }}
-            className="relative"
+            className="relative min-w-0 overflow-hidden"
           >
-            <div
-              className="pointer-events-none absolute -left-24 top-4 h-64 w-64 rounded-full bg-[#FFA91F]/[0.06] blur-[90px]"
-              aria-hidden
-            />
-            <div
-              className="pointer-events-none absolute -right-24 top-0 h-72 w-72 rounded-full bg-[#FFA91F]/[0.08] blur-[100px]"
-              aria-hidden
-            />
-
-            <div className="relative grid gap-8 lg:grid-cols-[1fr_22rem] lg:items-start lg:gap-12">
-              <div>
+            <div className="relative grid min-w-0 gap-6 sm:gap-8 lg:grid-cols-[minmax(0,1fr)_22rem] lg:items-start lg:gap-12">
+              <div className="min-w-0">
                 <div className="mb-6 flex items-center gap-3">
                   <div className="h-px w-8 bg-[#FFA91F]" aria-hidden />
                   <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#FFA91F]">Fit check</p>
@@ -368,80 +358,56 @@ export function Problems() {
                 <div className="max-w-2xl">
                   <ScrollRevealWords
                     scrollYProgress={scrollYProgress}
-                    range={[0.72, 0.76]}
+                    range={[0.7, 0.75]}
                     reduced={isReduced}
-                    text="Sound familiar?"
-                    className="text-3xl font-bold leading-[1.05] tracking-[-0.03em] text-white sm:text-4xl lg:text-5xl"
+                    text="Sound familiar? Usually more than one."
+                    className="text-3xl font-bold leading-[1.12] tracking-[-0.03em] text-white sm:text-4xl lg:text-[2.75rem]"
                   />
-                  <ScrollRevealWords
-                    scrollYProgress={scrollYProgress}
-                    range={[0.74, 0.79]}
-                    reduced={isReduced}
-                    text="Usually more than one."
-                    className="mt-4 max-w-xl text-base font-medium leading-relaxed text-white/55 sm:text-lg"
-                  />
-                  <p className="mt-6 max-w-xl text-sm leading-relaxed text-white/42 sm:text-base">
+                  <p className="mt-6 max-w-xl text-sm leading-relaxed text-white/50 sm:text-base">
                     Bring the messy context. We will separate what needs a system, what needs a process change, and
                     what does not need a build at all.
                   </p>
                 </div>
 
-                <MobileSwipeRail hint="Swipe points" className="mt-9 sm:hidden" bleed={false} aria-label="Fit check points">
+                <div className="mt-10 border-t border-white/[0.08]">
                   {[
-                    ['01', 'No pitch deck'],
-                    ['02', 'No generic audit'],
-                    ['03', 'Clear next step'],
-                  ].map(([number, label]) => (
-                    <MobileSwipeCard key={label} widthClassName="w-[min(72vw,240px)]">
-                      <div className="h-full rounded-card border border-white/[0.07] bg-white/[0.025] p-4">
-                        <p className="text-[10px] font-bold tracking-[0.16em] text-[#FFA91F]/80">{number}</p>
-                        <p className="mt-2 text-sm font-semibold text-white/75">{label}</p>
-                      </div>
-                    </MobileSwipeCard>
-                  ))}
-                </MobileSwipeRail>
-
-                <div className="mt-9 hidden gap-3 sm:grid sm:grid-cols-3">
-                  {[
-                    ['01', 'No pitch deck'],
-                    ['02', 'No generic audit'],
-                    ['03', 'Clear next step'],
-                  ].map(([number, label]) => (
-                    <div key={label} className="rounded-card border border-white/[0.07] bg-white/[0.025] p-4">
-                      <p className="text-[10px] font-bold tracking-[0.16em] text-[#FFA91F]/80">{number}</p>
-                      <p className="mt-2 text-sm font-semibold text-white/75">{label}</p>
+                    ['01', 'No pitch deck', 'A working conversation, not a sales presentation.'],
+                    ['02', 'No generic audit', 'Observations specific to your stack — not a template.'],
+                    ['03', 'Clear next step', 'You leave knowing what to do, with or without us.'],
+                  ].map(([number, label, detail]) => (
+                    <div
+                      key={label}
+                      className="grid grid-cols-[2.5rem_1fr] items-baseline gap-4 border-b border-white/[0.08] py-5 sm:grid-cols-[2.5rem_13rem_1fr] sm:gap-6"
+                    >
+                      <span className="font-mono text-xs font-semibold tabular-nums text-[#FFA91F]/70">{number}</span>
+                      <p className="text-base font-semibold text-white sm:text-lg">{label}</p>
+                      <p className="col-span-2 col-start-2 text-sm leading-relaxed text-white/45 sm:col-span-1 sm:col-start-3">
+                        {detail}
+                      </p>
                     </div>
                   ))}
                 </div>
               </div>
 
-              <div className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111]/80 p-6 shadow-[0_28px_80px_-56px_rgba(255,169,31,0.28)] sm:p-8">
-                <div
-                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-[#FFA91F]/45 to-transparent"
-                  aria-hidden
-                />
-                <div
-                  className="pointer-events-none absolute -right-16 -top-20 h-48 w-48 rounded-full bg-[#FFA91F]/[0.1] blur-[70px]"
-                  aria-hidden
-                />
-                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-white/38">
+              <div className="relative min-w-0 max-w-full rounded-card border border-white/[0.08] border-t-2 border-t-[#FFA91F] bg-[#111111] p-6 sm:p-8">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-[#FFA91F]">
                   30-minute conversation
                 </p>
-                <p className="relative mt-4 text-2xl font-bold leading-tight tracking-[-0.02em] text-white">
+                <p className="mt-4 text-2xl font-bold leading-tight tracking-[-0.02em] text-white">
                   Know if Raven is the right team.
                 </p>
-                <ul className="relative mt-6 space-y-3 text-sm leading-relaxed text-white/55">
+                <ul className="mt-6 divide-y divide-white/[0.06] text-sm leading-relaxed text-white/60">
                   {['What is breaking', 'What should be built', 'What should wait'].map((item) => (
-                    <li key={item} className="flex items-center gap-3">
-                      <span className="h-1.5 w-1.5 rounded-full bg-[#FFA91F]" aria-hidden />
+                    <li key={item} className="flex items-center gap-3 py-2.5">
+                      <span className="h-1 w-3 shrink-0 bg-[#FFA91F]" aria-hidden />
                       {item}
                     </li>
                   ))}
                 </ul>
-                <CTAButton href="/book" variant="primary" className="relative mt-8 w-full justify-center px-7 py-4 text-sm">
+                <CTAButton href="/book" variant="primary" className="mt-8 w-full max-w-full justify-center px-5 py-3.5 text-sm sm:px-7 sm:py-4">
                   Book 30 minutes
                 </CTAButton>
-                <p className="relative mt-4 text-xs leading-relaxed text-white/38">
+                <p className="mt-4 text-xs leading-relaxed text-white/38">
                   We reply within one business day with a calendar link, or a direct note if it is not a fit.
                 </p>
               </div>

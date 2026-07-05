@@ -11,29 +11,12 @@ import {
 import { twMerge } from 'tailwind-merge'
 import {
   ArrowRight,
-  Building,
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  Code,
-  Cloud,
-  Cpu,
-  GraduationCap,
-  HandHeart,
-  HeartPulse,
-  Home,
-  Landmark,
-  Layers,
-  Link2,
   Minus,
   Plus,
-  Shield,
-  ShoppingBag,
-  Store,
-  Truck,
-  type LucideIcon,
 } from 'lucide-react'
 import { MetricsBand } from '@/components/services/MetricsBand'
+import { ServiceIndustriesList } from '@/components/services/ServiceIndustriesList'
+import { ClientTestimonialsSection } from '@/components/sections/ClientTestimonialsSection'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
@@ -41,7 +24,6 @@ import {
   serviceBenefitWatermarkVariants,
   serviceCapabilityStaggerChildVariants,
   serviceCapabilityStaggerParentVariants,
-  serviceIndustryCardVariants,
   serviceInsightCardVariants,
   serviceSectionHeaderChildVariants,
   serviceSectionHeaderGroupVariants,
@@ -56,34 +38,11 @@ import type { Capability, ServiceDetail } from './service-page-types'
 
 const SECTION_VIEWPORT = { once: true, margin: '-80px' as const }
 
-const INDUSTRY_ICONS: Record<string, LucideIcon> = {
-  saccos: Building2,
-  sacco: Building2,
-  fintechs: Landmark,
-  fintech: Landmark,
-  healthcare: HeartPulse,
-  logistics: Truck,
-  retail: Store,
-  ecommerce: ShoppingBag,
-  'e-commerce': ShoppingBag,
-  education: GraduationCap,
-  ngo: HandHeart,
-  ngos: HandHeart,
-  'public-sector': Building,
-  public: Building,
-  'real-estate': Home,
-  realestate: Home,
-}
-
-const CAPABILITY_ICONS: LucideIcon[] = [
-  Code,
-  Cloud,
-  Shield,
-  Link2,
-  Cpu,
-  Layers,
-  ArrowRight,
-]
+const SERVICE_SECTION_PY = 'py-16 sm:py-20 lg:py-32'
+const SERVICE_SECTION_PY_LOOSE = 'py-16 sm:py-24 lg:py-36'
+const SERVICE_H2 =
+  'text-[1.75rem] font-bold leading-[1.08] tracking-[-0.02em] sm:text-3xl md:text-4xl lg:text-5xl'
+const SERVICE_SECTION_INNER = 'w-full min-w-0'
 
 function caseStudyMetrics(slug: string): string[] {
   const study = caseStudies.find((c) => c.slug === slug)
@@ -130,39 +89,31 @@ function RealProjectsCaseStudyImage({
   )
 }
 
-function industryIconKey(slug: string | undefined, name: string): string {
-  if (slug) return slug.toLowerCase()
-  return name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
+/** Equal-weight row — flex for 2–3 cols (reliable equal heights); grid for 4+ */
+function capabilityRowClass(count: number): string {
+  if (count <= 1) return 'md:flex md:flex-col md:max-w-2xl md:mx-auto'
+  if (count <= 3) return 'md:flex md:flex-row'
+  if (count === 4) return 'md:grid sm:grid-cols-2'
+  return 'md:grid md:grid-cols-2 lg:grid-cols-3'
 }
 
-function pickIndustryIcon(slug: string | undefined, name: string): LucideIcon {
-  const key = industryIconKey(slug, name)
-  return INDUSTRY_ICONS[key] ?? Building2
+function capabilityItemClass(count: number): string {
+  if (count <= 3) return 'flex min-w-0 flex-1 flex-col'
+  return 'h-full min-h-0 self-stretch'
 }
 
-/** Equal-weight grid — avoids uneven “bento” spans that read as arbitrary */
-function capabilityGridClass(count: number): string {
-  if (count <= 1) return 'grid-cols-1 w-full max-w-2xl mx-auto'
-  if (count === 2) return 'md:grid-cols-2'
-  if (count === 3) return 'md:grid-cols-3'
-  if (count === 4) return 'sm:grid-cols-2'
-  return 'md:grid-cols-2 lg:grid-cols-3'
-}
-
-function CapabilityCard({ cap, index }: { cap: Capability; index: number }) {
-  const Icon = CAPABILITY_ICONS[index % CAPABILITY_ICONS.length]!
+function CapabilityCard({ cap }: { cap: Capability }) {
   return (
-    <article className="group/cap flex h-full flex-col rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-all duration-300 hover:scale-[1.01] hover:border-brand-500/40 hover:bg-[#161616] lg:p-9">
-      <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white/[0.06] ring-1 ring-white/[0.08]">
-        <Icon className="h-5 w-5 text-brand-500" strokeWidth={1.5} aria-hidden />
+    <article className="group/cap grid h-full min-h-0 flex-1 grid-rows-[11rem_1fr] rounded-card border border-white/[0.08] bg-[#111111] p-6 transition-all duration-300 hover:scale-[1.01] hover:border-brand-500/40 hover:bg-[#161616] sm:grid-rows-[11.5rem_1fr] sm:p-8 lg:grid-rows-[12rem_1fr] lg:p-9">
+      <div className="flex min-h-0 flex-col overflow-hidden">
+        <h3 className="text-xl font-semibold leading-snug tracking-tight text-white">{cap.title}</h3>
+        <p className="mt-3 line-clamp-4 text-[15px] leading-relaxed text-white/60">{cap.description}</p>
       </div>
-      <h3 className="mt-6 text-xl font-semibold tracking-tight text-white">{cap.title}</h3>
-      <p className="mt-3 flex-1 text-[15px] leading-relaxed text-white/60">{cap.description}</p>
       {cap.points && cap.points.length > 0 ? (
-        <ul className="mt-6 space-y-2.5 border-t border-white/[0.06] pt-6">
+        <ul className="flex min-h-0 flex-col space-y-2.5 self-stretch border-t border-white/[0.06] pt-6">
           {cap.points.map((pt) => (
             <li key={pt} className="flex gap-2.5 text-sm leading-relaxed text-white/65">
-              <span className="text-brand-500/50" aria-hidden>
+              <span className="shrink-0 text-brand-500/50" aria-hidden>
                 +
               </span>
               <span>{pt}</span>
@@ -206,7 +157,7 @@ function ServiceSectionHeader({
       </motion.div>
       <motion.h2
         variants={serviceSectionHeaderChildVariants}
-        className="text-3xl font-bold tracking-[-0.02em] text-white md:text-4xl lg:text-5xl lg:leading-[1.1]"
+        className={`text-2xl font-bold tracking-[-0.02em] text-white sm:text-3xl md:text-4xl lg:text-5xl lg:leading-[1.1]`}
       >
         {title}
       </motion.h2>
@@ -265,123 +216,6 @@ function ServiceFaqRow({
   )
 }
 
-function CustomerFeedbackCarousel({
-  entries,
-  reducedMotion,
-}: {
-  entries: NonNullable<ServiceDetail['customerFeedback']>
-  reducedMotion: boolean | null
-}) {
-  const [index, setIndex] = useState(0)
-  const [dir, setDir] = useState(0)
-  const n = entries.length
-  const current = entries[index % n]
-
-  const go = (next: number, direction: number) => {
-    setDir(direction)
-    setIndex(((next % n) + n) % n)
-  }
-
-  return (
-    <div className="relative">
-      {n > 1 ? (
-        <div className="flex items-center justify-between gap-4">
-          <button
-            type="button"
-            aria-label="Previous testimonial"
-            onClick={() => go(index - 1, -1)}
-            className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-card border border-white/[0.12] text-white/70 transition-colors hover:border-brand-500/40 hover:text-white"
-          >
-            <ChevronLeft size={20} aria-hidden />
-          </button>
-          <button
-            type="button"
-            aria-label="Next testimonial"
-            onClick={() => go(index + 1, 1)}
-            className="inline-flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-card border border-white/[0.12] text-white/70 transition-colors hover:border-brand-500/40 hover:text-white"
-          >
-            <ChevronRight size={20} aria-hidden />
-          </button>
-        </div>
-      ) : null}
-      <div className={`relative min-h-[200px] md:min-h-[160px] ${n > 1 ? 'mt-8' : ''}`}>
-        <AnimatePresence initial={false} custom={dir} mode="wait">
-          <motion.div
-            key={current.quote}
-            custom={dir}
-            initial={
-              reducedMotion
-                ? { opacity: 1, x: 0 }
-                : { opacity: 0, x: dir >= 0 ? 28 : -28 }
-            }
-            animate={{ opacity: 1, x: 0 }}
-            exit={
-              reducedMotion
-                ? { opacity: 0 }
-                : { opacity: 0, x: dir >= 0 ? -28 : 28 }
-            }
-            transition={{ duration: reducedMotion ? 0 : 0.35, ease: [0.22, 1, 0.36, 1] }}
-            className="flex flex-col gap-6 md:flex-row md:items-start md:gap-10"
-          >
-            {current.avatar ? (
-              <div className="relative h-16 w-16 flex-shrink-0 overflow-hidden rounded-full border border-white/[0.1]">
-                <Image
-                  src={current.avatar}
-                  alt={`${current.author}, ${current.company}`}
-                  fill
-                  className="object-cover"
-                  sizes="64px"
-                />
-              </div>
-            ) : (
-              <div
-                className="flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full border border-white/[0.1] bg-white/[0.06] text-xs font-semibold uppercase tracking-wide text-white/50"
-                aria-hidden
-              >
-                {current.company.slice(0, 2)}
-              </div>
-            )}
-            <div className="min-w-0 flex-1">
-              <blockquote className="text-xl font-medium italic leading-relaxed text-white/90 md:text-2xl">
-                &ldquo;{current.quote}&rdquo;
-              </blockquote>
-              <div className="mt-6 border-t border-white/[0.08] pt-6">
-                <p className="font-semibold text-white">{current.author}</p>
-                <p className="text-sm text-white/55">
-                  {current.role}
-                  {current.role && current.company ? ' · ' : ''}
-                  {current.company}
-                </p>
-                {current.projectContext ? (
-                  <p className="mt-2 text-sm text-white/45">{current.projectContext}</p>
-                ) : null}
-              </div>
-            </div>
-          </motion.div>
-        </AnimatePresence>
-      </div>
-      {n > 1 ? (
-        <div className="mt-8 flex justify-center gap-2">
-          {entries.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              aria-label={`Show testimonial ${i + 1}`}
-              onClick={() => {
-                setDir(i > index ? 1 : -1)
-                setIndex(i)
-              }}
-              className={`h-2 rounded-full transition-all ${
-                i === index ? 'w-8 bg-brand-500' : 'w-2 bg-white/25 hover:bg-white/40'
-              }`}
-            />
-          ))}
-        </div>
-      ) : null}
-    </div>
-  )
-}
-
 function DeliveryTimelinePhases({
   steps,
   reducedMotion,
@@ -428,7 +262,7 @@ function DeliveryTimelinePhases({
         />
       </div>
 
-      <MobileSwipeRail hint="Swipe phases" className="md:hidden" bleed={false} aria-label="Delivery phases">
+      <MobileSwipeRail hint="Swipe phases" className="min-w-0 md:hidden" aria-label="Delivery phases">
         {steps.map((step, i) => (
           <MobileSwipeCard key={step.title} widthClassName="w-[min(82vw,300px)]">
             <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-6">
@@ -469,11 +303,11 @@ function SampleTimelineVisual({
         : 'md:grid-cols-2'
 
   return (
-    <div className="mt-12 overflow-x-auto">
+    <div className="mt-12 max-w-full md:overflow-x-auto md:overscroll-x-contain">
       <motion.svg
         width={w}
         height={h}
-        className="mx-auto block text-brand-500"
+        className="mx-auto hidden text-brand-500 md:block"
         initial={reducedMotion ? false : 'hidden'}
         whileInView={reducedMotion ? undefined : 'visible'}
         viewport={SECTION_VIEWPORT}
@@ -489,7 +323,7 @@ function SampleTimelineVisual({
           variants={serviceTimelineLineVariants}
         />
       </motion.svg>
-      <MobileSwipeRail hint="Swipe timeline" className="mt-6 md:hidden" bleed={false} aria-label="Sample timeline">
+      <MobileSwipeRail hint="Swipe timeline" className="mt-6 min-w-0 md:hidden" aria-label="Sample timeline">
         {phases.map((p) => (
           <MobileSwipeCard key={p.phase} widthClassName="w-[min(72vw,240px)]">
             <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-4">
@@ -530,19 +364,19 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
   const otherCases = caseList.slice(1)
 
   return (
-    <div className="text-white">
+    <div className="min-w-0 text-white">
       {/* 01 — What you get */}
-      <section id="what-you-get" className={`bg-[#0A0A0A] py-24 lg:py-32 ${sm}`}>
-        <div className="site-shell">
-          <div className="content-wrap">
-            <div className="grid gap-16 lg:grid-cols-[5fr_7fr] xl:gap-24">
-              <div className="lg:sticky lg:top-32 lg:self-start">
+      <section id="what-you-get" className={`bg-[#0A0A0A] ${SERVICE_SECTION_PY} ${sm}`}>
+        <div className={SERVICE_SECTION_INNER}>
+          <div className="content-wrap min-w-0">
+            <div className="grid min-w-0 gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 xl:gap-24">
+              <div className="min-w-0 lg:sticky lg:top-32 lg:self-start">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">01 / What you get</p>
-                <h2 className="mt-6 text-4xl font-bold tracking-tight text-white lg:text-5xl">
+                <h2 className={`mt-5 text-white ${SERVICE_H2}`}>
                   <span className="text-white">What you get</span>{' '}
                   <span className="text-white/40">with Raven</span>
                 </h2>
-                <p className="mt-6 max-w-md leading-relaxed text-white/60">{detail.overview}</p>
+                <p className="mt-5 max-w-md text-base leading-relaxed text-white/60 sm:mt-6">{detail.overview}</p>
                 <Link
                   href="/contact"
                   className="group/consult mt-8 inline-flex items-center gap-2 text-sm font-semibold text-brand-500"
@@ -554,13 +388,12 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
               </div>
               <MobileSwipeRail
                 hint="Swipe highlights"
-                className="lg:hidden"
-                bleed={false}
+                className="min-w-0 lg:hidden"
                 aria-label="What you get"
               >
                 {whatBlocks.map((cap, i) => (
                   <MobileSwipeCard key={cap.title} widthClassName="w-[min(88vw,340px)]">
-                    <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-8">
+                    <div className="h-full rounded-card border border-white/[0.08] bg-[#111111] p-6 sm:p-8">
                       <p className="text-5xl font-bold leading-none text-white/[0.08]">
                         {String(i + 1).padStart(2, '0')}
                       </p>
@@ -623,9 +456,9 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* 02 — Capabilities */}
       {caps.length > 0 ? (
-        <section id="services" className={`relative overflow-hidden bg-[#0A0A0A] py-24 lg:py-32 ${sm}`}>
-          <div className="site-shell relative z-10">
-            <div className="content-wrap">
+        <section id="services" className={`relative overflow-hidden bg-[#0A0A0A] ${SERVICE_SECTION_PY} ${sm}`}>
+          <div className={`${SERVICE_SECTION_INNER} relative z-10`}>
+            <div className="content-wrap min-w-0">
               <motion.div
                 className="mb-14 max-w-3xl"
                 initial={reducedMotion ? false : 'hidden'}
@@ -644,7 +477,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                 </motion.div>
                 <motion.h2
                   variants={serviceSectionHeaderChildVariants}
-                  className="mt-6 text-4xl font-bold tracking-tight text-white lg:text-5xl"
+                  className={`mt-5 text-white ${SERVICE_H2}`}
                 >
                   <span className="text-white">Capabilities</span>{' '}
                   <span className="text-white/40">we deploy on your behalf</span>
@@ -656,26 +489,30 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
               <MobileSwipeRail
                 hint="Swipe capabilities"
-                className="md:hidden"
+                className="min-w-0 md:hidden"
                 aria-label="Service capabilities"
               >
-                {caps.map((cap, index) => (
-                  <MobileSwipeCard key={cap.title} widthClassName="w-[min(88vw,360px)]">
-                    <CapabilityCard cap={cap} index={index} />
+                {caps.map((cap) => (
+                  <MobileSwipeCard key={cap.title} widthClassName="w-[min(88vw,360px)]" className="h-full">
+                    <CapabilityCard cap={cap} />
                   </MobileSwipeCard>
                 ))}
               </MobileSwipeRail>
 
               <motion.div
-                className={`hidden gap-6 md:grid lg:gap-8 ${capabilityGridClass(caps.length)}`}
+                className={`hidden md:items-stretch md:gap-6 lg:gap-8 ${capabilityRowClass(caps.length)} ${caps.length <= 3 ? 'md:flex' : 'md:grid'}`}
                 initial={reducedMotion ? false : 'hidden'}
                 whileInView={reducedMotion ? undefined : 'visible'}
                 viewport={SECTION_VIEWPORT}
                 variants={serviceCapabilityStaggerParentVariants}
               >
-                {caps.map((cap, index) => (
-                  <motion.div key={cap.title} variants={serviceCapabilityStaggerChildVariants}>
-                    <CapabilityCard cap={cap} index={index} />
+                {caps.map((cap) => (
+                  <motion.div
+                    key={cap.title}
+                    className={capabilityItemClass(caps.length)}
+                    variants={serviceCapabilityStaggerChildVariants}
+                  >
+                    <CapabilityCard cap={cap} />
                   </motion.div>
                 ))}
               </motion.div>
@@ -686,15 +523,15 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* 03 — Benefits */}
       {detail.numberedBenefits && detail.numberedBenefits.length > 0 ? (
-        <section id="service-benefits" className={`relative bg-[#0A0A0A] py-28 lg:py-36 ${sm}`}>
-          <div className="site-shell">
-            <div className="content-wrap">
-              <div className="mb-16 grid gap-10 lg:grid-cols-2 lg:gap-16">
+        <section id="service-benefits" className={`relative bg-[#0A0A0A] ${SERVICE_SECTION_PY_LOOSE} ${sm}`}>
+          <div className={SERVICE_SECTION_INNER}>
+            <div className="content-wrap min-w-0">
+              <div className="mb-16 grid min-w-0 gap-8 sm:gap-10 lg:grid-cols-2 lg:gap-16">
                 <div className="lg:-mt-5">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">
                     03 / Service benefits
                   </p>
-                  <h2 className="mt-4 text-4xl font-bold tracking-tight text-white lg:text-5xl">
+                  <h2 className={`mt-4 text-white ${SERVICE_H2}`}>
                     <span className="text-white">Why teams choose us for</span>{' '}
                     <span className="text-white/40">{service.title.toLowerCase()}</span>
                   </h2>
@@ -717,8 +554,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
               <MobileSwipeRail
                 hint="Swipe benefits"
-                className="lg:hidden"
-                bleed={false}
+                className="min-w-0 lg:hidden"
                 aria-label="Service benefits"
               >
                 {detail.numberedBenefits.map((row) => (
@@ -774,9 +610,9 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* 04 — How we work */}
       {detail.deliveryApproach && detail.deliveryApproach.length > 0 ? (
-        <section id="how-we-work" className={`bg-[#0A0A0A] py-24 lg:py-32 ${sm}`}>
-          <div className="site-shell">
-            <div className="content-wrap">
+        <section id="how-we-work" className={`bg-[#0A0A0A] ${SERVICE_SECTION_PY} ${sm}`}>
+          <div className={SERVICE_SECTION_INNER}>
+            <div className="content-wrap min-w-0">
               <motion.div
                 className="max-w-3xl"
                 initial={reducedMotion ? false : 'hidden'}
@@ -792,7 +628,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                 </motion.p>
                 <motion.h2
                   variants={serviceSectionHeaderChildVariants}
-                  className="mt-4 text-4xl font-bold tracking-tight text-white lg:text-5xl"
+                  className={`mt-4 text-white ${SERVICE_H2}`}
                 >
                   <span className="text-white">Phased delivery,</span>{' '}
                   <span className="text-white/40">transparent checkpoints</span>
@@ -811,11 +647,11 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
       {featuredCase ? (
         <section
           id="real-projects"
-          className={`relative bg-[#050505] py-24 lg:py-32 ${sm}`}
+          className={`relative bg-[#0A0A0A] ${SERVICE_SECTION_PY} ${sm}`}
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-[#0A0A0A]/40 to-transparent" aria-hidden />
-          <div className="site-shell relative z-10">
-            <div className="content-wrap">
+          <div className={`${SERVICE_SECTION_INNER} relative z-10`}>
+            <div className="content-wrap min-w-0">
               <motion.div
                 className="mb-14 max-w-3xl"
                 initial={reducedMotion ? false : 'hidden'}
@@ -831,7 +667,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                 </motion.p>
                 <motion.h2
                   variants={serviceSectionHeaderChildVariants}
-                  className="mt-4 text-4xl font-bold tracking-tight text-white lg:text-5xl"
+                  className={`mt-4 text-white ${SERVICE_H2}`}
                 >
                   <span className="text-white">Shipped work,</span>{' '}
                   <span className="text-white/40">documented outcomes</span>
@@ -855,11 +691,11 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                       />
                     </div>
                   ) : null}
-                  <div className="flex flex-col justify-between bg-[#0f0f0f] p-10 lg:p-14">
+                  <div className="flex flex-col justify-between bg-[#0f0f0f] p-6 sm:p-8 lg:p-14">
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-white/40">Case study</p>
                       <p className="mt-2 text-sm font-semibold text-brand-500">{featuredCase.client}</p>
-                      <h3 className="mt-6 text-2xl font-bold leading-tight text-white lg:text-3xl">
+                      <h3 className="mt-4 text-xl font-bold leading-tight text-white sm:mt-6 sm:text-2xl lg:text-3xl">
                         {featuredCase.outcome}
                       </h3>
                       <p className="mt-4 leading-relaxed text-white/60">
@@ -884,8 +720,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                 <>
                   <MobileSwipeRail
                     hint="Swipe case studies"
-                    className="lg:hidden"
-                    bleed={false}
+                    className="min-w-0 lg:hidden"
                     aria-label="Related case studies"
                   >
                     {otherCases.map((cs) => {
@@ -978,67 +813,21 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* Customer feedback */}
       {detail.customerFeedback && detail.customerFeedback.length > 0 ? (
-        <section id="customer-feedback" className={`bg-[#111111] py-24 lg:py-32 ${sm}`}>
-          <div className="site-shell">
-            <ServiceSectionHeader
-              eyebrow="Clients"
-              title="What leadership teams say"
-              reducedMotion={reducedMotion}
-            />
-            <CustomerFeedbackCarousel entries={detail.customerFeedback} reducedMotion={reducedMotion} />
-          </div>
-        </section>
+        <ClientTestimonialsSection
+          embedded
+          id="customer-feedback"
+          entries={detail.customerFeedback}
+          autoplayMs={6500}
+          className={`${SERVICE_SECTION_PY} ${sm}`}
+        />
       ) : null}
 
       {/* Industries */}
       {detail.industries && detail.industries.length > 0 ? (
-        <section id="industries" className={`bg-[#050505] py-20 ${sm}`}>
-          <div className="site-shell">
-            <div className="content-wrap">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">06 / Industries</p>
-              <h2 className="mt-4 max-w-2xl text-3xl font-bold tracking-tight text-white lg:text-4xl">
-                Sectors we operate in
-              </h2>
-              <MobileSwipeRail
-                hint="Swipe sectors"
-                className="mt-10 md:hidden"
-                bleed={false}
-                aria-label="Industries"
-              >
-                {detail.industries.map((ind) => {
-                  const Icon = pickIndustryIcon(ind.slug, ind.name)
-                  return (
-                    <MobileSwipeCard key={ind.name} widthClassName="w-[min(78vw,260px)]">
-                      <div className="h-full rounded-card border border-white/[0.06] bg-[#0f0f0f] p-5">
-                        <Icon className="h-5 w-5 text-brand-500" strokeWidth={1.5} aria-hidden />
-                        <p className="mt-4 text-sm font-semibold text-white">{ind.name}</p>
-                      </div>
-                    </MobileSwipeCard>
-                  )
-                })}
-              </MobileSwipeRail>
-
-              <motion.div
-                className="mt-10 hidden grid-cols-2 gap-3 md:grid md:grid-cols-3 lg:grid-cols-4"
-                initial={reducedMotion ? false : 'hidden'}
-                whileInView={reducedMotion ? undefined : 'visible'}
-                viewport={SECTION_VIEWPORT}
-                variants={serviceCapabilityStaggerParentVariants}
-              >
-                {detail.industries.map((ind) => {
-                  const Icon = pickIndustryIcon(ind.slug, ind.name)
-                  return (
-                    <motion.div
-                      key={ind.name}
-                      variants={serviceIndustryCardVariants}
-                      className="rounded-card border border-white/[0.06] bg-[#0f0f0f] p-5 transition-all duration-200 hover:-translate-y-px hover:border-brand-500/30"
-                    >
-                      <Icon className="h-5 w-5 text-brand-500" strokeWidth={1.5} aria-hidden />
-                      <p className="mt-4 text-sm font-semibold text-white">{ind.name}</p>
-                    </motion.div>
-                  )
-                })}
-              </motion.div>
+        <section id="industries" className={`bg-[#0A0A0A] ${SERVICE_SECTION_PY} ${sm}`}>
+          <div className={SERVICE_SECTION_INNER}>
+            <div className="content-wrap min-w-0">
+              <ServiceIndustriesList industries={detail.industries} />
             </div>
           </div>
         </section>
@@ -1046,8 +835,8 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* Sample timeline */}
       {detail.sampleTimeline && detail.sampleTimeline.length > 0 ? (
-        <section id="timeline" className={`bg-[#0A0A0A] py-24 lg:py-32 ${sm}`}>
-          <div className="site-shell">
+        <section id="timeline" className={`bg-[#0A0A0A] ${SERVICE_SECTION_PY} ${sm}`}>
+          <div className={SERVICE_SECTION_INNER}>
             <ServiceSectionHeader
               eyebrow="Planning"
               title="Sample delivery timeline"
@@ -1061,13 +850,13 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* FAQ */}
       {detail.faqs && detail.faqs.length > 0 ? (
-        <section id="faq" className={`bg-[#0A0A0A] py-24 ${sm}`}>
-          <div className="site-shell">
-            <div className="content-wrap">
-              <div className="grid gap-16 lg:grid-cols-[1fr_2fr] lg:gap-16">
-                <div className="lg:sticky lg:top-28 lg:self-start">
+        <section id="faq" className={`bg-[#0A0A0A] py-16 sm:py-20 lg:py-24 ${sm}`}>
+          <div className={SERVICE_SECTION_INNER}>
+            <div className="content-wrap min-w-0">
+              <div className="grid min-w-0 gap-10 lg:grid-cols-[1fr_2fr] lg:gap-16">
+                <div className="min-w-0 lg:sticky lg:top-28 lg:self-start">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">07 / FAQ</p>
-                  <h2 className="mt-4 text-3xl font-bold tracking-tight text-white lg:text-4xl">
+                  <h2 className={`mt-4 text-white ${SERVICE_H2} lg:text-4xl`}>
                     Questions before you engage
                   </h2>
                   <p className="mt-4 text-white/55">
@@ -1077,7 +866,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                     Contact
                   </CTAButton>
                 </div>
-                <div>
+                <div className="min-w-0">
                   {detail.faqs.map((faq, i) => (
                     <ServiceFaqRow
                       key={faq.question}
@@ -1095,8 +884,8 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* Insights */}
       {detail.relatedInsights && detail.relatedInsights.length > 0 ? (
-        <section id="insights" className={`bg-[#050505] py-24 lg:py-32 ${sm}`}>
-          <div className="site-shell">
+        <section id="insights" className={`${SERVICE_SECTION_PY} ${sm}`}>
+          <div className={SERVICE_SECTION_INNER}>
             <ServiceSectionHeader
               eyebrow="Insights"
               title="Related reading from Raven"
@@ -1105,8 +894,7 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
             />
             <MobileSwipeRail
               hint="Swipe articles"
-              className="lg:hidden"
-              bleed={false}
+              className="min-w-0 lg:hidden"
               aria-label="Related insights"
             >
               {detail.relatedInsights.map((post) => (
@@ -1191,19 +979,19 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
 
       {/* Final CTA — single tailored action per service */}
       {detail.closingCta ? (
-        <section className="relative overflow-hidden bg-[#0A0A0A] py-32 text-center lg:py-48">
+        <section className="relative overflow-hidden bg-[#0A0A0A] py-20 text-center sm:py-24 lg:py-48">
           <p
             className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 select-none text-[clamp(80px,18vw,200px)] font-bold leading-none tracking-[-0.04em] text-white/[0.02]"
             aria-hidden
           >
             RAVEN
           </p>
-          <div className="site-shell relative z-10">
+          <div className={`${SERVICE_SECTION_INNER} relative z-10`}>
             <div className="content-wrap mx-auto max-w-3xl">
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-brand-500">
                 {detail.closingCta.eyebrow}
               </p>
-              <h2 className="mt-6 text-3xl font-bold tracking-tight text-white md:text-4xl lg:text-5xl">
+              <h2 className={`mt-6 text-white ${SERVICE_H2}`}>
                 {detail.closingCta.headline}
               </h2>
               <p className="mx-auto mt-6 max-w-xl text-white/60">{detail.closingCta.body}</p>

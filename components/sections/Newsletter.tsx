@@ -83,7 +83,7 @@ export function Newsletter() {
             transition={{ type: 'spring', stiffness: 200, damping: 15 }}
             className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-sm bg-brand-500/20"
           >
-            <Mail className="h-8 w-8 text-brand-400" />
+            <Mail className="h-8 w-8 text-brand-500" />
           </motion.div>
           
           <h2 className="mb-4 text-3xl font-semibold text-white sm:text-4xl">
@@ -134,7 +134,7 @@ export function Newsletter() {
               <motion.div
                 initial={{ opacity: 0, y: -10 }}
                 animate={{ opacity: 1, y: 0 }}
-                className="mt-4 flex items-center justify-center gap-2 rounded-sm bg-brand-500/20 px-4 py-3 text-sm text-brand-200"
+                className="mt-4 flex items-center justify-center gap-2 rounded-sm bg-brand-500/20 px-4 py-3 text-sm text-brand-500"
               >
                 <CheckCircle size={18} />
                 <span>Successfully subscribed! Check your email.</span>
