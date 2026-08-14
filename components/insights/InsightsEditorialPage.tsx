@@ -2,11 +2,13 @@
 
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
 
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
+import { ScrubProgressLine } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import type { Insight } from '@/lib/data/insights'
 
 type InsightFilter = Insight['category'] | 'all'
@@ -31,6 +33,8 @@ function cardSpanClass(index: number): string {
 export function InsightsEditorialPage({ insights }: InsightsEditorialPageProps) {
   const reducedMotion = useReducedMotion()
   const [activeFilter, setActiveFilter] = useState<InsightFilter>('all')
+  const pageRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(pageRef, { reduced: reducedMotion })
 
   const featured = useMemo(
     () => insights.find((article) => article.featured) ?? insights[0],
@@ -47,7 +51,7 @@ export function InsightsEditorialPage({ insights }: InsightsEditorialPageProps) 
   }, [activeFilter, featured, filteredInsights])
 
   return (
-    <main className="bg-[#0A0A0A] text-white">
+    <main ref={pageRef} className="bg-[#0A0A0A] text-white">
       <section className="bg-[#0A0A0A] py-24 lg:py-32">
         <div className="site-shell">
           <div className="content-wrap">
@@ -145,6 +149,7 @@ export function InsightsEditorialPage({ insights }: InsightsEditorialPageProps) 
       <section className="bg-[#0A0A0A] pb-24 lg:pb-28">
         <div className="site-shell">
           <div className="content-wrap">
+            <ScrubProgressLine className="mb-8 mt-0" />
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeFilter}
@@ -160,6 +165,8 @@ export function InsightsEditorialPage({ insights }: InsightsEditorialPageProps) 
                     key={article.slug}
                     href={`/insights/${article.slug}`}
                     className={`group/card overflow-hidden rounded-card border border-white/[0.06] bg-[#111111] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#FFA91F]/30 ${cardSpanClass(index)}`}
+                    data-scrub-item
+                    data-scrub-fade="0"
                   >
                     <div className="relative aspect-[16/10] overflow-hidden bg-[#0A0A0A]">
                       <SafeRasterImage

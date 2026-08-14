@@ -1,11 +1,13 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowLeft, CheckCircle, Clock, MapPin, Video } from 'lucide-react'
 
 import { CTAButtonElement } from '@/components/ui/CTAButton'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   bookingServiceOptions,
   resolveBookingUrl,
@@ -20,6 +22,8 @@ const focusRing =
 export default function BookPage() {
   const [selectedService, setSelectedService] = useState<BookingServiceId>('discovery')
   const reducedMotion = useReducedMotion()
+  const pageRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(pageRef, { reduced: reducedMotion })
   const instant = reducedMotion ? { opacity: 1, y: 0 } : undefined
 
   const activeUrl = useMemo(() => {
@@ -34,7 +38,7 @@ export default function BookPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0A0A0A] pt-[72px]">
+    <main ref={pageRef} className="min-h-screen bg-[#0A0A0A] pt-[72px]">
       <div className="site-shell py-10 pb-24 lg:py-24">
         <div className="content-wrap">
           <Link
@@ -161,6 +165,7 @@ export default function BookPage() {
                   <p className="mt-3 text-sm leading-relaxed text-white/55">
                     Three ways to engage — then continue to Microsoft Bookings to choose a slot.
                   </p>
+                  <ScrubProgressLine className="mt-6" />
                 </div>
 
                 <div className="space-y-3">
@@ -174,12 +179,15 @@ export default function BookPage() {
                         type="button"
                         aria-pressed={isSelected}
                         onClick={() => setSelectedService(service.id)}
-                        className={`relative w-full rounded-card border p-4 text-left transition-all duration-200 sm:p-5 ${focusRing} ${
+                        data-scrub-item
+                        data-scrub-fade="0"
+                        className={`relative w-full overflow-hidden rounded-card border p-4 text-left transition-all duration-200 sm:p-5 ${focusRing} ${
                           isSelected
                             ? 'border-[#FFA91F]/50 bg-[#FFA91F]/[0.04]'
                             : 'border-white/[0.08] bg-[#0A0A0A] hover:border-white/[0.15] hover:bg-[#141414]'
                         }`}
                       >
+                        <ScrubRule />
                         <div className="flex items-start gap-3 sm:gap-4">
                           <div
                             className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-card border transition-colors duration-200 ${

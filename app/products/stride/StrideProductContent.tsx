@@ -1,11 +1,14 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowUpRight, CheckCircle2 } from 'lucide-react'
 
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
@@ -16,10 +19,12 @@ const ease = [0.21, 0.47, 0.32, 0.98] as const
 
 export function StrideProductContent() {
   const reduced = useReducedMotion()
+  const pageRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(pageRef, { reduced })
   const instant = reduced ? { opacity: 1, y: 0 } : undefined
 
   return (
-    <main className="bg-[#0A0A0A] pt-[72px]">
+    <main ref={pageRef} className="bg-[#0A0A0A] pt-[72px]">
       {/* Hero */}
       <section className="relative overflow-hidden pb-24 pt-16 lg:pb-32 lg:pt-24">
         <div
@@ -155,6 +160,7 @@ export function StrideProductContent() {
                 </a>
                 . This is the overview.
               </p>
+              <ScrubProgressLine />
 
               <motion.ul
                 variants={staggerContainer}
@@ -167,8 +173,11 @@ export function StrideProductContent() {
                   <motion.li
                     key={mod.title}
                     variants={fadeInUp}
-                    className="rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-colors duration-300 hover:border-brand-500/40 hover:bg-[#161616]"
+                    data-scrub-item
+                    data-scrub-fade="0"
+                    className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-colors duration-300 hover:border-brand-500/40 hover:bg-[#161616]"
                   >
+                    <ScrubRule />
                     <h3 className="text-xl font-semibold tracking-tight text-white">{mod.title}</h3>
                     <p className="mt-3 text-base leading-relaxed text-white/60">{mod.description}</p>
                   </motion.li>
@@ -199,6 +208,7 @@ export function StrideProductContent() {
               <h2 className="mt-6 max-w-2xl text-3xl font-bold tracking-[-0.02em] text-white md:text-4xl">
                 Vertical packs on the same core
               </h2>
+              <ScrubProgressLine />
 
               <MobileSwipeRail hint="Swipe industries" className="mt-16 md:hidden" aria-label="Stride industries">
                 {product.industries.map((industry) => (
@@ -218,8 +228,10 @@ export function StrideProductContent() {
                 {product.industries.map((industry) => (
                   <li
                     key={industry.title}
-                    className="flex gap-4 rounded-card border border-white/[0.08] bg-[#111111] p-6"
+                    data-scrub-item
+                    className="relative flex gap-4 overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-6"
                   >
+                    <ScrubRule />
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-500" aria-hidden />
                     <div>
                       <h3 className="text-lg font-semibold text-white">{industry.title}</h3>

@@ -11,7 +11,9 @@ import { Services as ServicesShowcase } from '@/components/sections/Services'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
-import { fadeInUp, staggerContainer } from '@/lib/animations'
+import { fadeInUp } from '@/lib/animations'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   SERVICE_MEGA_CATEGORIES,
   SERVICE_MEGA_CATEGORY_SERVICES,
@@ -258,9 +260,12 @@ function CapabilityGroups() {
 }
 
 function EngagementModel() {
+  const sectionRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(sectionRef)
+
   return (
     <ScrollReveal>
-      <section className="relative border-t border-white/[0.06] bg-[#0A0A0A] py-24 lg:py-32 xl:py-40">
+      <section ref={sectionRef} className="relative border-t border-white/[0.06] bg-[#0A0A0A] py-24 lg:py-32 xl:py-40">
         <div className="site-shell">
           <div className="mb-8 md:mb-10 xl:mb-12">
             <SectionEyebrow gutterBottom={false} className="mb-2 md:mb-3">
@@ -272,6 +277,7 @@ function EngagementModel() {
             <p className="mt-3 max-w-3xl text-base leading-relaxed text-white/60">
               The service changes. The delivery discipline does not.
             </p>
+            <ScrubProgressLine />
           </div>
 
           <MobileSwipeRail hint="Swipe steps" className="md:hidden" aria-label="Engagement model">
@@ -296,19 +302,14 @@ function EngagementModel() {
             ))}
           </MobileSwipeRail>
 
-          <motion.div
-            variants={staggerContainer}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, margin: '-60px' }}
-            className="hidden w-full grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16"
-          >
+          <div className="hidden w-full grid-cols-1 gap-8 md:grid md:grid-cols-2 lg:grid-cols-4 lg:gap-12 xl:gap-16">
             {engagementSteps.map((step, index) => (
-              <motion.article
+              <article
                 key={step.label}
-                variants={fadeInUp}
-                className="relative min-h-0 overflow-hidden border-t border-white/[0.06] px-0 pb-14 pt-10 transition-colors duration-200 hover:border-t-[1.5px] hover:border-brand-500/70 lg:min-h-[240px]"
+                data-scrub-item
+                className="relative min-h-0 overflow-hidden border-t border-white/[0.06] px-0 pb-14 pt-10 lg:min-h-[240px]"
               >
+                <ScrubRule />
                 <span
                   className="absolute right-0 top-6 z-0 select-none text-[150px] font-bold leading-none tracking-[-0.04em] text-white/[0.05] lg:text-[190px]"
                   aria-hidden
@@ -324,9 +325,9 @@ function EngagementModel() {
                     {step.description}
                   </p>
                 </div>
-              </motion.article>
+              </article>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
     </ScrollReveal>

@@ -3,6 +3,8 @@ import { notFound } from 'next/navigation'
 import { ExternalLink } from 'lucide-react'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
+import { ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { ScrubScope } from '@/components/motion/ScrubScope'
 import { CaseStudyStickyMetricsBar } from '@/components/case-studies/CaseStudyStickyMetricsBar'
 import { RelatedContent } from '@/components/shared/RelatedContent'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
@@ -190,17 +192,21 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
             <h2 className="text-2xl font-bold tracking-tight text-white md:text-3xl">The outcome</h2>
             <p className="mt-4 text-xl font-semibold text-white">{study.outcomeHeadline}</p>
             <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white/70">{study.outcomeSummary}</p>
+            <ScrubScope>
             <div className="mt-10 grid gap-4 sm:grid-cols-3">
               {study.metrics.map((m) => (
                 <div
                   key={m.label}
-                  className="rounded-card border border-white/[0.08] bg-[#111111] px-5 py-6 text-center"
+                  data-scrub-item
+                  className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] px-5 py-6 text-center"
                 >
+                  <ScrubRule />
                   <p className="text-3xl font-bold text-[#FFA91F] md:text-4xl">{m.value}</p>
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/55">{m.label}</p>
                 </div>
               ))}
             </div>
+            </ScrubScope>
           </section>
         </ScrollReveal>
 

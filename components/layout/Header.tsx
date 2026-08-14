@@ -379,6 +379,7 @@ export function Header() {
                         transition: { duration: reducedMotion ? 0 : 0.3 },
                       }}
                       className="relative z-[50] max-h-[min(85vh,calc(100dvh-5rem))] overflow-y-auto rounded-b-card border-t border-neutral-800 bg-black/95 backdrop-blur-sm md:hidden"
+                      data-lenis-prevent
                     >
                       <div className="space-y-1 px-4 py-4 sm:px-5">
                         {SITE_HEADER_NAV.map((entry, index) => (

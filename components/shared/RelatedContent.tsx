@@ -1,6 +1,8 @@
 import Link from 'next/link'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { ScrubScope } from '@/components/motion/ScrubScope'
 
 export type RelatedCard = {
   href: string
@@ -28,14 +30,18 @@ export function RelatedContent({ eyebrow, heading, cards, footerLink }: RelatedC
           <div className="h-px w-6 shrink-0 bg-[#FFA91F]" aria-hidden />
           <span className="text-xs font-semibold uppercase tracking-[0.15em] text-[#FFA91F]">{eyebrow}</span>
         </div>
-        <h2 className="mb-10 text-2xl font-bold tracking-[-0.02em] text-white md:text-3xl">{heading}</h2>
-        <div className="grid gap-6 md:grid-cols-3">
-          {cards.map((c) => (
-            <Link
-              key={c.href}
-              href={c.href}
-              className="group/card flex flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#FFA91F]/30"
-            >
+        <h2 className="text-2xl font-bold tracking-[-0.02em] text-white md:text-3xl">{heading}</h2>
+        <ScrubScope>
+          <ScrubProgressLine className="mb-10" />
+          <div className="grid gap-6 md:grid-cols-3">
+            {cards.map((c) => (
+              <Link
+                key={c.href}
+                href={c.href}
+                data-scrub-item
+                className="group/card relative flex flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#FFA91F]/30"
+              >
+                <ScrubRule />
               <div className="relative aspect-[16/10] w-full overflow-hidden">
                 <SafeRasterImage
                   src={c.image}
@@ -60,6 +66,7 @@ export function RelatedContent({ eyebrow, heading, cards, footerLink }: RelatedC
             </Link>
           ))}
         </div>
+        </ScrubScope>
         {footerLink ? (
           <div className="mt-8 flex justify-end">
             <Link

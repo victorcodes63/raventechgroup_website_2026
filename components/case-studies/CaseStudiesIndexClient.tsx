@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef } from 'react'
 import type { CaseStudy } from '@/lib/data/caseStudies'
 import { CaseStudyCard } from '@/components/case-studies/CaseStudyCard'
 import { CaseStudyFilters } from '@/components/case-studies/CaseStudyFilters'
@@ -9,6 +9,8 @@ import {
   type IndustryFilterId,
 } from '@/components/case-studies/caseStudyIndustryFilters'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { ScrubProgressLine } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 
 type CaseStudiesIndexClientProps = {
   studies: CaseStudy[]
@@ -16,6 +18,8 @@ type CaseStudiesIndexClientProps = {
 
 export function CaseStudiesIndexClient({ studies }: CaseStudiesIndexClientProps) {
   const [filter, setFilter] = useState<IndustryFilterId>('all')
+  const rootRef = useRef<HTMLDivElement | null>(null)
+  useScrubReveal(rootRef)
 
   const featured = useMemo(() => studies.find((s) => s.featured), [studies])
 
@@ -32,7 +36,8 @@ export function CaseStudiesIndexClient({ studies }: CaseStudiesIndexClientProps)
   const showFeaturedBlock = filter === 'all' && featured != null && filtered.some((s) => s.slug === featured.slug)
 
   return (
-    <div className="space-y-12 lg:space-y-16">
+    <section ref={rootRef} className="space-y-12 lg:space-y-16">
+      <ScrubProgressLine className="mt-0" />
       <CaseStudyFilters active={filter} onChange={setFilter} />
 
       {filtered.length === 0 ? (
@@ -54,7 +59,9 @@ export function CaseStudiesIndexClient({ studies }: CaseStudiesIndexClientProps)
       {gridStudies.length > 0 ? (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {gridStudies.map((study) => (
-            <CaseStudyCard key={study.slug} study={study} variant="grid" />
+            <div key={study.slug} data-scrub-item>
+              <CaseStudyCard study={study} variant="grid" />
+            </div>
           ))}
         </div>
       ) : null}
@@ -75,6 +82,6 @@ export function CaseStudiesIndexClient({ studies }: CaseStudiesIndexClientProps)
           </CTAButton>
         </div>
       </div>
-    </div>
+    </section>
   )
 }

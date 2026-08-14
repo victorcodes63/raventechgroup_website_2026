@@ -1,9 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { fadeInUp } from '@/lib/animations'
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { Contact } from '@/components/sections/Contact'
 import { SITE_SECTION_STAGGER } from '@/lib/siteScrollMotion'
 import { Suspense } from 'react'
@@ -74,7 +76,8 @@ function ContactFaqAccordion({ items }: { items: FaqItem[] }) {
         const panelId = `contact-faq-panel-${index}`
 
         return (
-          <div key={faq.question} className="py-4 sm:py-5">
+          <div key={faq.question} data-scrub-item className="relative overflow-hidden py-4 sm:py-5">
+            <ScrubRule />
             <button
               type="button"
               id={triggerId}
@@ -120,6 +123,9 @@ function ContactFaqAccordion({ items }: { items: FaqItem[] }) {
 
 export default function ContactPage() {
   const s = (n: number) => n * SITE_SECTION_STAGGER
+  const faqRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(faqRef)
+
   return (
     <main className="min-h-screen bg-[#0A0A0A]">
       <ScrollReveal delay={s(0)}>
@@ -129,7 +135,7 @@ export default function ContactPage() {
       </ScrollReveal>
 
       <ScrollReveal delay={s(1)}>
-        <section className="border-t border-white/[0.06] bg-[#0A0A0A] py-16 text-white sm:py-20 lg:py-32">
+        <section ref={faqRef} className="border-t border-white/[0.06] bg-[#0A0A0A] py-16 text-white sm:py-20 lg:py-32">
           <div className="mx-auto w-full max-w-7xl px-5 md:px-8 lg:px-12">
             <div className="grid w-full gap-8 sm:gap-10 lg:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)] lg:items-start lg:gap-14">
               <motion.div
@@ -150,6 +156,7 @@ export default function ContactPage() {
                   No jargon here—just how we usually work. Still unsure? Send the form anyway; we&apos;d rather read your note than lose you
                   to a FAQ.
                 </p>
+                <ScrubProgressLine />
               </motion.div>
               <ContactFaqAccordion items={faqItems} />
             </div>

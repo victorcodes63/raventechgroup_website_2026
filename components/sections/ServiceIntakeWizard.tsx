@@ -1,19 +1,26 @@
 'use client'
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import Image from 'next/image'
 import Link from 'next/link'
 import { AnimatePresence, motion, useMotionTemplate, useSpring, useTransform } from 'framer-motion'
 import { ChevronLeft, ChevronRight, Minus, Plus } from 'lucide-react'
+import { useLenis } from 'lenis/react'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 
 import { useSectionScrollProgress } from '@/components/motion/ScrollDrivenTypography'
+import { useLenisScrollTo } from '@/components/motion/useLenisScrollTo'
 import { CTAButton, CTAButtonElement } from '@/components/ui/CTAButton'
 import { services } from '@/lib/data/services'
+import { getServiceMetricsBand, type ServiceMetricBandItem } from '@/lib/data/serviceMetricsBand'
 import { serviceIntakeSpotlights } from '@/lib/data/serviceIntakeSpotlights'
 
 type Step = 1 | 2 | 3 | 4
+
+function spotlightMetricValue(item: ServiceMetricBandItem): string {
+  if (item.kind === 'text') return item.value
+  return `${item.prefix ?? ''}${item.end}${item.suffix}`
+}
 
 const stateOptions = [
   { id: 'idea', label: 'Idea' },
@@ -86,8 +93,10 @@ function buildPrefillMessage(params: {
 
 function ServiceSpotlightCarousel({
   recommendedSlugs,
+  className = '',
 }: {
   recommendedSlugs: string[]
+  className?: string
 }) {
   const scrollerRef = useRef<HTMLDivElement>(null)
 
@@ -114,8 +123,8 @@ function ServiceSpotlightCarousel({
   const isSingleCard = cardsToRender.length === 1
 
   return (
-    <div className="flex flex-col">
-        <div className="mb-3 flex items-end justify-between gap-3 sm:mb-4">
+    <div className={`flex min-h-0 flex-col ${className}`.trim()}>
+        <div className="mb-3 flex shrink-0 items-end justify-between gap-3 sm:mb-4">
           <div className="min-w-0">
             <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/40">How we help</p>
             <p className="mt-1 max-w-md text-sm text-white/50">Browse what we deliver — or use the quiz to narrow it down.</p>
@@ -124,7 +133,7 @@ function ServiceSpotlightCarousel({
             <button
               type="button"
               onClick={() => scroll(-1)}
-              className="flex h-10 w-10 items-center justify-center rounded-sm border border-white/[0.1] bg-white/[0.05] text-white/50 transition hover:border-white/20 hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-card border border-white/[0.1] bg-white/[0.05] text-white/50 transition hover:border-white/20 hover:text-white"
               aria-label="Previous services"
             >
               <ChevronLeft size={18} />
@@ -132,7 +141,7 @@ function ServiceSpotlightCarousel({
             <button
               type="button"
               onClick={() => scroll(1)}
-              className="flex h-10 w-10 items-center justify-center rounded-sm border border-white/[0.1] bg-white/[0.05] text-white/50 transition hover:border-white/20 hover:text-white"
+              className="flex h-10 w-10 items-center justify-center rounded-card border border-white/[0.1] bg-white/[0.05] text-white/50 transition hover:border-white/20 hover:text-white"
               aria-label="Next services"
             >
               <ChevronRight size={18} />
@@ -143,50 +152,77 @@ function ServiceSpotlightCarousel({
 
       <div
         ref={scrollerRef}
-        className="-mx-1 flex snap-x snap-mandatory gap-3 overflow-x-auto px-1 pb-3 pt-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:gap-4 sm:px-0 [&::-webkit-scrollbar]:hidden"
+        data-lenis-prevent-horizontal
+        className="-mx-1 flex snap-x snap-mandatory items-stretch gap-3 overflow-x-auto px-1 pb-3 pt-1 [-ms-overflow-style:none] [scrollbar-width:none] sm:mx-0 sm:gap-4 sm:px-0 lg:min-h-0 lg:flex-1 lg:pb-0 lg:pt-0 [&::-webkit-scrollbar]:hidden"
       >
-        {cardsToRender.map((item) => {
+        {cardsToRender.map((item, index) => {
           const suggested = recommendedSlugs.includes(item.slug)
+          const service = services.find((entry) => entry.slug === item.slug)
+          const metrics = getServiceMetricsBand(item.slug).slice(0, 2)
+          const tags = service?.tags ?? []
+          const indexLabel = String(index + 1).padStart(2, '0')
           return (
             <article
               key={item.slug}
               data-spotlight-card
-              className={`relative flex flex-col shrink-0 snap-center overflow-hidden rounded-sm border bg-[#111111] shadow-[0_18px_50px_-38px_rgba(0,0,0,0.6)] transition sm:w-[min(100%,340px)] lg:w-[420px] ${
+              className={`relative flex shrink-0 snap-center flex-col overflow-hidden rounded-card border bg-[#111111] p-5 shadow-[0_18px_50px_-38px_rgba(0,0,0,0.6)] transition sm:w-[min(100%,340px)] sm:p-6 lg:w-[420px] lg:p-7 ${
                 isSingleCard ? 'w-full' : 'w-[min(88vw,300px)]'
               } ${
                 suggested ? 'border-brand-500/50 ring-2 ring-brand-500/25' : 'border-white/[0.08]'
               }`}
             >
               {suggested && (
-                <span className="absolute right-3 top-3 z-10 rounded-sm bg-brand-500 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-black">
+                <span className="absolute right-3 top-3 z-10 rounded-full bg-brand-500 px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide text-[#0A0A0A]">
                   Suggested
                 </span>
               )}
-              <div className="p-5 pb-4">
-                <p className="inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/40">
-                  <span className="h-1.5 w-1.5 rounded-full bg-white/25" aria-hidden />
-                  {item.category}
-                </p>
-                <h3 className="mt-3 text-[17px] font-bold leading-snug tracking-tight text-white">{item.headline}</h3>
-                <p className="mt-2 text-[13px] leading-relaxed text-white/55">{item.body}</p>
+              <span
+                aria-hidden
+                className="pointer-events-none absolute -right-1 top-4 select-none text-[5.5rem] font-bold leading-none tracking-[-0.04em] text-white/[0.04]"
+              >
+                {indexLabel}
+              </span>
+              <p className="relative inline-flex items-center gap-2 text-[11px] font-semibold uppercase tracking-[0.18em] text-[#FFA91F]">
+                <span className="h-px w-4 bg-[#FFA91F]" aria-hidden />
+                {item.category}
+              </p>
+              <h3 className="relative mt-4 text-[17px] font-bold leading-snug tracking-tight text-white">{item.headline}</h3>
+              <p className="relative mt-2 text-[13px] leading-relaxed text-white/55">{item.body}</p>
+
+              <div className="relative mt-auto border-t border-white/[0.06] pt-5">
+                <div className="grid grid-cols-2 gap-4">
+                  {metrics.map((metric) => (
+                    <div key={metric.label}>
+                      <p className="text-xl font-bold tabular-nums tracking-[-0.03em] text-white">
+                        {spotlightMetricValue(metric)}
+                      </p>
+                      <p className="mt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-white/40">
+                        {metric.label}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+                {tags.length > 0 ? (
+                  <ul className="mt-4 space-y-1.5">
+                    {tags.map((tag) => (
+                      <li key={tag} className="flex gap-2 text-[13px] leading-snug text-white/55">
+                        <span className="shrink-0 text-[#FFA91F]/60" aria-hidden>
+                          +
+                        </span>
+                        {tag}
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
               </div>
+
               <Link
                 href={item.href}
-                className="group/img relative mt-auto flex-none block h-[132px] w-full overflow-hidden bg-black sm:h-[148px] md:h-[160px]"
+                className="group/card relative mt-5 inline-flex items-center text-sm font-semibold text-[#FFA91F]"
               >
-                <Image
-                  src={item.imageSrc}
-                  alt={item.headline}
-                  fill
-                  sizes="(max-width: 640px) 88vw, (max-width: 1024px) 340px, 420px"
-                  className="object-cover transition duration-700 ease-out group-hover/img:scale-[1.03] saturate-90 group-hover/img:saturate-100"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/95 via-black/45 to-black/25" />
-                <div className="absolute inset-x-0 bottom-0 p-4 text-white">
-                  <ArrowSwapRow groupName="img" iconSize={18} strokeWidth={2.2} className="text-sm font-semibold">
-                    View service
-                  </ArrowSwapRow>
-                </div>
+                <ArrowSwapRow groupName="card" iconSize={14} strokeWidth={2.2}>
+                  View service
+                </ArrowSwapRow>
               </Link>
             </article>
           )
@@ -197,6 +233,8 @@ function ServiceSpotlightCarousel({
 }
 
 export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardProps) {
+  const scrollTo = useLenisScrollTo()
+  const lenis = useLenis()
   const sectionRef = useRef<HTMLElement | null>(null)
   const assignSectionNode = useCallback(
     (node: HTMLElement | null) => {
@@ -244,10 +282,10 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
         const rect = el.getBoundingClientRect()
         const elementCenter = rect.top + window.scrollY + rect.height / 2
         const targetScrollY = elementCenter - window.innerHeight / 2
-        window.scrollTo({ top: targetScrollY, behavior: 'smooth' })
+        scrollTo(targetScrollY)
       }, 120)
     }
-  }, [step])
+  }, [scrollTo, step])
 
   useEffect(() => {
     if (openSection === 3 && q3Ref.current) {
@@ -257,11 +295,16 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
         const rect = el.getBoundingClientRect()
         const viewportBottom = window.innerHeight
         if (rect.bottom > viewportBottom - 32) {
-          window.scrollBy({ top: rect.bottom - viewportBottom + 80, behavior: 'smooth' })
+          const delta = rect.bottom - viewportBottom + 80
+          if (lenis) {
+            lenis.scrollTo(lenis.scroll + delta)
+          } else {
+            window.scrollBy({ top: delta, behavior: 'smooth' })
+          }
         }
       }, 180)
     }
-  }, [openSection])
+  }, [lenis, openSection])
 
   const stageLabel = useMemo(
     () => stateOptions.find((opt) => opt.id === projectStage)?.label ?? 'Not selected',
@@ -375,7 +418,7 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
             className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_minmax(0,3fr)] lg:items-stretch lg:gap-8 xl:gap-10"
             style={{ opacity: bodyOpacity, y: bodyY }}
           >
-            <div className="order-1 flex min-w-0 flex-col overflow-hidden rounded-sm border border-white/[0.08] bg-[#111111] lg:order-1">
+            <div className="order-1 flex min-w-0 flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] lg:order-1">
               <div className="h-1 w-full bg-white/[0.05]">
                 <motion.div
                   className="h-full bg-brand-500"
@@ -681,8 +724,11 @@ export function ServiceIntakeWizard({ registerSectionRef }: ServiceIntakeWizardP
               </div>
             </div>
 
-            <div className="order-2 min-w-0 pt-1 lg:order-2 lg:pt-1">
-              <ServiceSpotlightCarousel recommendedSlugs={step === 4 ? recommended : []} />
+            <div className="order-2 min-w-0 lg:order-2 lg:flex lg:min-h-0 lg:flex-col">
+              <ServiceSpotlightCarousel
+                className="lg:min-h-0 lg:flex-1"
+                recommendedSlugs={step === 4 ? recommended : []}
+              />
             </div>
           </motion.div>
         </div>

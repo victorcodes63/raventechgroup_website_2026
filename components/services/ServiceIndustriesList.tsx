@@ -5,6 +5,7 @@ import { motion, useReducedMotion } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
 import { pickIndustryIcon } from '@/lib/data/industryIcons'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import {
   serviceIndustryCardVariants,
   serviceSectionHeaderChildVariants,
@@ -44,8 +45,11 @@ function ServiceIndustryRow({
       whileInView={reducedMotion ? undefined : 'visible'}
       viewport={SECTION_VIEWPORT}
       transition={{ delay: reducedMotion ? 0 : index * 0.035 }}
-      className="group relative list-none"
+      data-scrub-item
+      data-scrub-fade="0"
+      className="group relative list-none overflow-hidden"
     >
+      <ScrubRule />
       <div className="relative overflow-hidden border-b border-white/[0.06] px-1 py-5 transition-colors duration-300 group-hover:bg-[#111111] sm:px-3 sm:py-6">
         <span
           aria-hidden
@@ -144,6 +148,7 @@ export function ServiceIndustriesList({
         >
           {industries.length} sectors · indexed by delivery depth
         </motion.p>
+        <ScrubProgressLine className="mt-8" />
       </motion.div>
 
       <div className="mt-12 min-w-0 border-t border-white/[0.08] sm:mt-14 lg:mt-16">

@@ -1,10 +1,12 @@
 import type { Metadata } from 'next'
 import { Manrope } from 'next/font/google'
+import 'lenis/dist/lenis.css'
 import './globals.css'
 import { Header } from '@/components/layout/Header'
 import { GlobalContactLead } from '@/components/layout/GlobalContactLead'
 import { Footer } from '@/components/layout/Footer'
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
+import { LenisProvider } from '@/components/motion/LenisProvider'
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -116,12 +118,14 @@ export default function RootLayout({
             adsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? ''}
           />
         )}
-        <Header />
-        <main className="min-h-screen min-w-0 overflow-x-clip">
-          {children}
-        </main>
-        <GlobalContactLead />
-        <Footer />
+        <LenisProvider>
+          <Header />
+          <main className="min-h-screen min-w-0 overflow-x-clip">
+            {children}
+          </main>
+          <GlobalContactLead />
+          <Footer />
+        </LenisProvider>
       </body>
     </html>
   )

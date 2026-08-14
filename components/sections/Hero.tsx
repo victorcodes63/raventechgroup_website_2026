@@ -1,6 +1,8 @@
 'use client'
 
 import { useState, useEffect, useCallback, useRef, useLayoutEffect, type CSSProperties } from 'react'
+import Image from 'next/image'
+import Link from 'next/link'
 import {
   motion,
   AnimatePresence,
@@ -10,10 +12,9 @@ import {
   useTransform,
   type MotionValue,
 } from 'framer-motion'
+import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { SubtleParallaxBackground } from '@/components/motion/SubtleParallaxBackground'
 import { LetterFillReveal } from '@/components/motion/LetterFillReveal'
-import Link from 'next/link'
-import { ChevronLeft, ChevronRight, Plus } from 'lucide-react'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { TrustedByLogoMarquee } from '@/components/trust/TrustedByLogoMarquee'
 import { heroClientLogos } from '@/lib/data/clientLogos'
@@ -27,29 +28,36 @@ import { HOMEPAGE_INTAKE_SEAM } from '@/lib/siteScrollMotion'
 
 /* ─── Panel data ──────────────────────────────────────────── */
 
-type PanelGeometry = {
-  baseClass: string
-  /** Soft mesh / radial layers only (no stripe texture) */
-  ambient: string
-}
-
 type HeroPanel = {
   id: string
   category: string
   headline: string
   description: string
   cta: { label: string; href: string }
-  geometry: PanelGeometry
+  imageSrc: string
   tags: { label: string; href: string }[]
   /** Fills the same band as the overview client logos so spacing stays even on other panels */
   accentLine?: string
 }
 
-function PanelBackdrop({ g }: { g: PanelGeometry }) {
+function PanelBackdrop({
+  imageSrc,
+  priority = false,
+}: {
+  imageSrc: string
+  priority?: boolean
+}) {
   return (
-    <div className="pointer-events-none absolute inset-0" aria-hidden>
-      <div className={`absolute inset-0 ${g.baseClass}`} />
-      <div className="absolute inset-0" style={{ background: g.ambient }} />
+    <div className="pointer-events-none absolute inset-0 bg-[#0A0A0A]" aria-hidden>
+      <Image
+        src={imageSrc}
+        alt=""
+        fill
+        priority={priority}
+        sizes="(min-width: 1024px) 72vw, 100vw"
+        className="object-cover object-center saturate-[0.25] contrast-[1.08] brightness-[0.62]"
+      />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A] via-[#0A0A0A]/70 to-[#0A0A0A]/30" />
     </div>
   )
 }
@@ -129,11 +137,7 @@ const panels: HeroPanel[] = [
     description:
       'Custom software, cloud infrastructure, and systems that replace manual work for growth-stage teams in Nairobi and across Kenya.',
     cta: { label: 'Explore services', href: '/services' },
-    geometry: {
-      baseClass: 'bg-[#0A0A0A]',
-      ambient:
-        'radial-gradient(ellipse 120% 90% at 0% 0%, rgba(255,255,255,0.03) 0%, transparent 60%), radial-gradient(circle at 80% 80%, rgba(255,255,255,0.02) 0%, transparent 50%)',
-    },
+    imageSrc: '/images/services/digital-transformation.jpeg',
     tags: [
       { label: 'Web development', href: '/services/web-development' },
       { label: 'Software development', href: '/services/software-development' },
@@ -149,11 +153,7 @@ const panels: HeroPanel[] = [
     description:
       'We scope, design, and ship custom platforms — from SACCO portals to M-Pesa integrations to full HR systems across Kenya.',
     cta: { label: 'View service', href: '/services/software-development' },
-    geometry: {
-      baseClass: 'bg-[#0A0A0A]',
-      ambient:
-        'radial-gradient(ellipse 105% 95% at 100% 8%, rgba(255,255,255,0.03) 0%, transparent 60%), radial-gradient(circle at 15% 85%, rgba(255,255,255,0.02) 0%, transparent 55%)',
-    },
+    imageSrc: '/images/services/software-development.jpeg',
     tags: [
       { label: 'Web development', href: '/services/web-development' },
       { label: 'Web platforms', href: '/services/software-development' },
@@ -170,11 +170,7 @@ const panels: HeroPanel[] = [
     description:
       'We migrate, architect, and manage cloud environments so downtime and growing pains stop being your problem as you scale across Kenya and East Africa.',
     cta: { label: 'View service', href: '/services/cloud-solutions' },
-    geometry: {
-      baseClass: 'bg-[#0A0A0A]',
-      ambient:
-        'radial-gradient(ellipse 100% 85% at 50% 0%, rgba(255,255,255,0.025) 0%, transparent 60%), radial-gradient(circle at 85% 65%, rgba(255,255,255,0.02) 0%, transparent 55%)',
-    },
+    imageSrc: '/images/services/cloud-solutions.jpeg',
     tags: [
       { label: 'AWS & Azure', href: '/services/cloud-solutions' },
       { label: 'Terraform & IaC', href: '/services/cloud-solutions' },
@@ -191,11 +187,7 @@ const panels: HeroPanel[] = [
     description:
       'From KYC compliance to fintech data protection — we harden systems before breaches become headlines for regulated teams in Kenya.',
     cta: { label: 'View service', href: '/services/cybersecurity' },
-    geometry: {
-      baseClass: 'bg-[#0A0A0A]',
-      ambient:
-        'radial-gradient(ellipse 85% 105% at 100% 50%, rgba(255,255,255,0.025) 0%, transparent 65%), radial-gradient(circle at 30% 30%, rgba(255,255,255,0.015) 0%, transparent 55%)',
-    },
+    imageSrc: '/images/services/cybersecurity.jpeg',
     tags: [
       { label: 'Threat modelling', href: '/services/cybersecurity' },
       { label: 'Penetration testing', href: '/services/cybersecurity' },
@@ -212,11 +204,7 @@ const panels: HeroPanel[] = [
     description:
       'We assess your current setup, name what is blocking delivery, and map technology decisions that hold up in 12 months for leadership teams in Nairobi.',
     cta: { label: 'View service', href: '/services/it-consulting' },
-    geometry: {
-      baseClass: 'bg-[#0A0A0A]',
-      ambient:
-        'radial-gradient(ellipse 115% 75% at 20% 100%, rgba(255,255,255,0.025) 0%, transparent 60%), radial-gradient(circle at 90% 15%, rgba(255,255,255,0.02) 0%, transparent 50%)',
-    },
+    imageSrc: '/images/services/it-consulting.jpeg',
     tags: [
       { label: 'CTO advisory', href: '/services/it-consulting' },
       { label: 'Architecture reviews', href: '/services/it-consulting' },
@@ -543,7 +531,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                       : 'min-w-[3.25rem] cursor-pointer group/strip xl:min-w-[3.75rem] min-[1600px]:min-w-[4.25rem] min-[1920px]:min-w-[4.75rem]'
                   }`}
                 >
-                  <PanelBackdrop g={panel.geometry} />
+                  <PanelBackdrop imageSrc={panel.imageSrc} priority={i === 0} />
 
                   {/* Stepped glass (xylophone) when collapsed — smooth gradients + blur */}
                   <AnimatePresence>
@@ -564,7 +552,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                     className="pointer-events-none absolute inset-0 z-[5] transition-opacity duration-[1.35s]"
                     style={{ opacity: isActive ? 1 : 0 }}
                   >
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-[#0A0A0A]/25 to-transparent" />
                   </div>
 
                   {/* ── Collapsed: vertical label + circled plus ── */}
@@ -772,8 +760,8 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                     className="relative isolate flex h-full min-h-0 flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-8 pb-6"
                   >
                     <div className="pointer-events-none absolute inset-0 -z-10">
-                      <PanelBackdrop g={panel.geometry} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                      <PanelBackdrop imageSrc={panel.imageSrc} priority={i === 0} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-[#0A0A0A]/25 to-transparent" />
                     </div>
                     <div aria-hidden className="pointer-events-none absolute inset-y-0 left-0 w-0.5 bg-brand-500" />
 
@@ -864,6 +852,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
           <div
             ref={mobileScrollRef}
             className="-mx-5 flex min-h-0 flex-1 gap-3 overflow-x-auto overflow-y-visible scroll-pl-5 scroll-pr-5 snap-x snap-mandatory px-5 pb-1 [touch-action:pan-x_pan-y] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+            data-lenis-prevent-horizontal
             onTouchStart={() => setPaused(true)}
             onTouchEnd={() => setPaused(false)}
           >
@@ -880,8 +869,8 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                   className="relative isolate flex min-h-[calc(100svh_-_140px)] w-[min(32rem,calc(100vw-2.75rem))] shrink-0 snap-start snap-always flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-5 pb-8 sm:p-8 sm:pb-10"
                 >
                   <div className="pointer-events-none absolute inset-0 -z-10">
-                    <PanelBackdrop g={panel.geometry} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
+                    <PanelBackdrop imageSrc={panel.imageSrc} priority={i === 0} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-[#0A0A0A]/25 to-transparent" />
                   </div>
                   <div className="relative space-y-4">
                     <div>

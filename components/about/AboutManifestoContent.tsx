@@ -7,6 +7,8 @@ import { motion, useReducedMotion, useSpring, useTransform } from 'framer-motion
 
 import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { useSectionScrollProgress } from '@/components/motion/ScrollDrivenTypography'
 import { CTAButton } from '@/components/ui/CTAButton'
 import {
@@ -130,7 +132,9 @@ function CaseStudyPreviewCard({ study }: { study: CaseStudy }) {
 
 export function AboutManifestoContent() {
   const reducedMotion = useReducedMotion()
+  const pageRef = useRef<HTMLElement | null>(null)
   const principlesSectionRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(pageRef, { reduced: reducedMotion })
   const [isSmallLaptop, setIsSmallLaptop] = useState(false)
   const { scrollYProgress: principlesScroll, isReduced: principlesHookReduced } = useSectionScrollProgress(
     principlesSectionRef as RefObject<HTMLElement | null>,
@@ -171,7 +175,7 @@ export function AboutManifestoContent() {
   const principlesContentY = useSpring(principlesContentYRaw, { stiffness: 300, damping: 26, mass: 0.8 })
 
   return (
-    <main className="min-w-0 bg-[#050505] text-white">
+    <main ref={pageRef} className="min-w-0 bg-[#050505] text-white">
       <section className="relative flex min-h-[80vh] flex-col justify-center bg-[#050505] px-0 py-24 md:py-28 lg:py-32">
         <div
           className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_85%_60%_at_100%_0%,rgba(255,169,31,0.04),transparent_55%)]"
@@ -290,6 +294,7 @@ export function AboutManifestoContent() {
                     <span className="text-brand-500">phone number</span>, not a process diagram.
                   </p>
                 </motion.blockquote>
+                <ScrubProgressLine className="mt-10 lg:mt-14" />
 
                 <motion.div variants={serviceSectionHeaderChildVariants} className="mt-10 lg:mt-14">
                   <div className="h-px w-24 bg-gradient-to-r from-[#FFA91F] to-[#FFA91F]/10" aria-hidden />
@@ -325,18 +330,12 @@ export function AboutManifestoContent() {
 
                 <div className="mt-14 border-t border-white/[0.08]">
                   {STORY_COMMITMENTS.map((c, i) => (
-                    <motion.div
+                    <div
                       key={c.lead}
-                      className="group grid gap-2 border-b border-white/[0.08] py-7 sm:grid-cols-[3rem_1fr] sm:gap-6"
-                      initial={reducedMotion ? false : { opacity: 0, y: 14 }}
-                      whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-                      viewport={{ once: true, margin: '-60px' }}
-                      transition={{
-                        duration: reducedMotion ? 0 : 0.5,
-                        delay: reducedMotion ? 0 : i * 0.07,
-                        ease: [0.22, 1, 0.36, 1],
-                      }}
+                      data-scrub-item
+                      className="group relative grid gap-2 overflow-hidden border-b border-white/[0.08] py-7 sm:grid-cols-[3rem_1fr] sm:gap-6"
                     >
+                      <ScrubRule />
                       <span className="font-mono text-xs font-semibold tabular-nums text-brand-500/70 sm:pt-1.5">
                         {String(i + 1).padStart(2, '0')}
                       </span>
@@ -344,7 +343,7 @@ export function AboutManifestoContent() {
                         <span className="font-semibold text-white">{c.lead}</span>{' '}
                         <span className="text-white/55">{c.rest}</span>
                       </p>
-                    </motion.div>
+                    </div>
                   ))}
                 </div>
               </motion.div>
@@ -373,6 +372,7 @@ export function AboutManifestoContent() {
                 <span className="text-white/40">won&apos;t compromise on.</span>
               </h2>
               <p className="mt-8 max-w-sm text-base leading-relaxed text-white/55">Five commitments you can hold us to.</p>
+              <ScrubProgressLine />
             </div>
 
             <motion.div
@@ -384,14 +384,13 @@ export function AboutManifestoContent() {
               }}
             >
               {PRINCIPLES.map((p, i) => (
-                <motion.article
+                <article
                   key={p.title}
-                  initial={reducedMotion ? false : { opacity: 0, y: 16 }}
-                  whileInView={reducedMotion ? undefined : { opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: '-10%' }}
-                  transition={{ duration: reducedMotion ? 0 : 0.5, delay: reducedMotion ? 0 : i * 0.08, ease: [0.22, 1, 0.36, 1] }}
-                  className="group relative bg-[#050505] p-8 transition-colors duration-300 hover:bg-[#0a0a0a] lg:p-10"
+                  data-scrub-item
+                  data-scrub-fade="0"
+                  className="group relative overflow-hidden bg-[#050505] p-8 transition-colors duration-300 hover:bg-[#0a0a0a] lg:p-10"
                 >
+                  <ScrubRule />
                   <div className="flex items-start gap-6 lg:gap-8">
                     <div className="flex flex-shrink-0 flex-col items-center pt-2">
                       <span className="font-mono text-sm font-semibold text-[#FFA91F]">
@@ -409,7 +408,7 @@ export function AboutManifestoContent() {
                       </p>
                     </div>
                   </div>
-                </motion.article>
+                </article>
               ))}
             </motion.div>
           </div>

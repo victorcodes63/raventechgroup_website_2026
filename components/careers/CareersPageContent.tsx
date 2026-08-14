@@ -1,9 +1,12 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   serviceCapabilityStaggerChildVariants,
   serviceCapabilityStaggerParentVariants,
@@ -16,9 +19,11 @@ const VIEWPORT = { once: true, margin: '-80px' as const }
 
 export function CareersPageContent() {
   const reducedMotion = useReducedMotion()
+  const pageRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(pageRef, { reduced: reducedMotion })
 
   return (
-    <main className="min-w-0 bg-[#050505] text-white">
+    <main ref={pageRef} className="min-w-0 bg-[#050505] text-white">
       <section className="relative flex min-h-[80vh] flex-col justify-center bg-[#050505] px-0 py-24 md:py-28 lg:py-32">
         <div
           aria-hidden
@@ -78,10 +83,11 @@ export function CareersPageContent() {
                   <br />
                   <span className="text-white/40">Serious delivery standards.</span>
                 </h2>
-                <p className="mt-7 max-w-md text-base leading-relaxed text-white/60">
+                  <p className="mt-7 max-w-md text-base leading-relaxed text-white/60">
                   We run lean by design. You get direct context, visible impact, and less process noise between problem
                   and execution.
                 </p>
+                <ScrubProgressLine />
               </motion.div>
 
               <motion.div
@@ -95,8 +101,11 @@ export function CareersPageContent() {
                   <motion.article
                     key={pillar.title}
                     variants={serviceCapabilityStaggerChildVariants}
-                    className="group relative bg-[#050505] p-7 transition-colors duration-300 hover:bg-[#0a0a0a] lg:p-8"
+                    data-scrub-item
+                    data-scrub-fade="0"
+                    className="group relative overflow-hidden bg-[#050505] p-7 transition-colors duration-300 hover:bg-[#0a0a0a] lg:p-8"
                   >
+                    <ScrubRule />
                     <div className="flex items-start gap-5 lg:gap-7">
                       <div className="flex flex-shrink-0 flex-col items-center pt-1.5">
                         <span className="font-mono text-sm font-semibold text-[#FFA91F]">
@@ -147,6 +156,7 @@ export function CareersPageContent() {
               >
                 We respect your time. Every stage has a reason, and every candidate gets an outcome.
               </motion.p>
+              <ScrubProgressLine />
             </motion.div>
 
             <motion.div
@@ -160,8 +170,11 @@ export function CareersPageContent() {
                 <motion.article
                   key={step.step}
                   variants={serviceCapabilityStaggerChildVariants}
-                  className="rounded-card border border-white/[0.08] bg-[#111111] p-7 transition-colors duration-300 hover:bg-[#161616]"
+                  data-scrub-item
+                  data-scrub-fade="0"
+                  className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-7 transition-colors duration-300 hover:bg-[#161616]"
                 >
+                  <ScrubRule />
                   <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-brand-500">
                     Step {step.step}
                   </p>

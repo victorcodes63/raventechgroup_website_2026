@@ -315,6 +315,7 @@ export function AboutPageContent() {
             />
             <motion.div
               className="flex gap-4 overflow-x-auto pb-2 custom-scrollbar md:grid md:grid-cols-3 md:gap-6 md:overflow-visible"
+              data-lenis-prevent-horizontal
               initial={reducedMotion ? false : 'hidden'}
               whileInView={reducedMotion ? undefined : 'visible'}
               viewport={SECTION_VIEWPORT}

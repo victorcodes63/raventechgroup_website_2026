@@ -14,6 +14,8 @@ import {
 import { CTAButton } from '@/components/ui/CTAButton'
 import { SITE_EASE } from '@/lib/siteScrollMotion'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
+import { ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 
 type ProblemRowProps = {
   lines: readonly string[]
@@ -172,6 +174,7 @@ function ProblemRow({
 export function Problems() {
   const sectionRef = useRef<HTMLElement>(null)
   const { scrollYProgress, isReduced } = useSectionScrollProgress(sectionRef)
+  useScrubReveal(sectionRef, { reduced: isReduced })
 
   const bannerOpacity = useTransform(
     scrollYProgress,
@@ -377,8 +380,11 @@ export function Problems() {
                   ].map(([number, label, detail]) => (
                     <div
                       key={label}
-                      className="grid grid-cols-[2.5rem_1fr] items-baseline gap-4 border-b border-white/[0.08] py-5 sm:grid-cols-[2.5rem_13rem_1fr] sm:gap-6"
+                      data-scrub-item
+                      data-scrub-fade="0"
+                      className="relative grid grid-cols-[2.5rem_1fr] items-baseline gap-4 overflow-hidden border-b border-white/[0.08] py-5 sm:grid-cols-[2.5rem_13rem_1fr] sm:gap-6"
                     >
+                      <ScrubRule />
                       <span className="font-mono text-xs font-semibold tabular-nums text-[#FFA91F]/70">{number}</span>
                       <p className="text-base font-semibold text-white sm:text-lg">{label}</p>
                       <p className="col-span-2 col-start-2 text-sm leading-relaxed text-white/45 sm:col-span-1 sm:col-start-3">

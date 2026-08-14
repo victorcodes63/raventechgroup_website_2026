@@ -1,10 +1,12 @@
 'use client'
 
+import { useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 
-import { ScrollReveal } from '@/components/motion/ScrollReveal'
+import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
+import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { getLiveProducts } from '@/lib/data/products'
 
@@ -12,10 +14,12 @@ const liveProducts = getLiveProducts()
 
 export function ProductsIndexContent() {
   const reduced = useReducedMotion()
+  const pageRef = useRef<HTMLElement | null>(null)
+  useScrubReveal(pageRef, { reduced })
   const instant = reduced ? { opacity: 1, y: 0 } : undefined
 
   return (
-    <main className="bg-[#0A0A0A] pt-[72px]">
+    <main ref={pageRef} className="bg-[#0A0A0A] pt-[72px]">
       <section className="py-24 lg:py-32">
         <div className="site-shell">
           <div className="content-wrap">
@@ -32,16 +36,17 @@ export function ProductsIndexContent() {
                 Raven ships products alongside client work — platforms we run, improve, and deploy for organisations
                 across East Africa.
               </p>
+              <ScrubProgressLine />
             </motion.div>
 
-            <ScrollReveal className="mt-16">
-              <ul className="grid gap-6 md:grid-cols-2">
-                {liveProducts.map((product) => (
-                  <li key={product.slug}>
-                    <Link
-                      href={product.bridgeHref}
-                      className="group flex h-full flex-col rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-all duration-300 hover:border-brand-500/40 hover:bg-[#161616]"
-                    >
+            <ul className="mt-16 grid gap-6 md:grid-cols-2">
+              {liveProducts.map((product) => (
+                <li key={product.slug} data-scrub-item className="relative overflow-hidden">
+                  <Link
+                    href={product.bridgeHref}
+                    className="group relative flex h-full flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-all duration-300 hover:border-brand-500/40 hover:bg-[#161616]"
+                  >
+                    <ScrubRule />
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-500">
@@ -56,12 +61,11 @@ export function ProductsIndexContent() {
                         />
                       </div>
                       <p className="mt-4 flex-1 text-base leading-relaxed text-white/60">{product.description}</p>
-                      <p className="mt-6 text-sm font-semibold text-brand-500">{product.tagline}</p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </ScrollReveal>
+                    <p className="mt-6 text-sm font-semibold text-brand-500">{product.tagline}</p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
 
             <p className="mt-12 text-sm text-white/40">
               Need custom software instead?{' '}

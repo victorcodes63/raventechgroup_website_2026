@@ -15,6 +15,22 @@
     font-size: 100%;
   }
 
+  /* Lenis owns wheel smoothing — CSS smooth-scroll fights the lerp. */
+  html.lenis,
+  html.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+
+  /*
+    Lenis CSS sets overscroll-behavior: contain on EVERY prevent flag, including
+    data-lenis-prevent-horizontal. That traps vertical page scroll on full-bleed
+    hero carousels and swipe rails. Contain only the axis we actually nested.
+  */
+  html.lenis [data-lenis-prevent-horizontal] {
+    overscroll-behavior-x: contain;
+    overscroll-behavior-y: auto;
+  }
+
   body {
     @apply bg-[#0A0A0A] text-white font-light;
     font-feature-settings: 'rlig' 1, 'calt' 1;

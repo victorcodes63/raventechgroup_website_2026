@@ -5,6 +5,8 @@ import { motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 
+import { useLenisScrollTo } from '@/components/motion/useLenisScrollTo'
+
 export type ServiceScrollNavItem = {
   id: string
   label: string
@@ -13,6 +15,7 @@ export type ServiceScrollNavItem = {
 export function ServiceScrollNav({ items }: { items: ServiceScrollNavItem[] }) {
   const [activeId, setActiveId] = useState(items[0]?.id ?? '')
   const reducedMotion = useReducedMotion()
+  const scrollTo = useLenisScrollTo()
   const itemIdsKey = items.map((i) => i.id).join('|')
 
   useEffect(() => {
@@ -51,13 +54,7 @@ export function ServiceScrollNav({ items }: { items: ServiceScrollNavItem[] }) {
     const element = document.getElementById(id)
     if (!element) return
 
-    const offset = 88
-    const elementTop = element.getBoundingClientRect().top + window.scrollY - offset
-
-    window.scrollTo({
-      top: elementTop,
-      behavior: reducedMotion ? 'auto' : 'smooth',
-    })
+    scrollTo(element, -88)
 
     setActiveId(id)
   }

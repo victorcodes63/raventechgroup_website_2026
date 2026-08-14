@@ -54,7 +54,7 @@ export function MobileSwipeRail({
       {hint ? (
         <p className={`mb-3 text-[11px] ${hintClassName}`}>{hint}</p>
       ) : null}
-      <div className={`${SCROLL_TRACK} ${bleedClasses}`} aria-label={ariaLabel}>
+      <div className={`${SCROLL_TRACK} ${bleedClasses}`} data-lenis-prevent-horizontal aria-label={ariaLabel}>
         {children}
       </div>
     </div>
