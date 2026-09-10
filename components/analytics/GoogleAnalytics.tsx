@@ -3,6 +3,7 @@
 import { useEffect, useRef } from 'react'
 import { usePathname } from 'next/navigation'
 import Script from 'next/script'
+import { GA_MEASUREMENT_ID } from '@/lib/data/analytics'
 
 interface GoogleAnalyticsProps {
   gaId: string
@@ -50,7 +51,7 @@ export function GoogleAnalytics({ gaId, adsId = '' }: GoogleAnalyticsProps) {
 
 export function trackPageView(url: string) {
   if (typeof window !== 'undefined' && window.gtag) {
-    const id = process.env.NEXT_PUBLIC_GA_ID || 'G-XXZLNHFX62'
+    const id = GA_MEASUREMENT_ID
     window.gtag('config', id, {
       page_path: url,
     })
