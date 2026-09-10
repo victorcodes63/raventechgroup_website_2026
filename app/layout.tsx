@@ -7,6 +7,7 @@ import { GlobalContactLead } from '@/components/layout/GlobalContactLead'
 import { Footer } from '@/components/layout/Footer'
 import { GoogleAnalytics } from '@/components/analytics/GoogleAnalytics'
 import { LenisProvider } from '@/components/motion/LenisProvider'
+import { GA_MEASUREMENT_ID } from '@/lib/data/analytics'
 
 const manrope = Manrope({
   subsets: ['latin'],
@@ -112,12 +113,10 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${manrope.className}`}>
       <body className="font-sans antialiased bg-[#0A0A0A] text-white">
-        {process.env.NEXT_PUBLIC_GA_ID && (
-          <GoogleAnalytics
-            gaId={process.env.NEXT_PUBLIC_GA_ID}
-            adsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? ''}
-          />
-        )}
+        <GoogleAnalytics
+          gaId={GA_MEASUREMENT_ID}
+          adsId={process.env.NEXT_PUBLIC_GOOGLE_ADS_ID ?? ''}
+        />
         <LenisProvider>
           <Header />
           <main className="min-h-screen min-w-0 overflow-x-clip">

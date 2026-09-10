@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef } from 'react'
+import { usePathname } from 'next/navigation'
 import Script from 'next/script'
 
 interface GoogleAnalyticsProps {
@@ -8,35 +9,21 @@ interface GoogleAnalyticsProps {
   adsId?: string
 }
 
-const CONSENT_KEY = 'cookie-consent'
-const CONSENT_EVENT = 'cookie-consent-updated'
-
 export function GoogleAnalytics({ gaId, adsId = '' }: GoogleAnalyticsProps) {
-  const [hasConsent, setHasConsent] = useState(false)
-
+  const pathname = usePathname()
+  const isFirstPath = useRef(true)
   const measurementId = gaId || adsId
 
   useEffect(() => {
-    if (!measurementId) return
-
-    const syncConsent = () => {
-      if (typeof window === 'undefined') return
-      const consent = window.localStorage.getItem(CONSENT_KEY)
-      setHasConsent(consent === 'accepted')
+    if (!gaId || typeof window === 'undefined' || typeof window.gtag !== 'function') return
+    if (isFirstPath.current) {
+      isFirstPath.current = false
+      return
     }
+    window.gtag('event', 'page_view', { page_path: pathname })
+  }, [gaId, pathname])
 
-    syncConsent()
-    window.addEventListener(CONSENT_EVENT, syncConsent as EventListener)
-    window.addEventListener('storage', syncConsent)
-    return () => {
-      window.removeEventListener(CONSENT_EVENT, syncConsent as EventListener)
-      window.removeEventListener('storage', syncConsent)
-    }
-  }, [measurementId])
-
-  if (!measurementId || !hasConsent) {
-    return null
-  }
+  if (!measurementId) return null
 
   return (
     <>
@@ -61,19 +48,15 @@ export function GoogleAnalytics({ gaId, adsId = '' }: GoogleAnalyticsProps) {
   )
 }
 
-// Helper function to track page views
 export function trackPageView(url: string) {
   if (typeof window !== 'undefined' && window.gtag) {
-    const gaId = process.env.NEXT_PUBLIC_GA_ID
-    if (gaId) {
-      window.gtag('config', gaId, {
-        page_path: url,
-      })
-    }
+    const id = process.env.NEXT_PUBLIC_GA_ID || 'G-XXZLNHFX62'
+    window.gtag('config', id, {
+      page_path: url,
+    })
   }
 }
 
-// Helper function to track events
 export function trackEvent(
   action: string,
   category: string,
@@ -105,7 +88,6 @@ export function trackAdsConversion(
   })
 }
 
-// Extend Window interface for TypeScript
 declare global {
   interface Window {
     gtag: (
@@ -116,4 +98,3 @@ declare global {
     dataLayer: unknown[]
   }
 }
-
