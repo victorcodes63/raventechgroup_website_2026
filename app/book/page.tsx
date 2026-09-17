@@ -6,7 +6,6 @@ import Link from 'next/link'
 import { ArrowLeft, CheckCircle, Clock, MapPin, Video } from 'lucide-react'
 
 import { CTAButtonElement } from '@/components/ui/CTAButton'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   bookingServiceOptions,
@@ -165,7 +164,6 @@ export default function BookPage() {
                   <p className="mt-3 text-sm leading-relaxed text-white/55">
                     Three ways to engage — then continue to Microsoft Bookings to choose a slot.
                   </p>
-                  <ScrubProgressLine className="mt-6" />
                 </div>
 
                 <div className="space-y-3">
@@ -187,7 +185,6 @@ export default function BookPage() {
                             : 'border-white/[0.08] bg-[#0A0A0A] hover:border-white/[0.15] hover:bg-[#141414]'
                         }`}
                       >
-                        <ScrubRule />
                         <div className="flex items-start gap-3 sm:gap-4">
                           <div
                             className={`mt-0.5 flex h-10 w-10 shrink-0 items-center justify-center rounded-card border transition-colors duration-200 ${

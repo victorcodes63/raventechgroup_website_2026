@@ -12,7 +12,6 @@ import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { fadeInUp } from '@/lib/animations'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   SERVICE_MEGA_CATEGORIES,
@@ -277,7 +276,6 @@ function EngagementModel() {
             <p className="mt-3 max-w-3xl text-base leading-relaxed text-white/60">
               The service changes. The delivery discipline does not.
             </p>
-            <ScrubProgressLine />
           </div>
 
           <MobileSwipeRail hint="Swipe steps" className="md:hidden" aria-label="Engagement model">
@@ -309,7 +307,6 @@ function EngagementModel() {
                 data-scrub-item
                 className="relative min-h-0 overflow-hidden border-t border-white/[0.06] px-0 pb-14 pt-10 lg:min-h-[240px]"
               >
-                <ScrubRule />
                 <span
                   className="absolute right-0 top-6 z-0 select-none text-[150px] font-bold leading-none tracking-[-0.04em] text-white/[0.05] lg:text-[190px]"
                   aria-hidden

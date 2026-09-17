@@ -1,7 +1,6 @@
 import Link from 'next/link'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { ScrubScope } from '@/components/motion/ScrubScope'
 
 export type RelatedCard = {
@@ -32,8 +31,7 @@ export function RelatedContent({ eyebrow, heading, cards, footerLink }: RelatedC
         </div>
         <h2 className="text-2xl font-bold tracking-[-0.02em] text-white md:text-3xl">{heading}</h2>
         <ScrubScope>
-          <ScrubProgressLine className="mb-10" />
-          <div className="grid gap-6 md:grid-cols-3">
+          <div className="mt-10 grid gap-6 md:grid-cols-3">
             {cards.map((c) => (
               <Link
                 key={c.href}
@@ -41,8 +39,7 @@ export function RelatedContent({ eyebrow, heading, cards, footerLink }: RelatedC
                 data-scrub-item
                 className="group/card relative flex flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#FFA91F]/30"
               >
-                <ScrubRule />
-              <div className="relative aspect-[16/10] w-full overflow-hidden">
+                <div className="relative aspect-[16/10] w-full overflow-hidden">
                 <SafeRasterImage
                   src={c.image}
                   alt={c.imageAlt}

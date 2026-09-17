@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from 'framer-motion'
 
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   serviceCapabilityStaggerChildVariants,
@@ -87,7 +86,6 @@ export function CareersPageContent() {
                   We run lean by design. You get direct context, visible impact, and less process noise between problem
                   and execution.
                 </p>
-                <ScrubProgressLine />
               </motion.div>
 
               <motion.div
@@ -105,7 +103,6 @@ export function CareersPageContent() {
                     data-scrub-fade="0"
                     className="group relative overflow-hidden bg-[#050505] p-7 transition-colors duration-300 hover:bg-[#0a0a0a] lg:p-8"
                   >
-                    <ScrubRule />
                     <div className="flex items-start gap-5 lg:gap-7">
                       <div className="flex flex-shrink-0 flex-col items-center pt-1.5">
                         <span className="font-mono text-sm font-semibold text-[#FFA91F]">
@@ -156,7 +153,6 @@ export function CareersPageContent() {
               >
                 We respect your time. Every stage has a reason, and every candidate gets an outcome.
               </motion.p>
-              <ScrubProgressLine />
             </motion.div>
 
             <motion.div
@@ -174,7 +170,6 @@ export function CareersPageContent() {
                   data-scrub-fade="0"
                   className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-7 transition-colors duration-300 hover:bg-[#161616]"
                 >
-                  <ScrubRule />
                   <p className="font-mono text-xs font-semibold uppercase tracking-[0.2em] text-brand-500">
                     Step {step.step}
                   </p>

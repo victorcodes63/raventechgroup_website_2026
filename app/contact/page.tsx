@@ -4,7 +4,6 @@ import { useState, useRef } from 'react'
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
 import { fadeInUp } from '@/lib/animations'
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { Contact } from '@/components/sections/Contact'
 import { SITE_SECTION_STAGGER } from '@/lib/siteScrollMotion'
@@ -77,7 +76,6 @@ function ContactFaqAccordion({ items }: { items: FaqItem[] }) {
 
         return (
           <div key={faq.question} data-scrub-item className="relative overflow-hidden py-4 sm:py-5">
-            <ScrubRule />
             <button
               type="button"
               id={triggerId}
@@ -156,7 +154,6 @@ export default function ContactPage() {
                   No jargon here—just how we usually work. Still unsure? Send the form anyway; we&apos;d rather read your note than lose you
                   to a FAQ.
                 </p>
-                <ScrubProgressLine />
               </motion.div>
               <ContactFaqAccordion items={faqItems} />
             </div>

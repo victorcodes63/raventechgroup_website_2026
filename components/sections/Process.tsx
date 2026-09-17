@@ -3,7 +3,6 @@
 import { useRef } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
@@ -48,7 +47,6 @@ function ProcessStepCard({
       {...motionProps}
       className="relative min-h-0 overflow-hidden border-t border-white/[0.06] px-0 pb-14 pt-10 lg:min-h-[240px]"
     >
-      {scrub ? <ScrubRule /> : null}
       <span
         className="absolute right-0 top-6 z-0 select-none text-[180px] font-bold leading-none tracking-[-0.04em] text-white/[0.06] lg:text-[220px]"
         aria-hidden
@@ -92,7 +90,6 @@ export function Process() {
             <p className="mt-3 max-w-2xl text-base leading-snug text-white/60 sm:max-w-3xl sm:text-[1.0625rem] sm:leading-relaxed xl:max-w-4xl">
               Four phases — same team end to end. No hand-offs to anonymous builders.
             </p>
-            <ScrubProgressLine />
           </div>
 
           <div className="relative w-full">

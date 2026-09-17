@@ -3,7 +3,6 @@ import { notFound } from 'next/navigation'
 import { ExternalLink } from 'lucide-react'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
-import { ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { ScrubScope } from '@/components/motion/ScrubScope'
 import { CaseStudyStickyMetricsBar } from '@/components/case-studies/CaseStudyStickyMetricsBar'
 import { RelatedContent } from '@/components/shared/RelatedContent'
@@ -200,7 +199,6 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
                   data-scrub-item
                   className="relative overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] px-5 py-6 text-center"
                 >
-                  <ScrubRule />
                   <p className="text-3xl font-bold text-[#FFA91F] md:text-4xl">{m.value}</p>
                   <p className="mt-2 text-xs font-semibold uppercase tracking-[0.12em] text-white/55">{m.label}</p>
                 </div>

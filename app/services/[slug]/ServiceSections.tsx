@@ -20,7 +20,6 @@ import { ClientTestimonialsSection } from '@/components/sections/ClientTestimoni
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import {
   serviceBenefitWatermarkVariants,
@@ -111,7 +110,6 @@ function CapabilityCard({ cap }: { cap: Capability }) {
       data-scrub-fade="0"
       className="group/cap relative grid h-full min-h-0 flex-1 grid-rows-[11rem_1fr] overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-6 transition-all duration-300 hover:scale-[1.01] hover:border-brand-500/40 hover:bg-[#161616] sm:grid-rows-[11.5rem_1fr] sm:p-8 lg:grid-rows-[12rem_1fr] lg:p-9"
     >
-      <ScrubRule />
       <div className="flex min-h-0 flex-col overflow-hidden">
         <h3 className="text-xl font-semibold leading-snug tracking-tight text-white">{cap.title}</h3>
         <p className="mt-3 line-clamp-4 text-[15px] leading-relaxed text-white/60">{cap.description}</p>
@@ -173,7 +171,6 @@ function ServiceSectionHeader({
           {description}
         </motion.p>
       ) : null}
-      <ScrubProgressLine className="mt-6" />
     </motion.div>
   )
 }
@@ -194,7 +191,6 @@ function ServiceFaqRow({
       data-scrub-fade="0"
       className={`relative overflow-hidden border-t border-white/[0.08] ${isLast ? 'border-b border-white/[0.08]' : ''}`}
     >
-      <ScrubRule />
       <button
         type="button"
         onClick={() => setOpen((o) => !o)}
@@ -444,7 +440,6 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                     variants={serviceWhatYouGetBlockVariants}
                     transition={{ delay: reducedMotion ? 0 : i * 0.1 }}
                   >
-                    <ScrubRule />
                     <p className="text-6xl font-bold leading-none text-white/[0.08]">
                       {String(i + 1).padStart(2, '0')}
                     </p>
@@ -880,7 +875,6 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                   <p className="mt-4 text-white/55">
                     Prefer a conversation? We respond within one business day.
                   </p>
-                  <ScrubProgressLine className="mt-6" />
                   <CTAButton href="/contact" variant="outline-dark" className="mt-8">
                     Contact
                   </CTAButton>
@@ -965,7 +959,6 @@ export function ServiceSections({ detail, service }: ServiceSectionsProps) {
                   data-scrub-fade="0"
                   className="group relative flex flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#0A0A0A] transition-all duration-300 hover:border-brand-500/40"
                 >
-                  <ScrubRule />
                   <Link href={post.href ?? `/insights/${post.slug}`} className="flex flex-1 flex-col">
                     {post.image ? (
                       <div className="relative aspect-[16/10] w-full overflow-hidden">

@@ -9,7 +9,6 @@ import {
   type IndustryFilterId,
 } from '@/components/case-studies/caseStudyIndustryFilters'
 import { CTAButton } from '@/components/ui/CTAButton'
-import { ScrubProgressLine } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 
 type CaseStudiesIndexClientProps = {
@@ -37,7 +36,6 @@ export function CaseStudiesIndexClient({ studies }: CaseStudiesIndexClientProps)
 
   return (
     <section ref={rootRef} className="space-y-12 lg:space-y-16">
-      <ScrubProgressLine className="mt-0" />
       <CaseStudyFilters active={filter} onChange={setFilter} />
 
       {filtered.length === 0 ? (

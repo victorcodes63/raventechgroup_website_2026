@@ -7,7 +7,6 @@ import { useMemo, useState, useRef } from 'react'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
-import { ScrubProgressLine } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import type { Insight } from '@/lib/data/insights'
 
@@ -149,7 +148,6 @@ export function InsightsEditorialPage({ insights }: InsightsEditorialPageProps) 
       <section className="bg-[#0A0A0A] pb-24 lg:pb-28">
         <div className="site-shell">
           <div className="content-wrap">
-            <ScrubProgressLine className="mb-8 mt-0" />
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeFilter}

@@ -400,22 +400,25 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
     return () => clearInterval(id)
   }, [paused, next, active])
 
-  /** Mobile carousel: align scroll position when `active` changes (autoplay, progress tap, desktop N/A). */
-  useLayoutEffect(() => {
+  const snapMobileSlide = useCallback((index: number) => {
     const container = mobileScrollRef.current
-    const slide = mobileSlideRefs.current[active]
+    const slide = mobileSlideRefs.current[index]
     if (!container || !slide) return
     const target = slide.offsetLeft
-    if (Math.abs(container.scrollLeft - target) < 8) return
+    if (Math.abs(container.scrollLeft - target) < 2) return
     mobileScrollSuppressRef.current = true
-    container.scrollTo({ left: target, behavior: reduced ? 'auto' : 'smooth' })
-    const done = window.setTimeout(() => {
+    container.scrollTo({ left: target, behavior: 'auto' })
+    window.setTimeout(() => {
       mobileScrollSuppressRef.current = false
-    }, reduced ? 50 : 500)
-    return () => clearTimeout(done)
-  }, [active, reduced])
+    }, 50)
+  }, [])
 
-  /** Mobile carousel: swipe / drag updates `active` for timer bars + autoplay. */
+  /** Keep the rail locked to the active card after autoplay or progress-bar taps. Instant — no smooth overshoot. */
+  useLayoutEffect(() => {
+    snapMobileSlide(active)
+  }, [active, snapMobileSlide])
+
+  /** Swipe / drag updates `active` once the snap settles. */
   useEffect(() => {
     const c = mobileScrollRef.current
     if (!c) return
@@ -436,8 +439,8 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
             best = i
           }
         })
-        setActive((prev) => (prev !== best ? best : prev))
-      }, 120)
+        setActive((prevActive) => (prevActive !== best ? best : prevActive))
+      }, 80)
     }
     c.addEventListener('scroll', onScroll, { passive: true })
     return () => {
@@ -449,7 +452,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
   return (
     <section
       ref={sectionRef}
-      className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-[#0A0A0A] pt-[60px] lg:pt-[72px]"
+      className="relative flex h-full min-h-0 w-full min-w-0 flex-col bg-[#0A0A0A] pt-[60px] md:pt-[72px]"
     >
       <motion.div className="relative flex min-h-0 w-full min-w-0 flex-1 flex-col">
       {/* Minimal abstract motion lines — parallax drift while scrolling through the hero */}
@@ -503,7 +506,7 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
         }}
       />
 
-      <div className="site-shell relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col justify-start pb-4 sm:pb-6 lg:pb-6 lg:pt-1">
+      <div className="site-shell relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col justify-start pt-8 pb-4 sm:pt-10 sm:pb-6 lg:pt-1 lg:pb-6">
         {/* ════════ Desktop: horizontal accordion ════════════ */}
         <motion.div
           className="relative hidden min-h-0 lg:flex lg:flex-1 lg:flex-col"
@@ -753,10 +756,10 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
                 i === active ? (
                   <motion.article
                     key={panel.id}
-                    initial={reduced ? false : { opacity: 0, y: 14 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={reduced ? undefined : { opacity: 0, transition: { duration: 0.15 } }}
-                    transition={reduced ? { duration: 0 } : { duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                    initial={reduced ? false : { opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={reduced ? undefined : { opacity: 0, transition: { duration: 0.2 } }}
+                    transition={reduced ? { duration: 0 } : { duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
                     className="relative isolate flex h-full min-h-0 flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-8 pb-6"
                   >
                     <div className="pointer-events-none absolute inset-0 -z-10">
@@ -842,79 +845,81 @@ export function Hero({ homepageIntakeSeamProgress = null }: HeroProps) {
         {/* ════════ Mobile carousel (below md) ════════════════════ */}
         <motion.div
           className="flex min-h-0 w-full min-w-0 flex-1 flex-col md:hidden"
-          initial={reduced ? false : { opacity: 0, y: 28 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={reduced ? { duration: 0 } : { duration: 1.05, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
+          initial={reduced ? false : { opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={reduced ? { duration: 0 } : { duration: 0.7, ease: [0.22, 1, 0.36, 1], delay: 0.08 }}
           role="region"
           aria-roledescription="carousel"
           aria-label="Hero highlights"
         >
-          <div
-            ref={mobileScrollRef}
-            className="-mx-5 flex min-h-0 flex-1 gap-3 overflow-x-auto overflow-y-visible scroll-pl-5 scroll-pr-5 snap-x snap-mandatory px-5 pb-1 [touch-action:pan-x_pan-y] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            data-lenis-prevent-horizontal
-            onTouchStart={() => setPaused(true)}
-            onTouchEnd={() => setPaused(false)}
-          >
-            {panels.map((panel, i) => {
-              const headlineClass =
-                'whitespace-pre-line text-[clamp(1.85rem,8vw,2.85rem)] font-bold leading-[1.0] tracking-[-0.03em] text-white antialiased [text-shadow:none]'
-              return (
-                <article
-                  key={panel.id}
-                  ref={(el) => {
-                    mobileSlideRefs.current[i] = el
-                  }}
-                  aria-label={`${i + 1} of ${panels.length}: ${panel.category}`}
-                  className="relative isolate flex min-h-[calc(100svh_-_140px)] w-[min(32rem,calc(100vw-2.75rem))] shrink-0 snap-start snap-always flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-5 pb-8 sm:p-8 sm:pb-10"
-                >
-                  <div className="pointer-events-none absolute inset-0 -z-10">
-                    <PanelBackdrop imageSrc={panel.imageSrc} priority={i === 0} />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-[#0A0A0A]/25 to-transparent" />
-                  </div>
-                  <div className="relative space-y-4">
-                    <div>
-                      <HeroCategoryChip category={panel.category} />
+          <div className="relative min-h-0 w-full min-w-0 flex-1 overflow-hidden">
+            <div
+              ref={mobileScrollRef}
+              className="hero-mobile-carousel flex h-full min-h-0 snap-x snap-mandatory overflow-x-auto overflow-y-hidden [touch-action:pan-x_pan-y] [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              data-lenis-prevent-horizontal
+              onTouchStart={() => setPaused(true)}
+              onTouchEnd={() => setPaused(false)}
+            >
+              {panels.map((panel, i) => {
+                const headlineClass =
+                  'whitespace-pre-line text-[clamp(1.85rem,8vw,2.85rem)] font-bold leading-[1.0] tracking-[-0.03em] text-white antialiased [text-shadow:none]'
+                return (
+                  <article
+                    key={panel.id}
+                    ref={(el) => {
+                      mobileSlideRefs.current[i] = el
+                    }}
+                    aria-label={`${i + 1} of ${panels.length}: ${panel.category}`}
+                    className="relative isolate flex h-full w-full min-w-full shrink-0 snap-start snap-always flex-col justify-end overflow-hidden rounded-card border border-white/[0.07] p-5 pb-8"
+                  >
+                    <div className="pointer-events-none absolute inset-0 -z-10">
+                      <PanelBackdrop imageSrc={panel.imageSrc} priority={i === 0} />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#0A0A0A]/80 via-[#0A0A0A]/25 to-transparent" />
                     </div>
-                    {i === 0 ? (
-                      <h1 className={headlineClass}>
-                        <HeroHeadline panel={panel} isOverview />
-                      </h1>
-                    ) : (
-                      <h2 className={headlineClass}>{panel.headline}</h2>
-                    )}
-                    <p className="max-w-sm text-[13px] leading-relaxed text-white/60">{panel.description}</p>
-                    <div>
-                      <CTAButton
-                        href={panel.cta.href}
-                        variant={i === 0 ? 'primary' : 'outline'}
-                        className="px-5 py-2.5 text-sm shadow-none"
-                      >
-                        {panel.cta.label}
-                      </CTAButton>
+                    <div className="relative space-y-4">
+                      <div>
+                        <HeroCategoryChip category={panel.category} />
+                      </div>
+                      {i === 0 ? (
+                        <h1 className={headlineClass}>
+                          <HeroHeadline panel={panel} isOverview />
+                        </h1>
+                      ) : (
+                        <h2 className={headlineClass}>{panel.headline}</h2>
+                      )}
+                      <p className="max-w-sm text-[13px] leading-relaxed text-white/60">{panel.description}</p>
+                      <div>
+                        <CTAButton
+                          href={panel.cta.href}
+                          variant={i === 0 ? 'primary' : 'outline'}
+                          className="px-5 py-2.5 text-sm shadow-none"
+                        >
+                          {panel.cta.label}
+                        </CTAButton>
+                      </div>
+                      <HeroConsultationRow staticEntrance />
+                      <div className="min-w-0">
+                        <HeroSocialBand panel={panel} layout="mobile" />
+                      </div>
                     </div>
-                    <HeroConsultationRow staticEntrance />
-                    <div className="min-w-0">
-                      <HeroSocialBand panel={panel} layout="mobile" />
+                    <div className="relative mt-6 flex min-w-0 flex-wrap gap-x-4 gap-y-1.5">
+                      {panel.tags.map((tag) => (
+                        <Link
+                          key={tag.label}
+                          href={tag.href}
+                          className="text-[11px] font-medium text-white/45 transition-colors hover:text-white"
+                        >
+                          {tag.label}
+                        </Link>
+                      ))}
                     </div>
-                  </div>
-                  <div className="relative mt-6 flex min-w-0 flex-wrap gap-x-4 gap-y-1.5">
-                    {panel.tags.map((tag) => (
-                      <Link
-                        key={tag.label}
-                        href={tag.href}
-                        className="text-[11px] font-medium text-white/45 transition-colors hover:text-white"
-                      >
-                        {tag.label}
-                      </Link>
-                    ))}
-                  </div>
-                </article>
-              )
-            })}
+                  </article>
+                )
+              })}
+            </div>
           </div>
 
-          <div className="mt-4 w-full px-5">
+          <div className="mt-4 w-full">
             <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.2em] text-white/30">
               Swipe to explore
             </p>

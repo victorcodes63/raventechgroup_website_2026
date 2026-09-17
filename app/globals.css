@@ -31,6 +31,15 @@
     overscroll-behavior-y: auto;
   }
 
+  /* Hero mobile rail: snap without iOS rubber-band bounce at the ends. */
+  html.lenis .hero-mobile-carousel,
+  .hero-mobile-carousel {
+    overscroll-behavior-x: none;
+    overscroll-behavior-y: none;
+    -webkit-overflow-scrolling: auto;
+    scroll-behavior: auto;
+  }
+
   body {
     @apply bg-[#0A0A0A] text-white font-light;
     font-feature-settings: 'rlig' 1, 'calt' 1;

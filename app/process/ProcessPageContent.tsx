@@ -2,7 +2,6 @@
 
 import { useRef } from 'react'
 
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { CTAButton } from '@/components/ui/CTAButton'
 import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRail'
@@ -25,7 +24,6 @@ export function ProcessPageContent() {
         <p className="mt-4 max-w-2xl text-base leading-relaxed text-white/60 lg:text-lg">
           Four phases — same team end to end. No hand-offs to anonymous builders.
         </p>
-        <ScrubProgressLine className="mt-10" />
 
         <MobileSwipeRail hint="Swipe steps" className="mt-16 md:hidden" aria-label="Engagement steps">
           {howWeWorkSteps.map(({ title, description }, index) => {
@@ -59,7 +57,6 @@ export function ProcessPageContent() {
                 data-scrub-item
                 className="relative min-h-0 overflow-hidden border-t border-white/[0.06] px-0 pb-14 pt-10 lg:min-h-[240px]"
               >
-                <ScrubRule />
                 <span
                   className="absolute right-0 top-6 z-0 select-none text-[180px] font-bold leading-none tracking-[-0.04em] text-white/[0.06] lg:text-[220px]"
                   aria-hidden

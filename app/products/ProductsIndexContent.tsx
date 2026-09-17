@@ -5,7 +5,6 @@ import { motion, useReducedMotion } from 'framer-motion'
 import Link from 'next/link'
 import { ArrowUpRight } from 'lucide-react'
 
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { getLiveProducts } from '@/lib/data/products'
@@ -36,7 +35,6 @@ export function ProductsIndexContent() {
                 Raven ships products alongside client work — platforms we run, improve, and deploy for organisations
                 across East Africa.
               </p>
-              <ScrubProgressLine />
             </motion.div>
 
             <ul className="mt-16 grid gap-6 md:grid-cols-2">
@@ -46,7 +44,6 @@ export function ProductsIndexContent() {
                     href={product.bridgeHref}
                     className="group relative flex h-full flex-col overflow-hidden rounded-card border border-white/[0.08] bg-[#111111] p-8 transition-all duration-300 hover:border-brand-500/40 hover:bg-[#161616]"
                   >
-                    <ScrubRule />
                       <div className="flex items-start justify-between gap-4">
                         <div>
                           <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-brand-500">

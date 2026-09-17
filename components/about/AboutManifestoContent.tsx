@@ -7,7 +7,6 @@ import { motion, useReducedMotion, useSpring, useTransform } from 'framer-motion
 
 import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 import { useSectionScrollProgress } from '@/components/motion/ScrollDrivenTypography'
 import { CTAButton } from '@/components/ui/CTAButton'
@@ -294,7 +293,6 @@ export function AboutManifestoContent() {
                     <span className="text-brand-500">phone number</span>, not a process diagram.
                   </p>
                 </motion.blockquote>
-                <ScrubProgressLine className="mt-10 lg:mt-14" />
 
                 <motion.div variants={serviceSectionHeaderChildVariants} className="mt-10 lg:mt-14">
                   <div className="h-px w-24 bg-gradient-to-r from-[#FFA91F] to-[#FFA91F]/10" aria-hidden />
@@ -335,7 +333,6 @@ export function AboutManifestoContent() {
                       data-scrub-item
                       className="group relative grid gap-2 overflow-hidden border-b border-white/[0.08] py-7 sm:grid-cols-[3rem_1fr] sm:gap-6"
                     >
-                      <ScrubRule />
                       <span className="font-mono text-xs font-semibold tabular-nums text-brand-500/70 sm:pt-1.5">
                         {String(i + 1).padStart(2, '0')}
                       </span>
@@ -372,7 +369,6 @@ export function AboutManifestoContent() {
                 <span className="text-white/40">won&apos;t compromise on.</span>
               </h2>
               <p className="mt-8 max-w-sm text-base leading-relaxed text-white/55">Five commitments you can hold us to.</p>
-              <ScrubProgressLine />
             </div>
 
             <motion.div
@@ -390,7 +386,6 @@ export function AboutManifestoContent() {
                   data-scrub-fade="0"
                   className="group relative overflow-hidden bg-[#050505] p-8 transition-colors duration-300 hover:bg-[#0a0a0a] lg:p-10"
                 >
-                  <ScrubRule />
                   <div className="flex items-start gap-6 lg:gap-8">
                     <div className="flex flex-shrink-0 flex-col items-center pt-2">
                       <span className="font-mono text-sm font-semibold text-[#FFA91F]">

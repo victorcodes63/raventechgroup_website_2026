@@ -11,7 +11,6 @@ import { MobileSwipeCard, MobileSwipeRail } from '@/components/ui/MobileSwipeRai
 import { SectionEyebrow } from '@/components/ui/SectionEyebrow'
 import { ArrowSwapRow } from '@/components/ui/ArrowSwapRow'
 import { ScrollReveal } from '@/components/motion/ScrollReveal'
-import { ScrubProgressLine, ScrubRule } from '@/components/motion/ScrubProgressLine'
 import { useScrubReveal } from '@/components/motion/useScrubReveal'
 
 function CaseStudyMedia({
@@ -343,7 +342,6 @@ export function CaseStudiesPreview() {
               <span className="h-1.5 w-1.5 rounded-full bg-[#FFA91F]" aria-hidden />
               {`${liveCount} live · ${caseStudiesOrdered.length - liveCount} in active delivery`}
             </div>
-            <ScrubProgressLine />
           </div>
         </div>
       </ScrollReveal>
@@ -367,16 +365,13 @@ export function CaseStudiesPreview() {
 
         <div className="hidden flex-col gap-5 lg:flex lg:gap-6">
           <div data-scrub-item data-scrub-fade="0" className="relative overflow-hidden">
-            <ScrubRule />
             <CaseStudyCard study={featured} priority reduced={reduced} variant="featured" />
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:gap-6">
             <div data-scrub-item data-scrub-fade="0" className="relative overflow-hidden">
-              <ScrubRule />
               <CaseStudyCard study={firstSupport} reduced={reduced} variant="support" />
             </div>
             <div data-scrub-item data-scrub-fade="0" className="relative overflow-hidden">
-              <ScrubRule />
               <CaseStudyCard study={secondSupport} reduced={reduced} variant="support" />
             </div>
           </div>
