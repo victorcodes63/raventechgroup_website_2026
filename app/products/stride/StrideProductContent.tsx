@@ -148,7 +148,25 @@ export function StrideProductContent() {
                 Modules that share one data layer
               </h2>
               <p className="mt-4 max-w-2xl text-lg text-white/60">
-                Full module detail, pricing, and industry packs live on{' '}
+                Full{' '}
+                <a
+                  href={`${product.marketingUrl}/platform`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-500 underline-offset-4 hover:underline"
+                >
+                  module detail
+                </a>
+                ,{' '}
+                <a
+                  href={`${product.marketingUrl}/pricing`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-brand-500 underline-offset-4 hover:underline"
+                >
+                  pricing
+                </a>
+                , and industry packs live on{' '}
                 <a
                   href={product.marketingUrl}
                   target="_blank"
@@ -212,7 +230,20 @@ export function StrideProductContent() {
                     <div className="flex h-full gap-4 rounded-card border border-white/[0.08] bg-[#111111] p-6">
                       <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-500" aria-hidden />
                       <div>
-                        <h3 className="text-lg font-semibold text-white">{industry.title}</h3>
+                        <h3 className="text-lg font-semibold text-white">
+                          {industry.href ? (
+                            <a
+                              href={industry.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="underline-offset-4 hover:text-brand-400 hover:underline"
+                            >
+                              {industry.title}
+                            </a>
+                          ) : (
+                            industry.title
+                          )}
+                        </h3>
                         <p className="mt-2 text-sm leading-relaxed text-white/60">{industry.description}</p>
                       </div>
                     </div>
@@ -229,7 +260,20 @@ export function StrideProductContent() {
                   >
                     <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0 text-brand-500" aria-hidden />
                     <div>
-                      <h3 className="text-lg font-semibold text-white">{industry.title}</h3>
+                      <h3 className="text-lg font-semibold text-white">
+                        {industry.href ? (
+                          <a
+                            href={industry.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="underline-offset-4 hover:text-brand-400 hover:underline"
+                          >
+                            {industry.title}
+                          </a>
+                        ) : (
+                          industry.title
+                        )}
+                      </h3>
                       <p className="mt-2 text-sm leading-relaxed text-white/60">{industry.description}</p>
                     </div>
                   </li>

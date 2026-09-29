@@ -13,6 +13,8 @@ export type ProductModule = {
 export type ProductIndustry = {
   title: string
   description: string
+  /** Deep link to the matching Stride industry page (SEO: passes authority + anchor text). */
+  href?: string
 }
 
 export type ProductProofPoint = {
@@ -90,18 +92,22 @@ export const products: readonly ProductItem[] = [
       {
         title: 'Logistics & cargo',
         description: 'Fleet, trips, POD, and settlement — billing on the same finance module as payroll.',
+        href: `${STRIDE_MARKETING_URL}/industries/logistics`,
       },
       {
         title: 'SACCOs',
         description: 'Member-trusted payroll, workforce operations, and board-ready reporting.',
+        href: `${STRIDE_MARKETING_URL}/industries/saccos`,
       },
       {
         title: 'Healthcare',
         description: 'Rota, biometric clock-in, and shift scheduling for clinical and support teams.',
+        href: `${STRIDE_MARKETING_URL}/industries/healthcare`,
       },
       {
         title: 'HR consultancies',
         description: 'Multi-client workforce, payroll, and client billing — the pattern we proved with Eagle HR.',
+        href: `${STRIDE_MARKETING_URL}/industries`,
       },
     ],
     proofPoints: [
