@@ -168,6 +168,8 @@ const SERVICE_SEO_KEYWORDS: Record<string, string[]> = {
     'Core Web Vitals Kenya',
     'headless CMS Kenya',
     'corporate website Nairobi',
+    'PR agency website Nairobi',
+    'print studio website Kenya',
     'e-commerce development East Africa',
     'technical SEO Kenya',
     'Lighthouse optimisation',
@@ -870,7 +872,7 @@ const serviceDetailsBase: Record<string, ServiceDetail> = {
       {
         question: 'Do you work with Shopify or WordPress?',
         answer:
-          'We build e-commerce on Shopify when it is the right fit — Honey Box Accessories is a live example. For content sites we usually recommend Next.js with a headless CMS for better performance and control.',
+          'We build e-commerce on Shopify when it is the right fit — Honey Box Accessories is a live example. For content and brand sites we ship Next.js — BP Creatives and Brown Paper are live Nairobi examples.',
       },
       {
         question: 'Can you take over a site built by someone else?',
@@ -880,14 +882,19 @@ const serviceDetailsBase: Record<string, ServiceDetail> = {
     ],
     relatedCaseStudies: [
       {
+        slug: 'bp-creatives',
+        client: 'BP Creatives',
+        outcome: 'Cinematic PR site for a Riverside agency — services, work, and events on one Next.js surface',
+      },
+      {
+        slug: 'brown-paper',
+        client: 'Brown Paper',
+        outcome: 'Editorial print-studio site with production language, service lines, and Nairobi proof',
+      },
+      {
         slug: 'honey-box-accessories',
         client: 'Honey Box Accessories',
         outcome: 'Shopify store with 6 product collections and gift package bundles',
-      },
-      {
-        slug: 'eagle-hr-consultants',
-        client: 'Eagle HR Consultants',
-        outcome: 'Corporate website plus full platform ecosystem',
       },
     ],
   },

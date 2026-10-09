@@ -91,11 +91,11 @@ export function getCaseStudyImageSrc(study: CaseStudy): { src: string; unoptimiz
 }
 
 /**
- * Detail-page hero backdrop. Stride's card uses the light marketing capture, but the
- * hero needs the dark dashboard crop so the H1 stays legible over the gradient.
+ * Detail-page hero backdrop. When `heroImage` is distinct from the card capture,
+ * use it so page headlines are not fighting the live-site screenshot.
  */
 export function getCaseStudyHeroSrc(study: CaseStudy): { src: string; unoptimized: boolean } {
-  if (study.slug === 'stride') {
+  if (study.heroImage && study.cardImage && study.heroImage !== study.cardImage) {
     return { src: study.heroImage, unoptimized: false }
   }
   return getCaseStudyImageSrc(study)
@@ -462,6 +462,120 @@ export const caseStudies: CaseStudy[] = [
       },
     ],
   },
+  {
+    slug: 'bp-creatives',
+    client: 'BP Creatives',
+    industry: 'PR & Communications',
+    industrySlug: 'communications',
+    location: 'Riverside, Nairobi, Kenya',
+    engagementLength: 'Live',
+    year: '2026',
+    heroImage: '/images/case-studies/bp-creatives-hero.jpg',
+    heroImageAlt: 'BP Creatives — Nairobi PR and communications photography',
+    cardImage: '/images/case-studies/bp-creatives-preview.jpg',
+    services: ['Web Development'],
+    stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
+    tagline: 'A PR firm’s public site, built to the standard they sell.',
+    problem:
+      'BP Creatives is a full-service PR and communications agency at Baraza Media Lab in Riverside. Their work is reputation, narrative, and earned attention — and the previous web presence did not match that brief. A generic agency template would have undercut every pitch before the first meeting.',
+    solution:
+      'Raven built the production marketing site on Next.js and shipped it on Vercel. The homepage carries a cinematic Nairobi hero, a seven-line services rail, about and work proof, events, and a direct path to hello@bpcreatives.africa. Routing covers About, Services, Work, Events, and Contact as one visual system — not a brochure stapled to a contact form.',
+    outcomeHeadline: 'A live .africa front door that reads like the agency, not a template.',
+    outcomeSummary:
+      'Visitors move from the Riverside story to services, featured work, and a call without leaving the brand system. Seven offerings — PR, brand strategy, content, social, events, partnerships, reputation — sit on one surface with photography and motion that hold up next to the work BP Creatives actually sells.',
+    metrics: [
+      { value: '7', label: 'Service lines on one site' },
+      { value: '5', label: 'Primary public routes' },
+      { value: 'Live', label: 'bpcreatives.africa' },
+    ],
+    featured: false,
+    status: 'live',
+    siteUrl: 'https://www.bpcreatives.africa/',
+    publishedAt: '2026-10-08',
+    tags: ['Web Development', 'PR', 'Next.js'],
+    platformModules: [
+      'Cinematic homepage and agency narrative',
+      'Seven-line services architecture',
+      'Work, events, and contact conversion paths',
+    ],
+    cta: 'Read the BP Creatives story',
+    sections: [
+      {
+        heading: 'A communications firm cannot look generic',
+        body:
+          'Buyers judge a PR agency in the first scroll. If the site looks like a purchased theme, the claim of craft collapses. BP Creatives needed a public surface that could sit in a pitch deck and on a phone in traffic — photography-forward, tight type, and a gold-on-dark system that belongs to them, not to a template library.',
+      },
+      {
+        heading: 'Services, work, and events as one product',
+        body:
+          'The IA is the brief: About, a services catalogue with dedicated pages, a work index, events, and contact. We built those routes as one Next.js product so navigation, motion, and conversion language stay consistent. The services rail is not decoration — it is how a visitor maps PR, brand, content, social, events, partnerships, and reputation without a PDF.',
+        image: '/images/case-studies/bp-creatives-hero.jpg',
+        imageAlt: 'BP Creatives team photography used on the production homepage',
+      },
+      {
+        heading: 'What ships in production',
+        body:
+          'The site is live at bpcreatives.africa — Next.js, TypeScript, Tailwind, Vercel. Contact is explicit: email, phone, and Baraza Media Lab, Riverside. That is the job of a marketing site for a Nairobi agency: look like the work, then make it easy to start a conversation.',
+      },
+    ],
+  },
+  {
+    slug: 'brown-paper',
+    client: 'Brown Paper',
+    industry: 'Print · Branding',
+    industrySlug: 'branding',
+    location: 'Nairobi, Kenya',
+    engagementLength: 'Live',
+    year: '2026',
+    heroImage: '/images/case-studies/brown-paper-hero.jpg',
+    heroImageAlt: 'Folded kraft paper from the Brown Paper studio site',
+    cardImage: '/images/case-studies/brown-paper-preview.jpg',
+    services: ['Web Development'],
+    stack: ['Next.js', 'TypeScript', 'Tailwind CSS', 'Vercel'],
+    tagline: 'A print studio site that feels like the press room.',
+    problem:
+      'Brown Paper designs, prints, and brands from a Nairobi studio — identity, packaging, press work, and event display. Their physical work already refuses to blend in. The website could not read as a stock catalogue with a contact form. It had to carry material, process, and studio proof the same way a press check does.',
+    solution:
+      'Raven built an editorial Next.js site with a split-frame homepage, kraft-paper photography, and production language that matches how the studio actually works: brief, design, proof, deliver. Four service lines — brand identity, packaging, printing, display — have dedicated pages. Portfolio, about, and contact sit in the same system, with M-Pesa and studio logistics left honest in the FAQ.',
+    outcomeHeadline: 'A live studio front door with production language, not catalogue filler.',
+    outcomeSummary:
+      'The site is live at brownpaper.co.ke. Visitors see the four studio lines, the four-step journey from brief to install, and Nairobi proof before they call. The footer credits Raven Tech Group because the build is part of the work, not a hidden vendor line.',
+    metrics: [
+      { value: '4', label: 'Studio service lines' },
+      { value: '4', label: 'Steps from brief to install' },
+      { value: 'Live', label: 'brownpaper.co.ke' },
+    ],
+    featured: false,
+    status: 'live',
+    siteUrl: 'https://brownpaper.co.ke/',
+    publishedAt: '2026-10-07',
+    tags: ['Web Development', 'Print', 'Next.js'],
+    platformModules: [
+      'Split-frame homepage and material photography',
+      'Brand, packaging, print, and display service pages',
+      'Brief-to-install process and studio contact',
+    ],
+    cta: 'Read the Brown Paper story',
+    sections: [
+      {
+        heading: 'The site had to feel like the work',
+        body:
+          'Brown Paper’s clients include operators who already have brand guidelines and events that need display tomorrow. A thin marketing page would have sold printing as a commodity. We treated the homepage as a studio frame: type, kraft texture, and a claim that matches the press — the work refuses to blend in.',
+        image: '/images/case-studies/brown-paper-hero.jpg',
+        imageAlt: 'Folded kraft paper photography from the Brown Paper site',
+      },
+      {
+        heading: 'Service lines as a studio system',
+        body:
+          'Brand identity, packaging, printing, and display each get a page with outputs a buyer can recognise — marks and guidelines, shelf-ready packs, press-ready stationery, event-ready banners. The process section is numbered the way a job bag is numbered: brief, design, proof, deliver. That is operations copy, not slogan copy.',
+      },
+      {
+        heading: 'What ships in production',
+        body:
+          'brownpaper.co.ke runs on Next.js and Vercel. About, services, portfolio, and contact are live. The studio states hours, a Nairobi floor, phone, and email without a chatbot in the way. The build is credited — Website by Raven Tech Group — because the relationship is meant to be visible.',
+      },
+    ],
+  },
 ]
 
 /** Featured first, then published date desc */
@@ -469,3 +583,99 @@ export const caseStudiesOrdered: CaseStudy[] = [...caseStudies].sort((a, b) => {
   if (a.featured !== b.featured) return a.featured ? -1 : 1
   return b.publishedAt.localeCompare(a.publishedAt)
 })
+
+const CASE_STUDY_SEO: Record<string, { title: string; description: string; keywords: string[] }> = {
+  'eagle-hr-consultants': {
+    title: 'Eagle HR Consultants — HR platform Nairobi',
+    description:
+      'Raven built Eagle HR’s recruitment, payroll, and client portal in Nairobi — KRA-compliant payroll and a marketing site that feeds the ATS. Case study.',
+    keywords: ['HR software Kenya', 'ATS Nairobi', 'payroll software Kenya', 'Eagle HR Consultants'],
+  },
+  stride: {
+    title: 'Stride — payroll and HR platform Kenya',
+    description:
+      'Stride is Raven’s business platform for Kenya and Uganda — people, payroll, finance, and M-Pesa disbursements on one system. Built in Nairobi.',
+    keywords: ['payroll software Kenya', 'HR platform East Africa', 'M-Pesa disbursements', 'Stride Kenya'],
+  },
+  'r4-automotive': {
+    title: 'R4 Automotive — M-Pesa quoting portal Kenya',
+    description:
+      'Self-service European parts quotes in KES with M-Pesa checkout. Raven integrated eBay and Autodoc APIs for R4 Automotive in Nairobi.',
+    keywords: ['M-Pesa integration Kenya', 'auto parts portal Nairobi', 'R4 Automotive'],
+  },
+  'honey-box-accessories': {
+    title: 'Honey Box Accessories — Shopify store Nairobi',
+    description:
+      'Raven built a Shopify store for Honey Box Accessories in Nairobi — six collections, M-Pesa and cards, nationwide shipping from Instagram DMs.',
+    keywords: ['Shopify Kenya', 'e-commerce Nairobi', 'Honey Box Accessories'],
+  },
+  'youthplus-festival-2026': {
+    title: 'Youth+ Africa — festival website Kenya',
+    description:
+      'Raven built the Youth+ Africa festival site — programme, speakers, and pass tiers on Next.js. Live at youthplusafrica.com.',
+    keywords: ['event website Kenya', 'festival website Nairobi', 'Youth+ Africa'],
+  },
+  'all-axs-events': {
+    title: 'All AXS — events ticketing platform Kenya',
+    description:
+      'Raven built All AXS, a Next.js events discovery and ticketing product for Nairobi organisers — fees, QR passes, and M-Pesa-ready checkout copy.',
+    keywords: ['event ticketing Kenya', 'corporate events platform Nairobi', 'All AXS'],
+  },
+  'bp-creatives': {
+    title: 'BP Creatives website — PR agency Nairobi',
+    description:
+      'Raven built the Next.js site for BP Creatives, a Riverside PR and communications agency. Services, work, and events live at bpcreatives.africa.',
+    keywords: [
+      'PR agency website Nairobi',
+      'communications website Kenya',
+      'Next.js web development Nairobi',
+      'BP Creatives',
+    ],
+  },
+  'brown-paper': {
+    title: 'Brown Paper website — print studio Nairobi',
+    description:
+      'Raven built the Next.js site for Brown Paper, a Nairobi print, design and branding studio. Service lines and studio process live at brownpaper.co.ke.',
+    keywords: [
+      'print studio website Kenya',
+      'branding agency website Nairobi',
+      'Next.js website Nairobi',
+      'Brown Paper Kenya',
+    ],
+  },
+}
+
+export function getCaseStudySeo(study: CaseStudy): { title: string; description: string; keywords: string[] } {
+  return (
+    CASE_STUDY_SEO[study.slug] ?? {
+      title: `${study.client} case study`,
+      description: study.tagline,
+      keywords: [...study.services, study.industry, 'Nairobi', 'Kenya'],
+    }
+  )
+}
+
+export function getCaseStudyOgImage(study: CaseStudy): string {
+  return study.cardImage ?? study.heroImage
+}
+
+/** Related studies: shared services first, then live, then recency. */
+export function getRelatedCaseStudies(slug: string, limit = 2): CaseStudy[] {
+  const current = caseStudies.find((c) => c.slug === slug)
+  if (!current) return []
+  return [...caseStudies]
+    .filter((c) => c.slug !== slug)
+    .sort((a, b) => {
+      const score = (s: CaseStudy) => {
+        let n = 0
+        if (s.industrySlug === current.industrySlug) n += 4
+        n += s.services.filter((svc) => current.services.includes(svc)).length
+        if (s.status === 'live') n += 1
+        return n
+      }
+      const diff = score(b) - score(a)
+      if (diff !== 0) return diff
+      return b.publishedAt.localeCompare(a.publishedAt)
+    })
+    .slice(0, limit)
+}

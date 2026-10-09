@@ -1,7 +1,7 @@
 /**
  * Home hero — overview panel only. Logos render in grayscale.
  * Files live in: public/images/clients/
- * All logos render at the same slot size (80 × 56 px) for visual consistency.
+ * Default slot: 80 × 56 px. Long wordmarks use `wideSlot` (128 × 56).
  */
 export type HeroClientLogo = {
   name: string
@@ -10,6 +10,8 @@ export type HeroClientLogo = {
   scale?: number
   /** Nudge mark horizontally (px). */
   offsetXPx?: number
+  /** Nudge mark vertically (px). Positive is down. */
+  offsetYPx?: number
   /** Service hero grid: use a wider cell for long marks. */
   wideSlot?: boolean
 }
@@ -20,4 +22,6 @@ export const heroClientLogos: HeroClientLogo[] = [
   { name: 'R4 Automotive', file: 'r4_logo.png', scale: 1.28 },
   { name: 'YouthPlus', file: 'youthplus.png' },
   { name: 'AllAxs', file: 'allaxs.png' },
+  { name: 'BP Creatives', file: 'bp-creatives.png', scale: 0.72, offsetYPx: 1 },
+  { name: 'Brown Paper', file: 'brown-paper.png', wideSlot: true },
 ]

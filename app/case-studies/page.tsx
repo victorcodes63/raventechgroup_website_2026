@@ -5,24 +5,28 @@ import { caseStudiesOrdered } from '@/lib/data/caseStudies'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.raventechgroup.com'
 
+const CASE_STUDIES_TITLE = 'Case studies — Nairobi software, websites, and platforms | Raven Tech Group'
+const CASE_STUDIES_DESCRIPTION =
+  'Live Raven work in Nairobi: HR platforms, M-Pesa integrations, PR and print studio websites, Shopify, and event products. Outcomes you can open in a browser.'
+
 export const metadata: Metadata = {
-  title: 'Case Studies | Raven Tech Group — Real Work, Real Outcomes',
-  description:
-    'Case studies from Raven Tech Group — SACCO platforms, M-Pesa integrations, HR systems, and e-commerce stores built for Kenyan businesses. Real outcomes, real metrics.',
+  title: { absolute: CASE_STUDIES_TITLE },
+  description: CASE_STUDIES_DESCRIPTION,
   keywords: [
     'raven tech group case studies',
-    'kenyan software case studies',
-    'sacco platform case study',
+    'web development Nairobi case study',
+    'PR website Kenya',
+    'print studio website Nairobi',
+    'HR software Kenya case study',
     'm-pesa integration case study',
-    'eagle hr case study',
+    'Next.js agency Nairobi',
   ],
   alternates: {
     canonical: `${siteUrl}/case-studies`,
   },
   openGraph: {
-    title: 'Case Studies | Raven Tech Group — Real Work, Real Outcomes',
-    description:
-      'Case studies from Raven Tech Group — SACCO platforms, M-Pesa integrations, HR systems, and e-commerce stores built for Kenyan businesses.',
+    title: CASE_STUDIES_TITLE,
+    description: CASE_STUDIES_DESCRIPTION,
     url: `${siteUrl}/case-studies`,
     siteName: 'Raven Tech Group',
     type: 'website',
@@ -30,8 +34,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Case Studies | Raven Tech Group',
-    description: 'Real engagements with measurable outcomes — Nairobi and Kenya.',
+    title: CASE_STUDIES_TITLE,
+    description: CASE_STUDIES_DESCRIPTION,
   },
   robots: { index: true, follow: true },
 }
@@ -68,8 +72,8 @@ export default function CaseStudiesPage() {
               Work that actually runs in production.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-relaxed text-white/65">
-              Real engagements for Kenyan teams — with outcomes you can trace to systems, not slide decks. Filters help
-              you find work close to your sector.
+              HR platforms, M-Pesa portals, and production websites for Nairobi teams — including BP Creatives and Brown
+              Paper. Outcomes you can open in a browser. Filter by sector.
             </p>
           </ScrollReveal>
         </div>

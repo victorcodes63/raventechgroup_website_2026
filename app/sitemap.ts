@@ -107,9 +107,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
   const caseStudyPages: MetadataRoute.Sitemap = caseStudies.map((study) => ({
     url: `${baseUrl}/case-studies/${study.slug}`,
-    lastModified: now,
+    lastModified: new Date(study.publishedAt),
     changeFrequency: 'monthly' as const,
-    priority: 0.7,
+    priority: study.featured ? 0.85 : study.status === 'live' ? 0.8 : 0.65,
   }))
 
   const insightPages: MetadataRoute.Sitemap = getPublishedInsights().map((insight) => ({

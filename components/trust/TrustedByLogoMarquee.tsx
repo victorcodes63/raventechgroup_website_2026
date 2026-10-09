@@ -10,20 +10,23 @@ import { heroClientLogos, type HeroClientLogo } from '@/lib/data/clientLogos'
 const rise = heroAccordionRiseVariants
 
 const LOGO_W = 80
+const LOGO_W_WIDE = 128
 const LOGO_H = 56
 
 function MarqueeLogoMark({ logo }: { logo: HeroClientLogo }) {
   const scale = logo.scale ?? 1
   const offsetX = logo.offsetXPx ?? 0
+  const offsetY = logo.offsetYPx ?? 0
+  const slotW = logo.wideSlot ? LOGO_W_WIDE : LOGO_W
   return (
     <div
       className="flex shrink-0 items-center justify-center"
-      style={{ width: LOGO_W, height: LOGO_H, minWidth: LOGO_W }}
+      style={{ width: slotW, height: LOGO_H, minWidth: slotW }}
     >
       <span
         className="relative block h-full w-full"
         style={{
-          transform: `translateX(${offsetX}px) scale(${scale})`,
+          transform: `translate(${offsetX}px, ${offsetY}px) scale(${scale})`,
           transformOrigin: 'center center',
         }}
       >
@@ -31,7 +34,7 @@ function MarqueeLogoMark({ logo }: { logo: HeroClientLogo }) {
           src={`/images/clients/${encodeURIComponent(logo.file)}`}
           alt=""
           fill
-          sizes="80px"
+          sizes={logo.wideSlot ? '128px' : '80px'}
           className="object-contain object-center brightness-0 invert opacity-50 transition-opacity duration-200 hover:opacity-80"
         />
       </span>

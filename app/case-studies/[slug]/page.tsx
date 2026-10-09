@@ -1,4 +1,5 @@
 import type { Metadata } from 'next'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { ExternalLink } from 'lucide-react'
 import { CTAButton } from '@/components/ui/CTAButton'
@@ -8,7 +9,14 @@ import { CaseStudyStickyMetricsBar } from '@/components/case-studies/CaseStudySt
 import { RelatedContent } from '@/components/shared/RelatedContent'
 import { SafeRasterImage } from '@/components/shared/SafeRasterImage'
 import { CaseStudyClientLogoBadge } from '@/components/case-studies/CaseStudyClientLogoBadge'
-import { caseStudies, getCaseStudyHeroSrc, getCaseStudyImageSrc } from '@/lib/data/caseStudies'
+import {
+  caseStudies,
+  getCaseStudyHeroSrc,
+  getCaseStudyImageSrc,
+  getCaseStudyOgImage,
+  getCaseStudySeo,
+  getRelatedCaseStudies,
+} from '@/lib/data/caseStudies'
 import type { CaseStudy } from '@/lib/data/caseStudies'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.raventechgroup.com'
@@ -21,19 +29,17 @@ export function generateStaticParams() {
   return caseStudies.map((study) => ({ slug: study.slug }))
 }
 
-function relatedFor(slug: string): CaseStudy[] {
-  return caseStudies.filter((c) => c.slug !== slug).slice(0, 2)
-}
-
-function caseStudyArticleJsonLd(study: CaseStudy, canonical: string) {
+function caseStudyJsonLd(study: CaseStudy, canonical: string) {
   const { src } = getCaseStudyImageSrc(study)
   const imageUrl = src.startsWith('http') ? src : `${siteUrl}${src}`
-  const data = {
+  const seo = getCaseStudySeo(study)
+  const article = {
     '@context': 'https://schema.org',
     '@type': 'Article',
-    headline: `${study.client} — case study`,
-    description: study.tagline,
+    headline: seo.title,
+    description: seo.description,
     datePublished: study.publishedAt,
+    dateModified: study.publishedAt,
     author: {
       '@type': 'Person',
       name: 'Victor Chumo',
@@ -46,12 +52,30 @@ function caseStudyArticleJsonLd(study: CaseStudy, canonical: string) {
       url: siteUrl,
     },
     image: imageUrl,
+    url: canonical,
     mainEntityOfPage: canonical,
     articleSection: study.industry,
-    keywords: study.services.join(', '),
+    keywords: seo.keywords.join(', '),
+    about: {
+      '@type': 'Organization',
+      name: study.client,
+      ...(study.siteUrl ? { url: study.siteUrl } : {}),
+    },
+  }
+  const breadcrumbs = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: siteUrl },
+      { '@type': 'ListItem', position: 2, name: 'Case studies', item: `${siteUrl}/case-studies` },
+      { '@type': 'ListItem', position: 3, name: study.client, item: canonical },
+    ],
   }
   return (
-    <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }} />
+    <>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(article) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbs) }} />
+    </>
   )
 }
 
@@ -60,27 +84,30 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const study = caseStudies.find((item) => item.slug === slug)
   if (!study) return {}
   const url = `${siteUrl}/case-studies/${study.slug}`
-  const title = `${study.client} | Case Study | Raven Tech Group`
-  const description = study.tagline
+  const seo = getCaseStudySeo(study)
+  const title = `${seo.title} | Raven Tech Group`
+  const ogImage = getCaseStudyOgImage(study)
+  const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${siteUrl}${ogImage}`
   return {
-    title,
-    description,
-    keywords: [...study.services, study.industry, 'Nairobi', 'Kenya', 'Raven Tech Group'],
+    title: { absolute: title },
+    description: seo.description,
+    keywords: [...seo.keywords, ...study.services, 'Nairobi', 'Kenya', 'Raven Tech Group'],
     alternates: { canonical: url },
     openGraph: {
       title,
-      description,
+      description: seo.description,
       url,
       siteName: 'Raven Tech Group',
       type: 'article',
       locale: 'en_KE',
       publishedTime: study.publishedAt,
-      images: [{ url: study.heroImage.startsWith('http') ? study.heroImage : `${siteUrl}${study.heroImage}`, width: 1200, height: 630 }],
+      images: [{ url: ogImageUrl, width: 1200, height: 630, alt: study.heroImageAlt }],
     },
     twitter: {
       card: 'summary_large_image',
       title,
-      description,
+      description: seo.description,
+      images: [ogImageUrl],
     },
     robots: { index: true, follow: true },
   }
@@ -93,18 +120,21 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
 
   const { src, unoptimized } = getCaseStudyHeroSrc(study)
   const canonical = `${siteUrl}/case-studies/${study.slug}`
-  const related = relatedFor(study.slug)
-  const relatedCards = related.map((r) => ({
-    href: `/case-studies/${r.slug}`,
-    title: r.client,
-    subtitle: r.industry,
-    image: r.heroImage,
-    imageAlt: r.heroImageAlt,
-  }))
+  const related = getRelatedCaseStudies(study.slug, 2)
+  const relatedCards = related.map((r) => {
+    const img = getCaseStudyImageSrc(r)
+    return {
+      href: `/case-studies/${r.slug}`,
+      title: r.client,
+      subtitle: r.industry,
+      image: img.src,
+      imageAlt: r.heroImageAlt,
+    }
+  })
 
   return (
     <main className="bg-[#0A0A0A] pb-24 text-white">
-      {caseStudyArticleJsonLd(study, canonical)}
+      {caseStudyJsonLd(study, canonical)}
       <section id="case-study-hero" className="relative min-h-[52vh] overflow-hidden border-b border-white/[0.06]">
         <div className="absolute inset-0">
           <SafeRasterImage
@@ -129,6 +159,21 @@ export default async function CaseStudyDetailPage({ params }: PageProps) {
           ) : null}
         </div>
         <div className="relative z-[2] mx-auto flex min-h-[52vh] max-w-7xl flex-col justify-end px-5 pb-12 pt-28 md:px-8 md:pb-20 md:pt-40 lg:px-12">
+          <nav aria-label="Breadcrumb" className="mb-5">
+            <ol className="flex flex-wrap items-center gap-2 text-xs font-medium text-white/50">
+              <li>
+                <Link href="/case-studies" className="transition-colors hover:text-white">
+                  Case studies
+                </Link>
+              </li>
+              <li aria-hidden className="text-white/25">
+                /
+              </li>
+              <li className="text-white/70" aria-current="page">
+                {study.client}
+              </li>
+            </ol>
+          </nav>
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#FFA91F]">
             Case study · {study.industry}
           </p>

@@ -8,6 +8,8 @@ export type IndustryFilterId =
   | 'hr'
   | 'automotive'
   | 'events'
+  | 'communications'
+  | 'branding'
 
 export const CASE_STUDY_INDUSTRY_FILTERS: { id: IndustryFilterId; label: string }[] = [
   { id: 'all', label: 'All' },
@@ -15,6 +17,8 @@ export const CASE_STUDY_INDUSTRY_FILTERS: { id: IndustryFilterId; label: string 
   { id: 'fintech', label: 'Fintech' },
   { id: 'ecommerce', label: 'E-commerce' },
   { id: 'events', label: 'Events' },
+  { id: 'communications', label: 'PR' },
+  { id: 'branding', label: 'Print & branding' },
   { id: 'hr', label: 'HR' },
   { id: 'automotive', label: 'Automotive' },
 ]
